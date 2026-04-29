@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clarity in Calm</title>
+  <style>
+    :root {
+      --bg: #1c1b2e;
+      --accent: #a78bfa;
+      --text: #f0eef6;
+      --secondary: #3b3460;
+      --surface: #252042;
+      --focus: #c4b5fd;
+      --tap-min: 48px;
+      --circle-size: min(58vw, 260px);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 700px at 20% -10%, #2d2552 0%, transparent 55%),
+        radial-gradient(900px 600px at 95% 10%, #2b2450 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      scroll-behavior: smooth;
+    }
+
+    main {
+      width: min(960px, 94vw);
+      margin: 0 auto;
+      padding: 1rem 0 2rem;
+    }
+
+    section {
+      min-height: 100vh;
+      display: grid;
+      align-content: center;
+      gap: 1.1rem;
+      padding: 1rem 0;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(59, 52, 96, 0.64), rgba(37, 32, 66, 0.86));
+      border: 1px solid rgba(167, 139, 250, 0.25);
+      border-radius: 1.15rem;
+      padding: 1.1rem;
+      box-shadow: 0 10px 30px rgba(9, 8, 18, 0.45), 0 0 24px rgba(167, 139, 250, 0.14);
+    }
+
+    h1,
+    h2,
+    p {
+      margin: 0;
+    }
+
+    .brand {
+      text-align: center;
+      font-size: clamp(2rem, 8vw, 3.5rem);
+      letter-spacing: 0.02em;
+      font-weight: 600;
+      text-shadow: 0 0 24px rgba(167, 139, 250, 0.35);
+    }
+
+    .tagline {
+      text-align: center;
+      color: #ddd5f6;
+      font-size: clamp(1rem, 3.8vw, 1.25rem);
+    }
+
+    .description {
+      text-align: center;
+      max-width: 66ch;
+      margin: 0 auto;
+      color: #e6e1f8;
+    }
+
+    .btn {
+      min-height: var(--tap-min);
+      padding: 0.75rem 1.2rem;
+      border: 1px solid rgba(167, 139, 250, 0.7);
+      border-radius: 0.8rem;
+      background: linear-gradient(180deg, #b59fff, #8e74ef);
+      color: #130f23;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 180ms ease, opacity 120ms ease;
+      box-shadow: 0 6px 20px rgba(167, 139, 250, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(167, 139, 250, 0.45);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-secondary {
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--text);
+      border-color: rgba(167, 139, 250, 0.5);
+      box-shadow: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .cta-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .save-list {
+      margin: 0.6rem 0 0;
+      padding-left: 1.15rem;
+    }
+
+    .save-list li {
+      margin-bottom: 0.35rem;
+    }
+
+    .top-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 0.2rem;
+    }
+
+    .lang-toggle {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: flex-end;
+    }
+
+    .lang-btn {
+      min-height: var(--tap-min);
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid rgba(167, 139, 250, 0.45);
+      background: rgba(59, 52, 96, 0.85);
+      color: var(--text);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+
+    .lang-btn[aria-pressed="true"] {
+      background: linear-gradient(180deg, #b19afd, #896ff0);
+      color: #170f2e;
+      font-weight: 700;
+      border-color: transparent;
+    }
+
+    .breathing-wrap {
+      display: grid;
+      gap: 1rem;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .circle-shell {
+      width: var(--circle-size);
+      height: var(--circle-size);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 30% 30%, rgba(167, 139, 250, 0.35), rgba(59, 52, 96, 0.35));
+      box-shadow: inset 0 0 30px rgba(167, 139, 250, 0.25), 0 0 32px rgba(167, 139, 250, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .breath-circle {
+      width: 62%;
+      height: 62%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #cdbefd 0%, #a78bfa 50%, #7560cb 100%);
+      box-shadow: 0 0 24px rgba(167, 139, 250, 0.6);
+      transform: scale(0.8);
+      transition: transform 900ms ease-in-out, filter 450ms ease;
+    }
+
+    .breath-circle.inhale {
+      transform: scale(1.1);
+      filter: brightness(1.05);
+    }
+
+    .breath-circle.hold {
+      animation: pulse 1400ms ease-in-out infinite;
+      transform: scale(1.1);
+    }
+
+    .breath-circle.hold.paused {
+      animation-play-state: paused;
+    }
+
+    .breath-circle.exhale {
+      transform: scale(0.72);
+      filter: brightness(0.94);
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1.06); }
+      50% { transform: scale(1.12); }
+      100% { transform: scale(1.06); }
+    }
+
+    .status-line {
+      font-size: clamp(1.1rem, 4vw, 1.4rem);
+      font-weight: 600;
+      color: #efeafd;
+    }
+
+    .timer {
+      font-size: clamp(2rem, 8vw, 2.8rem);
+      font-weight: 700;
+      color: #d8ccff;
+      text-shadow: 0 0 20px rgba(167, 139, 250, 0.35);
+      min-height: 1.2em;
+    }
+
+    .round-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.65rem;
+      font-size: 1rem;
+    }
+
+    .round-input {
+      width: 4.4rem;
+      min-height: var(--tap-min);
+      border-radius: 0.7rem;
+      border: 1px solid rgba(167, 139, 250, 0.5);
+      background: #211b3d;
+      color: var(--text);
+      padding: 0.3rem 0.45rem;
+      font-size: 1rem;
+    }
+
+    .controls {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(92px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .completion {
+      min-height: 1.4em;
+      color: #d9d0fb;
+      font-size: 1rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (min-width: 768px) {
+      section {
+        gap: 1.35rem;
+      }
+
+      .card {
+        padding: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section id="landing" aria-labelledby="brand-heading">
+      <h1 id="brand-heading" class="brand" data-i18n="brandName">Clarity in Calm</h1>
+      <p class="tagline" data-i18n="tagline">Science-backed stillness. No voice. No face. Just calm.</p>
+      <p class="description card" data-i18n="description">
+        Clarity in Calm guides you through a proven 4-7-8 breathing rhythm to ease stress and steady your nervous system.
+        Follow inhale, hold, and exhale cues at your own pace and return any time you need a quiet reset.
+      </p>
+      <div class="cta-wrap">
+        <button id="beginBtn" class="btn" type="button" data-i18n="beginBreathing">Begin Breathing</button>
+      </div>
+      <article class="card" aria-labelledby="save-heading">
+        <h2 id="save-heading" data-i18n="saveTitle">Save to Home Screen</h2>
+        <p data-i18n="saveThanks">Thank you for trying Clarity in Calm.</p>
+        <h3 data-i18n="iosTitle">On iOS (Safari)</h3>
+        <ol class="save-list">
+          <li data-i18n="iosStep1">Tap the Share button at the bottom of Safari.</li>
+          <li data-i18n="iosStep2">Scroll and choose Add to Home Screen.</li>
+          <li data-i18n="iosStep3">Tap Add in the top-right corner.</li>
+        </ol>
+        <h3 data-i18n="androidTitle">On Android (Chrome)</h3>
+        <ol class="save-list">
+          <li data-i18n="androidStep1">Tap the three-dot menu in Chrome.</li>
+          <li data-i18n="androidStep2">Tap Add to Home screen or Install app.</li>
+          <li data-i18n="androidStep3">Confirm by tapping Add or Install.</li>
+        </ol>
+      </article>
+    </section>
+
+    <section id="breathing" aria-labelledby="breathing-title">
+      <div class="top-row">
+        <div id="langToggle" class="lang-toggle" role="group" aria-label="Language selection">
+          <button class="lang-btn" type="button" data-lang="en" aria-pressed="true">🇺🇸 EN</button>
+          <button class="lang-btn" type="button" data-lang="ko" aria-pressed="false">🇰🇷 KO</button>
+          <button class="lang-btn" type="button" data-lang="es" aria-pressed="false">🇪🇸 ES</button>
+          <button class="lang-btn" type="button" data-lang="hi" aria-pressed="false">🇮🇳 HI</button>
+        </div>
+      </div>
+
+      <article class="card breathing-wrap">
+        <h2 id="breathing-title" data-i18n="exerciseTitle">4-7-8 Breathing Exercise</h2>
+        <div class="circle-shell" aria-hidden="true">
+          <div id="breathCircle" class="breath-circle"></div>
+        </div>
+        <p id="phaseLabel" class="status-line" aria-live="polite">Inhale</p>
+        <p id="timerDisplay" class="timer" aria-live="polite">4</p>
+        <p id="roundDisplay" class="status-line">Round 1 of 4</p>
+        <div class="round-row">
+          <label for="roundInput" data-i18n="roundsLabel">Rounds</label>
+          <input id="roundInput" class="round-input" type="number" min="1" max="12" value="4" inputmode="numeric">
+        </div>
+        <div class="controls">
+          <button id="startBtn" class="btn" type="button">Start</button>
+          <button id="pauseBtn" class="btn btn-secondary" type="button">Pause</button>
+          <button id="resetBtn" class="btn btn-secondary" type="button">Reset</button>
+        </div>
+        <p id="completionMessage" class="completion" role="status" aria-live="polite"></p>
+      </article>
+      <p id="srStatus" class="visually-hidden" aria-live="assertive"></p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const phases = [
+        { key: "inhale", duration: 4, circleClass: "inhale" },
+        { key: "hold", duration: 7, circleClass: "hold" },
+        { key: "exhale", duration: 8, circleClass: "exhale" }
+      ];
+
+      const i18n = {
+        en: {
+          htmlLang: "en",
+          brandName: "Clarity in Calm",
+          tagline: "Science-backed stillness. No voice. No face. Just calm.",
+          description: "Clarity in Calm guides you through a proven 4-7-8 breathing rhythm to ease stress and steady your nervous system. Follow inhale, hold, and exhale cues at your own pace and return any time you need a quiet reset.",
+          beginBreathing: "Begin Breathing",
+          saveTitle: "Save to Home Screen",
+          saveThanks: "Thank you for trying Clarity in Calm.",
+          iosTitle: "On iOS (Safari)",
+          iosStep1: "Tap the Share button at the bottom of Safari.",
+          iosStep2: "Scroll and choose Add to Home Screen.",
+          iosStep3: "Tap Add in the top-right corner.",
+          androidTitle: "On Android (Chrome)",
+          androidStep1: "Tap the three-dot menu in Chrome.",
+          androidStep2: "Tap Add to Home screen or Install app.",
+          androidStep3: "Confirm by tapping Add or Install.",
+          exerciseTitle: "4-7-8 Breathing Exercise",
+          roundsLabel: "Rounds",
+          inhale: "Inhale",
+          hold: "Hold",
+          exhale: "Exhale",
+          start: "Start",
+          pause: "Pause",
+          reset: "Reset",
+          roundCounter: (current, total) => "Round " + current + " of " + total,
+          complete: "Well done. Return here anytime."
+        },
+        ko: {
+          htmlLang: "ko",
+          brandName: "Clarity in Calm",
+          tagline: "과학으로 뒷받침된 고요함. 목소리 없이, 얼굴 없이, 오직 평온.",
+          description: "Clarity in Calm은 검증된 4-7-8 호흡 리듬으로 긴장을 낮추고 마음을 안정시키도록 안내합니다. 들이쉬기, 참기, 내쉬기를 따라가며 필요할 때 언제든 다시 돌아오세요.",
+          beginBreathing: "호흡 시작",
+          saveTitle: "홈 화면에 저장",
+          saveThanks: "Clarity in Calm을 사용해 주셔서 감사합니다.",
+          iosTitle: "iOS (Safari)",
+          iosStep1: "Safari 하단의 공유 버튼을 누르세요.",
+          iosStep2: "아래로 스크롤해 홈 화면에 추가를 선택하세요.",
+          iosStep3: "오른쪽 위의 추가를 누르세요.",
+          androidTitle: "Android (Chrome)",
+          androidStep1: "Chrome의 점 세 개 메뉴를 누르세요.",
+          androidStep2: "홈 화면에 추가 또는 앱 설치를 누르세요.",
+          androidStep3: "추가 또는 설치를 눌러 확인하세요.",
+          exerciseTitle: "4-7-8 호흡",
+          roundsLabel: "라운드",
+          inhale: "들이쉬기",
+          hold: "참기",
+          exhale: "내쉬기",
+          start: "시작",
+          pause: "일시정지",
+          reset: "초기화",
+          roundCounter: (current, total) => current + "번째 / " + total + " 라운드",
+          complete: "잘 하셨습니다. 언제든지 돌아오세요."
+        },
+        es: {
+          htmlLang: "es",
+          brandName: "Clarity in Calm",
+          tagline: "Quietud respaldada por la ciencia. Sin voz. Sin rostro. Solo calma.",
+          description: "Clarity in Calm te guía con el ritmo respiratorio 4-7-8 para reducir el estrés y recuperar estabilidad. Sigue las fases de inhalar, sostener y exhalar a tu ritmo y vuelve cuando necesites calma.",
+          beginBreathing: "Comenzar Respiración",
+          saveTitle: "Guardar en pantalla de inicio",
+          saveThanks: "Gracias por probar Clarity in Calm.",
+          iosTitle: "En iOS (Safari)",
+          iosStep1: "Toca el botón Compartir en la parte inferior de Safari.",
+          iosStep2: "Desplázate y elige Añadir a pantalla de inicio.",
+          iosStep3: "Toca Añadir en la esquina superior derecha.",
+          androidTitle: "En Android (Chrome)",
+          androidStep1: "Toca el menú de tres puntos en Chrome.",
+          androidStep2: "Toca Añadir a la pantalla principal o Instalar aplicación.",
+          androidStep3: "Confirma tocando Añadir o Instalar.",
+          exerciseTitle: "Ejercicio de Respiración 4-7-8",
+          roundsLabel: "Rondas",
+          inhale: "Inhalar",
+          hold: "Sostener",
+          exhale: "Exhalar",
+          start: "Iniciar",
+          pause: "Pausar",
+          reset: "Reiniciar",
+          roundCounter: (current, total) => "Ronda " + current + " de " + total,
+          complete: "Bien hecho. Regresa cuando quieras."
+        },
+        hi: {
+          htmlLang: "hi",
+          brandName: "Clarity in Calm",
+          tagline: "विज्ञान-समर्थित शांति। न आवाज़, न चेहरा, बस सुकून।",
+          description: "Clarity in Calm आपको 4-7-8 श्वास अभ्यास के साथ धीरे-धीरे तनाव कम करने में मदद करता है। श्वास लें, रोकें, और छोड़ें के संकेतों के साथ चलें और जब चाहें वापस आएं।",
+          beginBreathing: "श्वास शुरू करें",
+          saveTitle: "होम स्क्रीन पर सेव करें",
+          saveThanks: "Clarity in Calm आज़माने के लिए धन्यवाद।",
+          iosTitle: "iOS (Safari) पर",
+          iosStep1: "Safari के नीचे Share बटन दबाएं।",
+          iosStep2: "नीचे स्क्रॉल करके Add to Home Screen चुनें।",
+          iosStep3: "ऊपर दाईं ओर Add दबाएं।",
+          androidTitle: "Android (Chrome) पर",
+          androidStep1: "Chrome में तीन-बिंदु मेनू दबाएं।",
+          androidStep2: "Add to Home screen या Install app चुनें।",
+          androidStep3: "Add या Install दबाकर पुष्टि करें।",
+          exerciseTitle: "4-7-8 श्वास अभ्यास",
+          roundsLabel: "राउंड",
+          inhale: "श्वास लें",
+          hold: "रोकें",
+          exhale: "छोड़ें",
+          start: "शुरू करें",
+          pause: "रुकें",
+          reset: "रीसेट",
+          roundCounter: (current, total) => "राउंड " + current + " / " + total + " में से",
+          complete: "शाबाश। जब चाहें वापस आएं।"
+        }
+      };
+
+      const beginBtn = document.getElementById("beginBtn");
+      const langToggle = document.getElementById("langToggle");
+      const phaseLabel = document.getElementById("phaseLabel");
+      const timerDisplay = document.getElementById("timerDisplay");
+      const roundDisplay = document.getElementById("roundDisplay");
+      const completionMessage = document.getElementById("completionMessage");
+      const breathCircle = document.getElementById("breathCircle");
+      const startBtn = document.getElementById("startBtn");
+      const pauseBtn = document.getElementById("pauseBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const roundInput = document.getElementById("roundInput");
+      const srStatus = document.getElementById("srStatus");
+
+      let currentLang = "en";
+      let totalRounds = 4;
+      let currentRound = 1;
+      let phaseIndex = 0;
+      let remainingSeconds = phases[0].duration;
+      let timerId = null;
+      let running = false;
+
+      function getT() {
+        return i18n[currentLang];
+      }
+
+      function setCirclePhase(phaseKey) {
+        breathCircle.classList.remove("inhale", "hold", "exhale");
+        const phase = phases.find(function (entry) {
+          return entry.key === phaseKey;
+        });
+        if (phase) {
+          breathCircle.classList.add(phase.circleClass);
+        }
+      }
+
+      function renderStaticTexts() {
+        const t = getT();
+        document.documentElement.lang = t.htmlLang;
+        document.querySelectorAll("[data-i18n]").forEach(function (node) {
+          const key = node.getAttribute("data-i18n");
+          if (key && t[key]) {
+            node.textContent = t[key];
+          }
+        });
+        startBtn.textContent = t.start;
+        pauseBtn.textContent = t.pause;
+        resetBtn.textContent = t.reset;
+      }
+
+      function renderDynamicTexts() {
+        const t = getT();
+        const phase = phases[phaseIndex];
+        phaseLabel.textContent = t[phase.key];
+        timerDisplay.textContent = String(remainingSeconds);
+        roundDisplay.textContent = t.roundCounter(currentRound, totalRounds);
+      }
+
+      function resetState() {
+        clearInterval(timerId);
+        timerId = null;
+        running = false;
+        breathCircle.classList.remove("paused");
+        currentRound = 1;
+        phaseIndex = 0;
+        remainingSeconds = phases[0].duration;
+        completionMessage.textContent = "";
+        setCirclePhase(phases[0].key);
+        renderDynamicTexts();
+        srStatus.textContent = "";
+      }
+
+      function advancePhase() {
+        if (phaseIndex < phases.length - 1) {
+          phaseIndex += 1;
+        } else if (currentRound < totalRounds) {
+          currentRound += 1;
+          phaseIndex = 0;
+        } else {
+          clearInterval(timerId);
+          timerId = null;
+          running = false;
+          completionMessage.textContent = getT().complete;
+          srStatus.textContent = getT().complete;
+          return;
+        }
+
+        remainingSeconds = phases[phaseIndex].duration;
+        setCirclePhase(phases[phaseIndex].key);
+        renderDynamicTexts();
+        srStatus.textContent = phaseLabel.textContent + " " + timerDisplay.textContent;
+      }
+
+      function runTick() {
+        if (!running) {
+          return;
+        }
+        remainingSeconds -= 1;
+        if (remainingSeconds <= 0) {
+          advancePhase();
+          return;
+        }
+        timerDisplay.textContent = String(remainingSeconds);
+      }
+
+      function startBreathing() {
+        if (running) {
+          return;
+        }
+        if (!timerId) {
+          setCirclePhase(phases[phaseIndex].key);
+          renderDynamicTexts();
+          srStatus.textContent = phaseLabel.textContent + " " + timerDisplay.textContent;
+          timerId = setInterval(runTick, 1000);
+        }
+        running = true;
+        breathCircle.classList.remove("paused");
+        completionMessage.textContent = "";
+      }
+
+      function pauseBreathing() {
+        running = false;
+        breathCircle.classList.add("paused");
+      }
+
+      function applyLanguage(lang) {
+        currentLang = lang;
+        renderStaticTexts();
+        renderDynamicTexts();
+        if (!running && !timerId && completionMessage.textContent) {
+          completionMessage.textContent = getT().complete;
+        }
+      }
+
+      beginBtn.addEventListener("click", function () {
+        document.getElementById("breathing").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      langToggle.addEventListener("click", function (event) {
+        const target = event.target.closest("button[data-lang]");
+        if (!target) {
+          return;
+        }
+        const nextLang = target.getAttribute("data-lang");
+        if (!i18n[nextLang]) {
+          return;
+        }
+        langToggle.querySelectorAll("button[data-lang]").forEach(function (btn) {
+          btn.setAttribute("aria-pressed", String(btn === target));
+        });
+        applyLanguage(nextLang);
+      });
+
+      startBtn.addEventListener("click", startBreathing);
+      pauseBtn.addEventListener("click", pauseBreathing);
+      resetBtn.addEventListener("click", resetState);
+
+      roundInput.addEventListener("change", function () {
+        const parsed = Number.parseInt(roundInput.value, 10);
+        if (!Number.isFinite(parsed)) {
+          roundInput.value = String(totalRounds);
+          return;
+        }
+        totalRounds = Math.max(1, Math.min(12, parsed));
+        roundInput.value = String(totalRounds);
+        if (currentRound > totalRounds) {
+          currentRound = totalRounds;
+        }
+        renderDynamicTexts();
+      });
+
+      renderStaticTexts();
+      resetState();
+    }());
+  </script>
+</body>
+</html>
