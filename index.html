@@ -207,6 +207,10 @@
       transform: scale(1.1);
     }
 
+    .breath-circle.hold.paused {
+      animation-play-state: paused;
+    }
+
     .breath-circle.exhale {
       transform: scale(0.72);
       filter: brightness(0.94);
@@ -531,6 +535,7 @@
         clearInterval(timerId);
         timerId = null;
         running = false;
+        breathCircle.classList.remove("paused");
         currentRound = 1;
         phaseIndex = 0;
         remainingSeconds = phases[0].duration;
@@ -584,11 +589,13 @@
           timerId = setInterval(runTick, 1000);
         }
         running = true;
+        breathCircle.classList.remove("paused");
         completionMessage.textContent = "";
       }
 
       function pauseBreathing() {
         running = false;
+        breathCircle.classList.add("paused");
       }
 
       function applyLanguage(lang) {
