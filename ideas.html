@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Ideas — Clarity in Calm</title>
+  <style>
+    :root {
+      --bg: #1c1b2e;
+      --accent: #a78bfa;
+      --text: #f0eef6;
+      --secondary: #3b3460;
+      --surface: #252042;
+      --focus: #c4b5fd;
+      --tap-min: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: radial-gradient(1200px 700px at 20% -10%, #2d2552 0%, transparent 55%),
+        radial-gradient(900px 600px at 95% 10%, #2b2450 0%, transparent 50%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    main {
+      width: min(960px, 94vw);
+      margin: 0 auto;
+      padding: 1rem 0 3rem;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(59, 52, 96, 0.64), rgba(37, 32, 66, 0.86));
+      border: 1px solid rgba(167, 139, 250, 0.25);
+      border-radius: 1.15rem;
+      padding: 1.1rem;
+      box-shadow: 0 10px 30px rgba(9, 8, 18, 0.45), 0 0 24px rgba(167, 139, 250, 0.14);
+    }
+
+    h1, h2, h3, p {
+      margin: 0;
+    }
+
+    .brand {
+      text-align: center;
+      font-size: clamp(1.6rem, 6vw, 2.8rem);
+      letter-spacing: 0.02em;
+      font-weight: 600;
+      text-shadow: 0 0 24px rgba(167, 139, 250, 0.35);
+    }
+
+    .tagline {
+      text-align: center;
+      color: #ddd5f6;
+      font-size: clamp(0.95rem, 3.4vw, 1.15rem);
+    }
+
+    .btn {
+      min-height: var(--tap-min);
+      padding: 0.75rem 1.2rem;
+      border: 1px solid rgba(167, 139, 250, 0.7);
+      border-radius: 0.8rem;
+      background: linear-gradient(180deg, #b59fff, #8e74ef);
+      color: #130f23;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 120ms ease, box-shadow 180ms ease, opacity 120ms ease;
+      box-shadow: 0 6px 20px rgba(167, 139, 250, 0.35);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(167, 139, 250, 0.45);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: rgba(167, 139, 250, 0.1);
+      color: var(--text);
+      border-color: rgba(167, 139, 250, 0.5);
+      box-shadow: none;
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .cta-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.75rem;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    /* Form inputs and selects */
+    .text-input {
+      width: 100%;
+      min-height: var(--tap-min);
+      border-radius: 0.7rem;
+      border: 1px solid rgba(167, 139, 250, 0.5);
+      background: #211b3d;
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .text-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.2);
+      outline: none;
+    }
+
+    .text-input::placeholder {
+      color: rgba(240, 238, 246, 0.35);
+    }
+
+    select.text-input {
+      appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a78bfa' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 12px;
+      padding-right: 2.2rem;
+    }
+
+    select.text-input option {
+      background: #211b3d;
+      color: var(--text);
+    }
+
+    /* Field groups */
+    .field-group {
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .field-label {
+      font-size: 0.9rem;
+      color: #ddd5f6;
+      font-weight: 500;
+    }
+
+    /* Responsive 2-column grid for controls */
+    .controls-grid {
+      display: grid;
+      gap: 0.85rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 560px) {
+      .controls-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* Setup section */
+    #setup {
+      display: grid;
+      gap: 1.1rem;
+      padding: 0.5rem 0 0.25rem;
+    }
+
+    /* Series cards */
+    .series-card {
+      display: grid;
+      gap: 0;
+    }
+
+    .series-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid rgba(167, 139, 250, 0.15);
+      margin-bottom: 0.85rem;
+    }
+
+    .series-title {
+      font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+      font-weight: 700;
+      color: var(--focus);
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    .series-hook {
+      font-size: 0.9rem;
+      color: #ddd5f6;
+      margin: 0.3rem 0 0;
+      font-style: italic;
+    }
+
+    .series-section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin: 0 0 0.4rem;
+    }
+
+    .series-description {
+      font-size: 0.95rem;
+      color: #e6e1f8;
+      margin: 0 0 1rem;
+      line-height: 1.6;
+    }
+
+    .episode-list {
+      margin: 0 0 1rem;
+      padding-left: 1.25rem;
+      display: grid;
+      gap: 0.35rem;
+    }
+
+    .episode-list li {
+      font-size: 0.92rem;
+      color: #e6e1f8;
+      line-height: 1.5;
+    }
+
+    .episode-list li strong {
+      color: var(--text);
+    }
+
+    .channel-fit {
+      font-size: 0.88rem;
+      color: #c4b5fd;
+      line-height: 1.55;
+      margin: 0;
+      padding: 0.65rem 0.75rem;
+      background: rgba(167, 139, 250, 0.07);
+      border-radius: 0.6rem;
+      border-left: 2px solid var(--accent);
+    }
+
+    .btn-copy {
+      flex-shrink: 0;
+      min-height: auto;
+      height: 2.25rem;
+      padding: 0 0.75rem;
+      font-size: 0.8rem;
+      border-radius: 0.55rem;
+      white-space: nowrap;
+    }
+
+    .btn-copy.copied {
+      background: rgba(100, 220, 150, 0.2);
+      color: #7effc0;
+      border-color: rgba(100, 220, 150, 0.5);
+    }
+
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position: 400px 0; }
+    }
+
+    .btn.loading {
+      background: linear-gradient(90deg, #8e74ef 25%, #b59fff 50%, #8e74ef 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.6s infinite linear;
+      cursor: wait;
+      color: #130f23;
+    }
+
+    .key-saved   { color: #7effc0; }
+    .key-missing { color: #ff9eb5; }
+
+    #results {
+      margin-top: 0.5rem;
+    }
+
+    #resultsContainer {
+      display: grid;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 1.35rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <nav aria-label="Site navigation" style="display:flex;justify-content:space-between;align-items:center;padding:0.75rem 0 0.25rem;">
+      <a href="index.html" class="btn btn-secondary"
+         style="text-decoration:none;font-size:0.9rem;padding:0.45rem 0.9rem;min-height:var(--tap-min);display:inline-flex;align-items:center;gap:0.35rem;">
+        ← Breathing App
+      </a>
+      <span style="font-size:0.85rem;color:var(--accent);opacity:0.75;">Clarity in Calm</span>
+    </nav>
+
+    <header style="text-align:center;padding:1rem 0 0.75rem;">
+      <h1 class="brand">Content Idea Generator</h1>
+      <p class="tagline" style="margin-top:0.4rem;">Generate YouTube series ideas for your mindfulness channel.</p>
+    </header>
+
+    <section id="setup" aria-label="Generator settings">
+
+      <!-- API Key card -->
+      <article class="card" aria-labelledby="apikey-heading">
+        <h2 id="apikey-heading" style="margin:0 0 0.5rem;font-size:1.05rem;">Claude API Key</h2>
+        <p style="margin:0 0 0.75rem;font-size:0.9rem;color:#ddd5f6;">
+          Your key is stored only in this browser and never sent anywhere except the Claude API.
+        </p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input id="apiKeyInput" type="password" class="text-input" style="flex:1;min-width:200px;"
+                 placeholder="sk-ant-..." autocomplete="off" spellcheck="false" aria-label="Anthropic API key">
+          <button id="saveKeyBtn" class="btn" type="button" style="white-space:nowrap;">Save Key</button>
+          <button id="clearKeyBtn" class="btn btn-secondary" type="button" style="white-space:nowrap;">Clear</button>
+        </div>
+        <p id="keyStatus" style="margin:0.5rem 0 0;font-size:0.85rem;min-height:1.2em;" aria-live="polite"></p>
+      </article>
+
+      <!-- Controls card -->
+      <article class="card" aria-labelledby="controls-heading">
+        <h2 id="controls-heading" style="margin:0 0 1rem;font-size:1.05rem;">Series Parameters</h2>
+
+        <div class="controls-grid">
+          <div class="field-group">
+            <label for="themeInput" class="field-label">Series Theme</label>
+            <input id="themeInput" type="text" class="text-input"
+                   placeholder="e.g. sleep, anxiety relief, morning ritual">
+          </div>
+          <div class="field-group">
+            <label for="audienceInput" class="field-label">Target Audience</label>
+            <input id="audienceInput" type="text" class="text-input"
+                   placeholder="e.g. busy professionals, parents, teens">
+          </div>
+          <div class="field-group">
+            <label for="toneSelect" class="field-label">Tone &amp; Style</label>
+            <select id="toneSelect" class="text-input">
+              <option value="gentle">Gentle &amp; Nurturing</option>
+              <option value="scientific">Science-backed &amp; Calm</option>
+              <option value="meditative">Deeply Meditative</option>
+              <option value="practical">Practical &amp; Grounded</option>
+              <option value="poetic">Poetic &amp; Atmospheric</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="episodeCount" class="field-label">Episodes per Series</label>
+            <select id="episodeCount" class="text-input">
+              <option value="3">3 episodes (short series)</option>
+              <option value="5" selected>5 episodes (standard)</option>
+              <option value="7">7 episodes (week-long)</option>
+              <option value="10">10 episodes (deep dive)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group" style="margin-top:0.85rem;">
+          <label for="seriesCount" class="field-label">
+            Number of Series to Generate: <span id="seriesCountDisplay" style="color:var(--accent);font-weight:600;">3</span>
+          </label>
+          <input id="seriesCount" type="range" min="1" max="5" value="3"
+                 style="width:100%;accent-color:var(--accent);cursor:pointer;" aria-valuemin="1" aria-valuemax="5" aria-valuenow="3">
+        </div>
+      </article>
+
+      <!-- Generate button -->
+      <div class="cta-wrap" style="margin-top:0;">
+        <button id="generateBtn" class="btn" type="button" style="min-width:220px;">
+          Generate Series Ideas
+        </button>
+      </div>
+      <p id="errorMsg" style="text-align:center;color:#ff9eb5;min-height:1.4em;margin-top:0.25rem;font-size:0.95rem;" aria-live="polite"></p>
+
+    </section>
+
+    <section id="results" aria-label="Generated series ideas">
+      <div id="resultsHeader" hidden>
+        <h2 class="brand" style="font-size:clamp(1.3rem,5vw,2rem);text-align:center;margin:1.5rem 0 1rem;">
+          Generated Series
+        </h2>
+      </div>
+      <div id="resultsContainer"></div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var API_URL = "https://api.anthropic.com/v1/messages";
+      var LS_KEY  = "clarityInCalm_apiKey";
+
+      var lastSeriesData = [];
+
+      var apiKeyInput        = document.getElementById("apiKeyInput");
+      var saveKeyBtn         = document.getElementById("saveKeyBtn");
+      var clearKeyBtn        = document.getElementById("clearKeyBtn");
+      var keyStatus          = document.getElementById("keyStatus");
+      var themeInput         = document.getElementById("themeInput");
+      var audienceInput      = document.getElementById("audienceInput");
+      var toneSelect         = document.getElementById("toneSelect");
+      var episodeCount       = document.getElementById("episodeCount");
+      var seriesCount        = document.getElementById("seriesCount");
+      var seriesCountDisplay = document.getElementById("seriesCountDisplay");
+      var generateBtn        = document.getElementById("generateBtn");
+      var errorMsg           = document.getElementById("errorMsg");
+      var resultsHeader      = document.getElementById("resultsHeader");
+      var resultsContainer   = document.getElementById("resultsContainer");
+
+      var SYSTEM_PROMPT = [
+        "You are a creative director and YouTube content strategist specializing in mindfulness,",
+        "breathwork, meditation, and wellness content. Your job is to generate YouTube video series",
+        "ideas for the channel \"Clarity in Calm\" — a faceless, ambient mindfulness channel that uses",
+        "only visual cues, breathing animations, and calm soundscapes. No talking heads, no narration,",
+        "no commentary, no flashy editing. The aesthetic is dark, deep purple gradients, minimal, serene.",
+        "",
+        "Your output MUST be valid JSON — nothing before or after the JSON object.",
+        "Return exactly this structure with no markdown code fences, no explanation text:",
+        "",
+        "{",
+        "  \"series\": [",
+        "    {",
+        "      \"title\": \"Series name (short, evocative)\",",
+        "      \"hook\": \"One-sentence subtitle or pitch for the series\",",
+        "      \"description\": \"2-3 sentence overview of the series arc and viewer benefit\",",
+        "      \"episodes\": [",
+        "        { \"number\": 1, \"title\": \"Episode title\", \"description\": \"One sentence on what this episode does\" }",
+        "      ],",
+        "      \"channelFit\": \"1-2 sentences explaining why this fits Clarity in Calm specifically\"",
+        "    }",
+        "  ]",
+        "}"
+      ].join("\n");
+
+      var toneDescriptions = {
+        gentle:     "warm, tender, and emotionally supportive",
+        scientific: "grounded in neuroscience and evidence-based wellness",
+        meditative: "deeply contemplative and spiritually open",
+        practical:  "action-oriented, habit-focused, and results-driven",
+        poetic:     "lyrical, imagistic, and atmosphere-rich"
+      };
+
+      function buildUserPrompt(theme, audience, tone, episodes, count) {
+        var themeClause   = theme.trim()
+          ? "The series theme should revolve around: " + theme.trim() + "."
+          : "Choose themes that would resonate broadly on a mindfulness channel.";
+        var audienceClause = audience.trim()
+          ? "The target audience is: " + audience.trim() + "."
+          : "Assume a general adult audience seeking stress relief and better sleep.";
+        var toneDesc = toneDescriptions[tone] || "calm and gentle";
+
+        return [
+          "Generate " + count + " distinct YouTube content series ideas.",
+          themeClause,
+          audienceClause,
+          "The tone and style should be " + toneDesc + ".",
+          "Each series should have exactly " + episodes + " episodes.",
+          "Make the series titles poetic and evocative, not generic.",
+          "Each episode title should be self-contained enough to stand alone as a search result.",
+          "Remember: this is a faceless, ambient video channel — no narration, no hosts.",
+          "Return only the JSON structure as specified."
+        ].join(" ");
+      }
+
+      async function callClaude(apiKey, userPrompt) {
+        var response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": apiKey,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true"
+          },
+          body: JSON.stringify({
+            model: "claude-sonnet-4-6",
+            max_tokens: 4096,
+            system: SYSTEM_PROMPT,
+            messages: [{ role: "user", content: userPrompt }]
+          })
+        });
+
+        if (!response.ok) {
+          var err = {};
+          try { err = await response.json(); } catch (e) {}
+          throw new Error(
+            (err && err.error && err.error.message)
+              ? err.error.message
+              : "API request failed (" + response.status + ")"
+          );
+        }
+
+        var data = await response.json();
+        return data.content[0].text;
+      }
+
+      function parseResponse(rawText) {
+        var cleaned = rawText.trim()
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/```\s*$/, "")
+          .trim();
+
+        var parsed;
+        try {
+          parsed = JSON.parse(cleaned);
+        } catch (e) {
+          throw new Error("Could not parse the response as JSON. Please try again.");
+        }
+
+        if (!parsed.series || !Array.isArray(parsed.series) || parsed.series.length === 0) {
+          throw new Error("Unexpected response format. Please try again.");
+        }
+
+        return parsed.series.map(function (s) {
+          return {
+            title:       String(s.title       || "Untitled Series"),
+            hook:        String(s.hook        || ""),
+            description: String(s.description || ""),
+            episodes:    Array.isArray(s.episodes) ? s.episodes : [],
+            channelFit:  String(s.channelFit  || "")
+          };
+        });
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function seriesAsText(series) {
+        var lines = [];
+        lines.push("=== " + series.title + " ===");
+        lines.push(series.hook);
+        lines.push("");
+        lines.push("OVERVIEW");
+        lines.push(series.description);
+        lines.push("");
+        lines.push("EPISODES");
+        series.episodes.forEach(function (ep) {
+          lines.push(ep.number + ". " + ep.title + " — " + ep.description);
+        });
+        lines.push("");
+        lines.push("WHY THIS FITS CLARITY IN CALM");
+        lines.push(series.channelFit);
+        return lines.join("\n");
+      }
+
+      function copyHandler(btn, series) {
+        var text = seriesAsText(series);
+        var doFallback = function () {
+          var ta = document.createElement("textarea");
+          ta.value = text;
+          ta.style.cssText = "position:fixed;opacity:0;pointer-events:none;";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showCopied(btn);
+        };
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () {
+            showCopied(btn);
+          }).catch(doFallback);
+        } else {
+          doFallback();
+        }
+      }
+
+      function showCopied(btn) {
+        btn.textContent = "Copied!";
+        btn.classList.add("copied");
+        setTimeout(function () {
+          btn.textContent = "Copy";
+          btn.classList.remove("copied");
+        }, 2000);
+      }
+
+      function renderSeriesCard(series, index) {
+        var card = document.createElement("article");
+        card.className = "card series-card";
+        card.setAttribute("aria-labelledby", "series-title-" + index);
+
+        var episodeItems = series.episodes.map(function (ep) {
+          return "<li><strong>" + escHtml(ep.title) + "</strong> — " + escHtml(ep.description) + "</li>";
+        }).join("");
+
+        card.innerHTML =
+          '<div class="series-card-header">' +
+            '<div>' +
+              '<h3 id="series-title-' + index + '" class="series-title">' + escHtml(series.title) + '</h3>' +
+              '<p class="series-hook">' + escHtml(series.hook) + '</p>' +
+            '</div>' +
+            '<button class="btn btn-secondary btn-copy" type="button" data-index="' + index + '" aria-label="Copy series to clipboard">Copy</button>' +
+          '</div>' +
+          '<p class="series-section-label">Overview</p>' +
+          '<p class="series-description">' + escHtml(series.description) + '</p>' +
+          '<p class="series-section-label">Episodes</p>' +
+          '<ol class="episode-list">' + episodeItems + '</ol>' +
+          '<p class="series-section-label">Channel Fit</p>' +
+          '<p class="channel-fit">' + escHtml(series.channelFit) + '</p>';
+
+        return card;
+      }
+
+      function setLoadingState(isLoading) {
+        generateBtn.disabled = isLoading;
+        if (isLoading) {
+          generateBtn.textContent = "Thinking…";
+          generateBtn.classList.add("loading");
+        } else {
+          generateBtn.textContent = "Generate Series Ideas";
+          generateBtn.classList.remove("loading");
+        }
+      }
+
+      function renderResults(seriesList) {
+        resultsHeader.hidden = false;
+        resultsContainer.innerHTML = "";
+        seriesList.forEach(function (series, index) {
+          var card = renderSeriesCard(series, index);
+          resultsContainer.appendChild(card);
+        });
+        resultsContainer.querySelectorAll(".btn-copy").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var idx = parseInt(btn.getAttribute("data-index"), 10);
+            copyHandler(btn, lastSeriesData[idx]);
+          });
+        });
+        resultsHeader.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      // API key management
+      function loadSavedKey() {
+        var saved = localStorage.getItem(LS_KEY);
+        if (saved) {
+          apiKeyInput.value = saved;
+          showKeyStatus("Key saved.", "key-saved");
+        }
+      }
+
+      function saveKey() {
+        var val = apiKeyInput.value.trim();
+        if (!val) { showKeyStatus("Enter a key first.", "key-missing"); return; }
+        localStorage.setItem(LS_KEY, val);
+        showKeyStatus("Key saved.", "key-saved");
+      }
+
+      function clearKey() {
+        localStorage.removeItem(LS_KEY);
+        apiKeyInput.value = "";
+        showKeyStatus("Key cleared.", "key-missing");
+      }
+
+      function showKeyStatus(msg, cls) {
+        keyStatus.textContent = msg;
+        keyStatus.className = cls || "";
+      }
+
+      function getApiKey() {
+        return apiKeyInput.value.trim() || localStorage.getItem(LS_KEY) || "";
+      }
+
+      // Range slider live display
+      seriesCount.addEventListener("input", function () {
+        seriesCountDisplay.textContent = seriesCount.value;
+        seriesCount.setAttribute("aria-valuenow", seriesCount.value);
+      });
+
+      // Generate
+      generateBtn.addEventListener("click", async function () {
+        var apiKey = getApiKey();
+        if (!apiKey) {
+          errorMsg.textContent = "Please enter and save your Claude API key first.";
+          apiKeyInput.focus();
+          return;
+        }
+
+        errorMsg.textContent = "";
+        setLoadingState(true);
+        resultsContainer.innerHTML = "";
+        resultsHeader.hidden = true;
+
+        try {
+          var userPrompt = buildUserPrompt(
+            themeInput.value,
+            audienceInput.value,
+            toneSelect.value,
+            episodeCount.value,
+            seriesCount.value
+          );
+          var rawText = await callClaude(apiKey, userPrompt);
+          lastSeriesData = parseResponse(rawText);
+          renderResults(lastSeriesData);
+        } catch (err) {
+          errorMsg.textContent = err.message || "Something went wrong. Please try again.";
+        } finally {
+          setLoadingState(false);
+        }
+      });
+
+      // Init
+      saveKeyBtn.addEventListener("click", saveKey);
+      clearKeyBtn.addEventListener("click", clearKey);
+      apiKeyInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") saveKey();
+      });
+
+      loadSavedKey();
+    }());
+  </script>
+</body>
+</html>
