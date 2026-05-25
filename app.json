@@ -8,9 +8,17 @@
     "scheme": "clarityincalm",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "bundleIdentifier": "com.clarityincalm.app",
+      "icon": "./assets/images/icon.png",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Used for profile photos.",
+        "NSCameraUsageDescription": "Used for profile photos."
+      }
     },
     "android": {
+      "package": "com.clarityincalm.app",
+      "jsEngine": "hermes",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -19,9 +27,18 @@
       },
       "predictiveBackGestureEnabled": false
     },
+    "newArchEnabled": true,
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "name": "Clarity in Calm",
+      "shortName": "Clarity",
+      "description": "A mindfulness app for breathing, journaling, and tracking your wellness.",
+      "themeColor": "#208AEF",
+      "backgroundColor": "#E6F4FE",
+      "display": "standalone",
+      "orientation": "portrait",
+      "lang": "en"
     },
     "plugins": [
       "expo-router",
@@ -34,7 +51,8 @@
             "imageWidth": 76
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
