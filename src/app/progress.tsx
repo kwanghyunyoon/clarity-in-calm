@@ -2,6 +2,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Spacing } from '@/constants/theme';
+import { useLocale } from '@/context/language-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
@@ -22,6 +23,7 @@ function toFixed1OrDash(val: number | null) {
 export default function ProgressScreen() {
   const colors = useTheme();
   const t = useTranslation();
+  const { locale } = useLocale();
   const { entries, breathingSessions, streak } = useWellness();
   const moods = t.moods;
 
@@ -32,25 +34,32 @@ export default function ProgressScreen() {
       ? entries.reduce((s, e) => s + e.mood, 0) / entries.length
       : null;
 
-  // Mood distribution (highest to lowest)
+  // Mood distribution (highest to lowest) — clamp index to [0,4] to prevent crashes
   const moodDist = [5, 4, 3, 2, 1].map((v) => {
     const count = entries.filter((e) => e.mood === v).length;
-    return { ...moods[v - 1], count };
+    const idx = Math.max(0, Math.min(4, v - 1));
+    return { ...moods[idx], count };
   });
   const maxCount = Math.max(...moodDist.map((m) => m.count), 1);
 
+  // YYYY-MM-DD helper — consistent local-timezone date key (mirrors wellness-context)
+  const toLocalDateStr = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
   // Weekly activity
   const weekActivity = week.map((day) => {
+    const dayKey = toLocalDateStr(day);
     const dayEntries = entries.filter(
-      (e) => new Date(e.date).toDateString() === day.toDateString()
+      (e) => toLocalDateStr(new Date(e.date)) === dayKey
     );
-    const moodAvg =
-      dayEntries.length > 0
-        ? Math.round(dayEntries.reduce((s, e) => s + e.mood, 0) / dayEntries.length)
-        : 0;
-    const isToday = day.toDateString() === new Date().toDateString();
+    // Clamp moodAvg to [1,5] so moods[moodAvg-1] never goes out of bounds
+    const rawAvg = dayEntries.length > 0
+      ? Math.round(dayEntries.reduce((s, e) => s + e.mood, 0) / dayEntries.length)
+      : 0;
+    const moodAvg = rawAvg > 0 ? Math.max(1, Math.min(5, rawAvg)) : 0;
+    const isToday = toLocalDateStr(day) === toLocalDateStr(new Date());
     return {
-      dayShort: day.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayShort: day.toLocaleDateString(locale, { weekday: 'short' }),
       dayNum:   day.getDate(),
       moodAvg,
       hasEntry: dayEntries.length > 0,
@@ -176,6 +185,94 @@ export default function ProgressScreen() {
           </View>
         )}
 
+        {/* ── Insights ── */}
+        {!isEmpty && (() => {
+          const ins = t.progress.insights;
+
+          // Most common mood
+          const topEntry = [...moodDist].sort((a, b) => b.count - a.count)[0];
+          const topMoodInfo = topEntry && topEntry.count > 0 ? topEntry : null;
+
+          // Mood trend: avg of last 7 days vs avg of previous 7 days
+          const now = new Date();
+          const last7Start  = new Date(now); last7Start.setDate(now.getDate() - 6);
+          const prev7Start  = new Date(now); prev7Start.setDate(now.getDate() - 13);
+          const prev7End    = new Date(now); prev7End.setDate(now.getDate() - 7);
+
+          const isInRange = (d: Date, from: Date, to: Date) => d >= from && d <= to;
+          const last7Entries = entries.filter((e) => isInRange(new Date(e.date), last7Start, now));
+          const prev7Entries = entries.filter((e) => isInRange(new Date(e.date), prev7Start, prev7End));
+
+          const avg = (arr: typeof entries) =>
+            arr.length > 0 ? arr.reduce((s, e) => s + e.mood, 0) / arr.length : null;
+          const last7Avg = avg(last7Entries);
+          const prev7Avg = avg(prev7Entries);
+
+          let trendText = ins.trend.none;
+          if (last7Avg !== null && prev7Avg !== null) {
+            const diff = last7Avg - prev7Avg;
+            trendText = diff >  0.2 ? ins.trend.up
+                      : diff < -0.2 ? ins.trend.down
+                      : ins.trend.flat;
+          }
+
+          // Best day of week
+          const dayTotals: Record<number, { sum: number; count: number }> = {};
+          entries.forEach((e) => {
+            const dow = new Date(e.date).getDay(); // 0=Sun … 6=Sat
+            if (!dayTotals[dow]) dayTotals[dow] = { sum: 0, count: 0 };
+            dayTotals[dow].sum   += e.mood;
+            dayTotals[dow].count += 1;
+          });
+          const dayAvgs = Object.entries(dayTotals).map(([dow, v]) => ({
+            dow: Number(dow),
+            avg: v.sum / v.count,
+          }));
+          const bestDow = dayAvgs.length >= 2
+            ? dayAvgs.reduce((best, d) => d.avg > best.avg ? d : best)
+            : null;
+          const bestDayName = bestDow
+            ? new Date(2024, 0, bestDow.dow + 7).toLocaleDateString(locale, { weekday: 'long' })
+            : null;
+
+          return (
+            <View style={[s.card, { backgroundColor: colors.backgroundElement }]}>
+              <Text style={[s.cardTitle, { color: colors.text }]}>{ins.title}</Text>
+
+              {/* Top mood */}
+              {topMoodInfo && (
+                <View style={s.insightRow}>
+                  <Text style={s.insightEmoji}>{topMoodInfo.emoji}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[s.insightLabel, { color: colors.textSecondary }]}>{ins.topMood}</Text>
+                    <Text style={[s.insightValue, { color: colors.text }]}>{topMoodInfo.label}</Text>
+                  </View>
+                </View>
+              )}
+
+              {/* Trend */}
+              <View style={s.insightRow}>
+                <Text style={s.insightEmoji}>📈</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.insightLabel, { color: colors.textSecondary }]}>{ins.trend.label}</Text>
+                  <Text style={[s.insightValue, { color: colors.text }]}>{trendText}</Text>
+                </View>
+              </View>
+
+              {/* Best day */}
+              <View style={s.insightRow}>
+                <Text style={s.insightEmoji}>📅</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[s.insightLabel, { color: colors.textSecondary }]}>{ins.bestDay}</Text>
+                  <Text style={[s.insightValue, { color: colors.text }]}>
+                    {bestDayName ?? ins.noPattern}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          );
+        })()}
+
         {/* ── Empty state ── */}
         {isEmpty && (
           <View style={[s.card, { backgroundColor: colors.backgroundElement, alignItems: 'center', paddingVertical: Spacing.five }]}>
@@ -235,6 +332,11 @@ const s = StyleSheet.create({
   barTrack:     { flex: 1, height: 10, borderRadius: 5, overflow: 'hidden' },
   barFill:      { height: '100%', borderRadius: 5 },
   barCount:     { fontSize: 12, fontWeight: '600' },
+
+  insightRow:   { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  insightEmoji: { fontSize: 20, width: 28, textAlign: 'center' },
+  insightLabel: { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+  insightValue: { fontSize: 15, fontWeight: '700', marginTop: 1 },
 
   motivEmoji:   { fontSize: 32, textAlign: 'center' },
   motivTitle:   { fontSize: 16, fontWeight: '700' },

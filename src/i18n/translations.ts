@@ -85,6 +85,8 @@ export const en = {
       breatheSub:   'Box breathing · 4 min',
       journalTitle: 'Journal',
       journalSub:   'Reflect & log mood',
+      groundTitle:  'Ground',
+      groundSub:    '5-4-3-2-1 · Reset now',
     },
     progress: {
       title:    'Your progress',
@@ -126,6 +128,30 @@ export const en = {
     startBreathing: 'Start breathing',
     infoText:
       'Box breathing activates your parasympathetic nervous system, reducing stress and improving focus. Each phase lasts 4 seconds.',
+  },
+
+  // ── Ground ────────────────────────────────────────────────────────────────
+  ground: {
+    title:    'Grounding',
+    subtitle: '5 – 4 – 3 – 2 – 1  ·  Back to now',
+    intro:    'Anxiety pulls you out of the present. This 2-minute exercise brings you back by engaging your senses one at a time.',
+    steps: [
+      { count: 5, emoji: '👁️',  sense: 'See',   instruction: 'Name 5 things you can SEE',            tip: 'Look around slowly — a wall, your hand, a window, a color, a shadow…' },
+      { count: 4, emoji: '🤲',  sense: 'Touch',  instruction: 'Name 4 things you can TOUCH or FEEL',  tip: 'Clothes on your skin, floor under your feet, the chair, air temperature…' },
+      { count: 3, emoji: '👂',  sense: 'Hear',   instruction: 'Name 3 sounds you can HEAR',           tip: 'Your breath, traffic, a fan, birds, the hum of silence…' },
+      { count: 2, emoji: '👃',  sense: 'Smell',  instruction: 'Name 2 things you can SMELL',          tip: 'Your drink, the air, soap, nearby food — or just take a slow breath…' },
+      { count: 1, emoji: '👅',  sense: 'Taste',  instruction: 'Name 1 thing you can TASTE',           tip: 'Water, gum, food — or simply notice the taste in your mouth right now…' },
+    ] as const,
+    next:  'Next',
+    done:  'Done',
+    complete: {
+      emoji: '🌿',
+      title: "You're present",
+      body:  'Your nervous system has been brought back to now. Take one slow breath and carry this calm with you.',
+      again: 'Run again',
+      back:  'Back to Home',
+    },
+    infoText: 'The 5-4-3-2-1 technique interrupts anxious thought spirals by activating your senses. Widely used by therapists worldwide — and it costs nothing.',
   },
 
   // ── Journal ───────────────────────────────────────────────────────────────
@@ -224,6 +250,19 @@ export const en = {
       title: 'Start your journey',
       body:  'Log your first mood in the Journal tab to see your progress here.',
     },
+    insights: {
+      title:    'Insights',
+      topMood:  'Most logged mood',
+      trend: {
+        label: 'Mood trend',
+        up:    '↑ Improving vs last week',
+        down:  '↓ Declining vs last week',
+        flat:  '→ Stable vs last week',
+        none:  'Log more entries to see your trend',
+      },
+      bestDay:   'Best day of your week',
+      noPattern: 'Keep logging to discover patterns',
+    },
   },
 } as const;
 
@@ -293,6 +332,8 @@ export const ko: Translations = {
       breatheSub:   '박스 호흡 · 4분',
       journalTitle: '일기 쓰기',
       journalSub:   '기분 기록하기',
+      groundTitle:  '그라운딩',
+      groundSub:    '5-4-3-2-1 · 지금 안정하기',
     },
     progress: {
       title:    '나의 진행 상황',
@@ -333,6 +374,29 @@ export const ko: Translations = {
     startBreathing: '호흡 시작',
     infoText:
       '박스 호흡은 부교감 신경계를 활성화하여 스트레스를 줄이고 집중력을 향상시킵니다. 각 단계는 4초입니다.',
+  },
+
+  ground: {
+    title:    '그라운딩',
+    subtitle: '5 – 4 – 3 – 2 – 1  ·  지금 이 순간으로',
+    intro:    '불안은 당신을 현재에서 끌어냅니다. 이 2분짜리 운동은 감각을 하나씩 활성화하여 현재로 되돌려줘요.',
+    steps: [
+      { count: 5, emoji: '👁️',  sense: '보이는 것', instruction: '지금 볼 수 있는 것 5가지',       tip: '천천히 주위를 살펴보세요 — 벽, 손, 창문, 색깔, 그림자…' },
+      { count: 4, emoji: '🤲',  sense: '느끼는 것', instruction: '몸으로 느낄 수 있는 것 4가지',   tip: '바닥에 닿은 발, 옷감, 의자, 공기의 온도…' },
+      { count: 3, emoji: '👂',  sense: '들리는 것', instruction: '들을 수 있는 소리 3가지',         tip: '숨소리, 차 소리, 선풍기, 새소리, 고요함의 소음…' },
+      { count: 2, emoji: '👃',  sense: '냄새',      instruction: '맡을 수 있는 것 2가지',           tip: '음료, 공기, 비누, 음식 — 아니면 천천히 숨을 들이마시세요…' },
+      { count: 1, emoji: '👅',  sense: '맛',        instruction: '느낄 수 있는 맛 1가지',           tip: '물, 껌, 음식 — 아니면 지금 입 안의 맛을 느껴보세요…' },
+    ] as const,
+    next:  '다음',
+    done:  '완료',
+    complete: {
+      emoji: '🌿',
+      title: '지금 여기에 있어요',
+      body:  '신경계가 현재 순간으로 돌아왔어요. 천천히 한 번 숨을 쉬고, 이 평온함을 이어가세요.',
+      again: '다시 하기',
+      back:  '홈으로',
+    },
+    infoText: '5-4-3-2-1 기법은 감각을 활성화해 불안한 생각의 소용돌이를 끊어줘요. 전 세계 치료사들이 활용하는 방법이고, 아무런 도구도 필요 없어요.',
   },
 
   journal: {
@@ -431,6 +495,19 @@ export const ko: Translations = {
       title: '여정을 시작하세요',
       body:  '일기 탭에서 첫 번째 기분을 기록하면 여기서 진행 상황을 볼 수 있어요.',
     },
+    insights: {
+      title:    '인사이트',
+      topMood:  '가장 많이 기록한 기분',
+      trend: {
+        label: '기분 추세',
+        up:    '↑ 지난 주보다 나아지고 있어요',
+        down:  '↓ 지난 주보다 낮아졌어요',
+        flat:  '→ 지난 주와 비슷해요',
+        none:  '추세를 보려면 더 기록해보세요',
+      },
+      bestDay:   '기분이 가장 좋은 요일',
+      noPattern: '매일 기록하면 패턴이 보여요',
+    },
   },
 };
 
@@ -500,6 +577,8 @@ export const es: Translations = {
       breatheSub:   'Respiración caja · 4 min',
       journalTitle: 'Diario',
       journalSub:   'Reflexionar y registrar',
+      groundTitle:  'Enraizar',
+      groundSub:    '5-4-3-2-1 · Vuelve al presente',
     },
     progress: {
       title:    'Tu progreso',
@@ -540,6 +619,29 @@ export const es: Translations = {
     startBreathing: 'Iniciar respiración',
     infoText:
       'La respiración de caja activa tu sistema nervioso parasimpático, reduciendo el estrés y mejorando la concentración. Cada fase dura 4 segundos.',
+  },
+
+  ground: {
+    title:    'Enraizamiento',
+    subtitle: '5 – 4 – 3 – 2 – 1  ·  Regresa al presente',
+    intro:    'La ansiedad te aleja del momento presente. Este ejercicio de 2 minutos te devuelve activando tus sentidos uno a uno.',
+    steps: [
+      { count: 5, emoji: '👁️',  sense: 'Ver',      instruction: 'Nombra 5 cosas que puedas VER',            tip: 'Mira lentamente — una pared, tu mano, una ventana, un color, una sombra…' },
+      { count: 4, emoji: '🤲',  sense: 'Sentir',   instruction: 'Nombra 4 cosas que puedas TOCAR o SENTIR', tip: 'La ropa en tu piel, el suelo bajo tus pies, la silla, la temperatura del aire…' },
+      { count: 3, emoji: '👂',  sense: 'Escuchar', instruction: 'Nombra 3 sonidos que puedas ESCUCHAR',     tip: 'Tu respiración, el tráfico, un ventilador, pájaros, el silencio…' },
+      { count: 2, emoji: '👃',  sense: 'Oler',     instruction: 'Nombra 2 cosas que puedas OLER',           tip: 'Tu bebida, el aire, jabón, comida cercana — o toma una respiración lenta…' },
+      { count: 1, emoji: '👅',  sense: 'Saborear', instruction: 'Nombra 1 cosa que puedas SABOREAR',        tip: 'Agua, chicle, comida — o simplemente nota el sabor en tu boca ahora mismo…' },
+    ] as const,
+    next:  'Siguiente',
+    done:  'Listo',
+    complete: {
+      emoji: '🌿',
+      title: 'Estás presente',
+      body:  'Tu sistema nervioso ha vuelto al momento presente. Respira hondo una vez y lleva esta calma contigo.',
+      again: 'Repetir',
+      back:  'Volver al inicio',
+    },
+    infoText: 'La técnica 5-4-3-2-1 interrumpe las espirales de ansiedad activando tus sentidos. Utilizada por terapeutas en todo el mundo — y no cuesta nada.',
   },
 
   journal: {
@@ -636,6 +738,19 @@ export const es: Translations = {
       title: 'Comienza tu viaje',
       body:  'Registra tu primer estado de ánimo en la pestaña Diario para ver tu progreso aquí.',
     },
+    insights: {
+      title:    'Perspectivas',
+      topMood:  'Estado de ánimo más registrado',
+      trend: {
+        label: 'Tendencia del ánimo',
+        up:    '↑ Mejorando vs la semana pasada',
+        down:  '↓ Bajando vs la semana pasada',
+        flat:  '→ Estable vs la semana pasada',
+        none:  'Registra más entradas para ver tu tendencia',
+      },
+      bestDay:   'Tu mejor día de la semana',
+      noPattern: 'Sigue registrando para descubrir patrones',
+    },
   },
 };
 
@@ -705,6 +820,8 @@ export const hi: Translations = {
       breatheSub:   'बॉक्स ब्रीदिंग · 4 मिनट',
       journalTitle: 'डायरी',
       journalSub:   'भावनाएँ लिखें',
+      groundTitle:  'ग्राउंड',
+      groundSub:    '5-4-3-2-1 · अभी करें',
     },
     progress: {
       title:    'आपकी प्रगति',
@@ -745,6 +862,29 @@ export const hi: Translations = {
     startBreathing: 'साँस लेना शुरू करें',
     infoText:
       'बॉक्स ब्रीदिंग आपके पैरासिम्पेथेटिक नर्वस सिस्टम को सक्रिय करती है, तनाव कम करती है और एकाग्रता बढ़ाती है। प्रत्येक चरण 4 सेकंड का है।',
+  },
+
+  ground: {
+    title:    'ग्राउंडिंग',
+    subtitle: '5 – 4 – 3 – 2 – 1  ·  अभी वापस आएँ',
+    intro:    'चिंता आपको वर्तमान से दूर ले जाती है। यह 2 मिनट का अभ्यास आपकी इंद्रियों को एक-एक करके जगाकर आपको वापस लाता है।',
+    steps: [
+      { count: 5, emoji: '👁️',  sense: 'देखना',       instruction: '5 चीज़ें जो आप देख सकते हैं',              tip: 'धीरे-धीरे चारों ओर देखें — एक दीवार, आपका हाथ, खिड़की, कोई रंग, छाया…' },
+      { count: 4, emoji: '🤲',  sense: 'महसूस करना',  instruction: '4 चीज़ें जो आप छू सकते हैं या महसूस कर सकते हैं', tip: 'कपड़ों का अहसास, पैरों तले फर्श, कुर्सी, हवा का तापमान…' },
+      { count: 3, emoji: '👂',  sense: 'सुनना',        instruction: '3 आवाज़ें जो आप सुन सकते हैं',             tip: 'अपनी साँस, वाहनों की आवाज़, पंखा, पक्षी, खामोशी की गूँज…' },
+      { count: 2, emoji: '👃',  sense: 'सूँघना',       instruction: '2 चीज़ें जो आप सूँघ सकते हैं',            tip: 'आपका पेय, हवा, साबुन, पास का खाना — या धीरे से साँस लें…' },
+      { count: 1, emoji: '👅',  sense: 'स्वाद',        instruction: '1 चीज़ जो आप स्वाद में महसूस कर सकते हैं', tip: 'पानी, गम, खाना — या बस अभी मुँह के स्वाद पर ध्यान दें…' },
+    ] as const,
+    next:  'अगला',
+    done:  'हो गया',
+    complete: {
+      emoji: '🌿',
+      title: 'आप वर्तमान में हैं',
+      body:  'आपका तंत्रिका तंत्र वर्तमान क्षण में वापस आ गया। एक धीमी साँस लें और यह शांति अपने साथ रखें।',
+      again: 'फिर करें',
+      back:  'होम पर वापस',
+    },
+    infoText: '5-4-3-2-1 तकनीक आपकी इंद्रियों को सक्रिय करके चिंता के चक्र को तोड़ती है। दुनिया भर के थेरेपिस्ट इसका उपयोग करते हैं — और इसके लिए कुछ भी चाहिए नहीं।',
   },
 
   journal: {
@@ -839,6 +979,19 @@ export const hi: Translations = {
     empty: {
       title: 'अपनी यात्रा शुरू करें',
       body:  'अपना पहला मूड डायरी टैब में दर्ज करें और यहाँ अपनी प्रगति देखें।',
+    },
+    insights: {
+      title:    'अंतर्दृष्टि',
+      topMood:  'सबसे अधिक दर्ज किया गया मूड',
+      trend: {
+        label: 'मूड प्रवृत्ति',
+        up:    '↑ पिछले सप्ताह से बेहतर',
+        down:  '↓ पिछले सप्ताह से कम',
+        flat:  '→ पिछले सप्ताह जैसा',
+        none:  'प्रवृत्ति देखने के लिए अधिक प्रविष्टियाँ करें',
+      },
+      bestDay:   'आपका सबसे अच्छा दिन',
+      noPattern: 'पैटर्न खोजने के लिए रोज़ लिखते रहें',
     },
   },
 };

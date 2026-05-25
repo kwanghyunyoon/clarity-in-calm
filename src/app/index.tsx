@@ -43,8 +43,11 @@ export default function HomeScreen() {
     weekday: 'long', month: 'long', day: 'numeric',
   });
 
+  const toLocalDateStr = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
   const todayEntries = entries.filter(
-    (e) => new Date(e.date).toDateString() === today.toDateString()
+    (e) => toLocalDateStr(new Date(e.date)) === toLocalDateStr(today)
   );
 
   // True when the user has never logged anything yet
@@ -109,9 +112,16 @@ export default function HomeScreen() {
 
         {/* ── Today's mood ── */}
         <View style={s.section}>
-          <Text style={[s.sectionTitle, { color: colors.text }]}>
-            {todayMood ? t.home.moodToday : t.home.moodPrompt}
-          </Text>
+          <View style={s.moodHeader}>
+            <Text style={[s.sectionTitle, { color: colors.text, marginBottom: 0 }]}>
+              {todayMood ? t.home.moodToday : t.home.moodPrompt}
+            </Text>
+            {todayMood && (
+              <Text style={[s.moodUpdateHint, { color: colors.textSecondary }]}>
+                {t.home.moodUpdateHint}
+              </Text>
+            )}
+          </View>
           <View style={s.moodRow}>
             {moods.map((m) => {
               const active = todayMood === m.value;
@@ -162,6 +172,18 @@ export default function HomeScreen() {
               </View>
               <Text style={[s.actionTitle, { color: colors.text }]}>{t.home.actions.journalTitle}</Text>
               <Text style={[s.actionSub, { color: colors.textSecondary }]}>{t.home.actions.journalSub}</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[s.actionCard, { backgroundColor: colors.backgroundElement }]}
+              activeOpacity={0.8}
+              onPress={() => router.push('/ground')}
+            >
+              <View style={[s.actionIcon, { backgroundColor: '#9C6FDE' + '33' }]}>
+                <Text style={{ fontSize: 28 }}>🌿</Text>
+              </View>
+              <Text style={[s.actionTitle, { color: colors.text }]}>{t.home.actions.groundTitle}</Text>
+              <Text style={[s.actionSub, { color: colors.textSecondary }]}>{t.home.actions.groundSub}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -216,7 +238,7 @@ export default function HomeScreen() {
           <View style={s.section}>
             <Text style={[s.sectionTitle, { color: colors.text }]}>{t.home.todayEntries}</Text>
             {todayEntries.slice(0, 3).map((entry) => {
-              const mood = moods[entry.mood - 1];
+              const mood = moods[Math.max(0, Math.min(moods.length - 1, entry.mood - 1))] ?? moods[0];
               return (
                 <View key={entry.id} style={[s.entryCard, { backgroundColor: colors.backgroundElement }]}>
                   <Text style={s.entryEmoji}>{mood?.emoji}</Text>
@@ -231,6 +253,11 @@ export default function HomeScreen() {
                 </View>
               );
             })}
+            {todayEntries.length > 3 && (
+              <Text style={[s.moreEntries, { color: colors.textSecondary }]}>
+                +{todayEntries.length - 3} {t.home.moreEntries}
+              </Text>
+            )}
           </View>
         )}
 
@@ -269,6 +296,8 @@ const s = StyleSheet.create({
   section:      { marginBottom: Spacing.three },
   sectionTitle: { fontSize: 17, fontWeight: '700', marginBottom: Spacing.two },
 
+  moodHeader:     { marginBottom: Spacing.two, gap: 3 },
+  moodUpdateHint: { fontSize: 12, fontWeight: '500' },
   moodRow:      { flexDirection: 'row', gap: Spacing.one },
   moodBtn:      { flex: 1, alignItems: 'center', borderRadius: 14, paddingVertical: Spacing.two, gap: 4 },
   moodBtnActive:{ transform: [{ scale: 1.08 }] },
@@ -304,4 +333,6 @@ const s = StyleSheet.create({
   entryEmoji:   { fontSize: 24 },
   entryMood:    { fontSize: 14, fontWeight: '700' },
   entryNote:    { fontSize: 13, marginTop: 2, lineHeight: 18 },
+  moreEntries:  { fontSize: 12, fontWeight: '600', textAlign: 'center',
+                  paddingVertical: Spacing.two },
 });
