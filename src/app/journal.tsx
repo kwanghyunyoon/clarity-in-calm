@@ -51,7 +51,12 @@ export default function JournalScreen() {
 
   const moods   = t.moods;
   const prompts = t.journal.prompts;
-  const todayPrompt = prompts[new Date().getDate() % prompts.length];
+  // Day-of-year index so prompt is consistent all day and cycles meaningfully
+  const now = new Date();
+  const dayOfYear = Math.floor(
+    (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  const todayPrompt = prompts[dayOfYear % prompts.length];
 
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const [note, setNote]                 = useState('');
@@ -75,7 +80,7 @@ export default function JournalScreen() {
     setSelectedMood(null);
     setNote('');
     setSaved(true);
-    setTimeout(() => setSaved(false), 2200);
+    setTimeout(() => setSaved(false), 3000);
   };
 
   const handleDeleteEntry = (id: string) => {
@@ -96,7 +101,13 @@ export default function JournalScreen() {
     setNote('');
     setSaved(true);
     setShowCrisis(false);
-    setTimeout(() => setSaved(false), 2200);
+    setTimeout(() => setSaved(false), 3000);
+  };
+
+  // Close crisis modal without saving — entry is intentionally not saved
+  const handleCrisisClose = () => {
+    setShowCrisis(false);
+    // Keep the text so user can edit it if they want to save after reading resources
   };
 
   return (
@@ -180,10 +191,11 @@ export default function JournalScreen() {
             style={[
               s.saveBtn,
               { backgroundColor: selectedMood ? (saved ? colors.accent : colors.primary) : colors.backgroundSelected },
+              (!selectedMood || saved) && { opacity: 0.55 },
             ]}
             onPress={handleSave}
             disabled={!selectedMood || saved}
-            activeOpacity={0.8}
+            activeOpacity={selectedMood && !saved ? 0.8 : 1}
           >
             <Text style={[s.saveTxt, { color: selectedMood ? '#ffffff' : colors.textSecondary }]}>
               {saved ? t.journal.savedBtn : t.journal.saveBtn}
@@ -195,7 +207,9 @@ export default function JournalScreen() {
             <View style={s.history}>
               <Text style={[s.historyTitle, { color: colors.text }]}>{t.journal.pastTitle}</Text>
               {entries.map((entry) => {
-                const mood = moods[entry.mood - 1];
+                const mood = moods[Math.max(0, Math.min(4, entry.mood - 1))];
+                // Defensive: skip rendering if mood lookup returns undefined (corrupt data)
+                if (!mood) return null;
                 return (
                   <Animated.View
                     key={entry.id}
@@ -270,7 +284,7 @@ export default function JournalScreen() {
             <View style={s.modalActions}>
               <TouchableOpacity
                 style={[s.modalBtnPrimary, { backgroundColor: colors.primary }]}
-                onPress={() => setShowCrisis(false)}
+                onPress={handleCrisisClose}
                 activeOpacity={0.8}
               >
                 <Text style={s.modalBtnPrimaryText}>{t.journal.crisis.confirmBtn}</Text>

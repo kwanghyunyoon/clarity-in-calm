@@ -29,24 +29,33 @@ const STORAGE_KEY_SESSIONS  = 'wellness_sessions_v1';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+/**
+ * Returns a YYYY-MM-DD string in the device's LOCAL timezone.
+ * Using local date arithmetic avoids DST bugs (a day isn't always 86400s).
+ */
+function toLocalDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function computeStreak(entries: JournalEntry[]): number {
   if (entries.length === 0) return 0;
 
   const uniqueDays = [
-    ...new Set(entries.map((e) => new Date(e.date).toDateString())),
-  ].sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+    ...new Set(entries.map((e) => toLocalDateStr(new Date(e.date)))),
+  ].sort((a, b) => (a < b ? 1 : -1)); // descending
 
-  const today     = new Date().toDateString();
-  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  const today = toLocalDateStr(new Date());
+  const yd    = new Date(); yd.setDate(yd.getDate() - 1);
+  const yesterday = toLocalDateStr(yd);
 
   if (uniqueDays[0] !== today && uniqueDays[0] !== yesterday) return 0;
 
   let count = 1;
   for (let i = 1; i < uniqueDays.length; i++) {
-    const prev    = new Date(uniqueDays[i - 1]);
-    const curr    = new Date(uniqueDays[i]);
-    const diffMs  = prev.getTime() - curr.getTime();
-    const diffDays = Math.round(diffMs / 86400000);
+    // Compare consecutive YYYY-MM-DD strings by subtracting dates
+    const prev = new Date(uniqueDays[i - 1]);
+    const curr = new Date(uniqueDays[i]);
+    const diffDays = Math.round((prev.getTime() - curr.getTime()) / 86400000);
     if (diffDays === 1) {
       count++;
     } else {
@@ -92,6 +101,8 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   // ── Actions ───────────────────────────────────────────────────────────────
 
   const addEntry = useCallback((mood: MoodValue, note: string) => {
+    // Guard: don't write before storage has loaded — would be overwritten on load completion
+    if (!isLoaded) return;
     setEntries((prev) => [
       {
         id:   `${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -101,23 +112,28 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
       },
       ...prev,
     ]);
-  }, []);
+  }, [isLoaded]);
 
   const deleteEntry = useCallback((id: string) => {
+    if (!isLoaded) return;
     setEntries((prev) => prev.filter((e) => e.id !== id));
-  }, []);
+  }, [isLoaded]);
 
   const addBreathingSession = useCallback(() => {
+    if (!isLoaded) return;
     setBreathingSessions((prev) => prev + 1);
-  }, []);
+  }, [isLoaded]);
 
   // ── Derived ───────────────────────────────────────────────────────────────
 
-  const todayMood: MoodValue | null =
-    (entries.find((e) => {
-      const today = new Date().toDateString();
-      return new Date(e.date).toDateString() === today;
-    })?.mood ?? null) as MoodValue | null;
+  // Use the LAST entry today (most recent update) — entries are newest-first.
+  // Validate the raw value is in [1, 5] before asserting MoodValue; corrupt data → null.
+  const todayMood: MoodValue | null = (() => {
+    const raw = entries.find(
+      (e) => toLocalDateStr(new Date(e.date)) === toLocalDateStr(new Date()),
+    )?.mood;
+    return raw !== undefined && raw >= 1 && raw <= 5 ? (raw as MoodValue) : null;
+  })();
 
   const streak = computeStreak(entries);
 
