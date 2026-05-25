@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View, Alert } from 'react-native';
+import { KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
@@ -58,10 +58,11 @@ export default function JournalScreen() {
   );
   const todayPrompt = prompts[dayOfYear % prompts.length];
 
-  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
-  const [note, setNote]                 = useState('');
-  const [saved, setSaved]               = useState(false);
-  const [showCrisis, setShowCrisis]     = useState(false);
+  const [selectedMood,    setSelectedMood]    = useState<MoodValue | null>(null);
+  const [note,            setNote]            = useState('');
+  const [saved,           setSaved]           = useState(false);
+  const [showCrisis,      setShowCrisis]      = useState(false);
+  const [deleteTargetId,  setDeleteTargetId]  = useState<string | null>(null);
 
   function containsCrisisLanguage(text: string): boolean {
     const lower = text.toLowerCase();
@@ -84,14 +85,12 @@ export default function JournalScreen() {
   };
 
   const handleDeleteEntry = (id: string) => {
-    Alert.alert(
-      'Delete entry?',
-      'This entry will be permanently removed.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => deleteEntry(id) },
-      ],
-    );
+    setDeleteTargetId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteTargetId) deleteEntry(deleteTargetId);
+    setDeleteTargetId(null);
   };
 
   const handleSaveWithCrisis = () => {
@@ -256,6 +255,44 @@ export default function JournalScreen() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* ── Delete confirmation modal ── */}
+      <Modal
+        visible={deleteTargetId !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDeleteTargetId(null)}
+      >
+        <View style={s.modalOverlay}>
+          <View style={[s.modalCard, { backgroundColor: colors.surface }]}>
+            <Text style={{ fontSize: 36, textAlign: 'center' }}>🗑️</Text>
+            <Text style={[s.modalTitle, { color: colors.text, fontSize: 20 }]}>
+              {t.journal.deleteConfirm.title}
+            </Text>
+            <Text style={[s.modalBody, { color: colors.textSecondary }]}>
+              {t.journal.deleteConfirm.body}
+            </Text>
+            <View style={s.modalActions}>
+              <TouchableOpacity
+                style={[s.modalBtnPrimary, { backgroundColor: '#E53935' }]}
+                onPress={confirmDelete}
+                activeOpacity={0.8}
+              >
+                <Text style={s.modalBtnPrimaryText}>{t.journal.deleteConfirm.confirm}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={s.modalBtnGhost}
+                onPress={() => setDeleteTargetId(null)}
+                activeOpacity={0.7}
+              >
+                <Text style={[s.modalBtnGhostText, { color: colors.textSecondary }]}>
+                  {t.journal.deleteConfirm.cancel}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
 
       {/* ── Crisis helpline modal ── */}
       <Modal

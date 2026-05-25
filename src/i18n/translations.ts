@@ -36,6 +36,15 @@ export const en = {
     { emoji: '😄', label: 'Great', value: 5, color: '#A0C4D0' },
   ] as const,
 
+  // ── PWA install banner ────────────────────────────────────────────────────
+  install: {
+    title:      'Add to Home Screen',
+    bodyIos:    "Tap the Share button (⬆) at the bottom of Safari, then choose 'Add to Home Screen'.",
+    bodyOther:  'Install Clarity in Calm for instant access — no app store needed.',
+    installBtn: 'Install App',
+    dismiss:    'Not now',
+  },
+
   // ── Onboarding ────────────────────────────────────────────────────────────
   onboarding: {
     slides: [
@@ -84,8 +93,10 @@ export const en = {
       sessions: 'sessions',
     },
     streakHow:    'Log a journal entry every day to grow your streak',
-    helpBtn:      'Not sure where to go?',
-    todayEntries: "Today's entries",
+    helpBtn:        'Not sure where to go?',
+    moodUpdateHint: 'Tap any mood to update',
+    todayEntries:   "Today's entries",
+    moreEntries:    'more — open Journal to see all',
     gettingStarted: {
       title: "Here's how to start",
       steps: [
@@ -182,6 +193,13 @@ export const en = {
       'hurt myself', 'self harm', 'self-harm', 'cutting myself',
       'overdose', 'not worth living',
     ],
+
+    deleteConfirm: {
+      title:   'Delete entry?',
+      body:    'This will permanently remove the entry.',
+      confirm: 'Delete',
+      cancel:  'Cancel',
+    },
   },
 
   // ── Progress ──────────────────────────────────────────────────────────────
@@ -229,6 +247,14 @@ export const ko: Translations = {
     { emoji: '😄', label: '아주 좋아요', value: 5, color: '#A0C4D0' },
   ],
 
+  install: {
+    title:      '홈 화면에 추가하기',
+    bodyIos:    "Safari 하단의 공유 버튼(⬆)을 탭한 후 '홈 화면에 추가'를 선택하세요.",
+    bodyOther:  'Clarity in Calm을 설치하면 앱스토어 없이 바로 접근할 수 있어요.',
+    installBtn: '앱 설치',
+    dismiss:    '나중에',
+  },
+
   onboarding: {
     slides: [
       {
@@ -275,8 +301,10 @@ export const ko: Translations = {
       sessions: '세션',
     },
     streakHow:    '매일 일기를 작성하면 연속 기록이 늘어나요',
-    helpBtn:      '어디서 시작할지 모르겠어요?',
-    todayEntries: '오늘의 기록',
+    helpBtn:        '어디서 시작할지 모르겠어요?',
+    moodUpdateHint: '기분을 탭해서 수정하세요',
+    todayEntries:   '오늘의 기록',
+    moreEntries:    '개 더 있어요 — 일기 탭에서 모두 보기',
     gettingStarted: {
       title: '이렇게 시작하세요',
       steps: [
@@ -373,6 +401,13 @@ export const ko: Translations = {
       '사라지고 싶다', '더 이상 살고 싶지 않다',
       '죽겠다', '죽을 것 같다', '죽는 게 낫다',
     ],
+
+    deleteConfirm: {
+      title:   '기록을 삭제할까요?',
+      body:    '이 기록은 영구적으로 삭제됩니다.',
+      confirm: '삭제',
+      cancel:  '취소',
+    },
   },
 
   progress: {
@@ -418,6 +453,14 @@ export const es: Translations = {
     { emoji: '🙂', label: 'Bien',     value: 4, color: '#B8DBC0' },
     { emoji: '😄', label: 'Genial',   value: 5, color: '#A0C4D0' },
   ],
+
+  install: {
+    title:      'Agregar a la pantalla de inicio',
+    bodyIos:    "Toca el botón Compartir (⬆) en Safari y elige 'Agregar a pantalla de inicio'.",
+    bodyOther:  'Instala Clarity in Calm para acceso inmediato — sin tienda de aplicaciones.',
+    installBtn: 'Instalar app',
+    dismiss:    'Ahora no',
+  },
 
   onboarding: {
     slides: [
@@ -465,8 +508,10 @@ export const es: Translations = {
       sessions: 'sesiones',
     },
     streakHow:    'Registra una entrada en el diario cada día para aumentar tu racha',
-    helpBtn:      '¿No sabes por dónde empezar?',
-    todayEntries: 'Registros de hoy',
+    helpBtn:        '¿No sabes por dónde empezar?',
+    moodUpdateHint: 'Toca un estado de ánimo para actualizar',
+    todayEntries:   'Registros de hoy',
+    moreEntries:    'más — abre el Diario para ver todo',
     gettingStarted: {
       title: '¿Por dónde empezar?',
       steps: [
@@ -561,6 +606,13 @@ export const es: Translations = {
       'autolesión', 'autolesionarme', 'cortarme', 'sobredosis',
       'no vale la pena vivir', 'desaparecer para siempre',
     ],
+
+    deleteConfirm: {
+      title:   '¿Eliminar entrada?',
+      body:    'Esta entrada se eliminará de forma permanente.',
+      confirm: 'Eliminar',
+      cancel:  'Cancelar',
+    },
   },
 
   progress: {
@@ -606,6 +658,14 @@ export const hi: Translations = {
     { emoji: '🙂', label: 'अच्छा',    value: 4, color: '#B8DBC0' },
     { emoji: '😄', label: 'शानदार',   value: 5, color: '#A0C4D0' },
   ],
+
+  install: {
+    title:      'होम स्क्रीन पर जोड़ें',
+    bodyIos:    "Safari में नीचे Share बटन (⬆) टैप करें, फिर 'Add to Home Screen' चुनें।",
+    bodyOther:  'Clarity in Calm इंस्टॉल करें — ऐप स्टोर की ज़रूरत नहीं, सीधे एक्सेस करें।',
+    installBtn: 'ऐप इंस्टॉल करें',
+    dismiss:    'अभी नहीं',
+  },
 
   onboarding: {
     slides: [
@@ -653,8 +713,10 @@ export const hi: Translations = {
       sessions: 'सत्र',
     },
     streakHow:    'स्ट्रीक बढ़ाने के लिए हर दिन डायरी में प्रविष्टि करें',
-    helpBtn:      'कहाँ जाएँ समझ नहीं आ रहा?',
-    todayEntries: 'आज की प्रविष्टियाँ',
+    helpBtn:        'कहाँ जाएँ समझ नहीं आ रहा?',
+    moodUpdateHint: 'अपडेट करने के लिए मूड टैप करें',
+    todayEntries:   'आज की प्रविष्टियाँ',
+    moreEntries:    'और — सभी देखने के लिए डायरी खोलें',
     gettingStarted: {
       title: 'शुरुआत कैसे करें',
       steps: [
@@ -748,6 +810,13 @@ export const hi: Translations = {
       'आत्मघात', 'सब छोड़ देना चाहता हूँ', 'सब छोड़ देना चाहती हूँ',
       'गायब हो जाना चाहता हूँ', 'गायब हो जाना चाहती हूँ',
     ],
+
+    deleteConfirm: {
+      title:   'प्रविष्टि हटाएँ?',
+      body:    'यह प्रविष्टि स्थायी रूप से हट जाएगी।',
+      confirm: 'हटाएँ',
+      cancel:  'रद्द करें',
+    },
   },
 
   progress: {
