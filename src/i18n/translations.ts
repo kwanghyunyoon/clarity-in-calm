@@ -84,6 +84,7 @@ export const en = {
       sessions: 'sessions',
     },
     streakHow:    'Log a journal entry every day to grow your streak',
+    helpBtn:      'Not sure where to go?',
     todayEntries: "Today's entries",
     gettingStarted: {
       title: "Here's how to start",
@@ -274,6 +275,7 @@ export const ko: Translations = {
       sessions: '세션',
     },
     streakHow:    '매일 일기를 작성하면 연속 기록이 늘어나요',
+    helpBtn:      '어디서 시작할지 모르겠어요?',
     todayEntries: '오늘의 기록',
     gettingStarted: {
       title: '이렇게 시작하세요',
@@ -463,6 +465,7 @@ export const es: Translations = {
       sessions: 'sesiones',
     },
     streakHow:    'Registra una entrada en el diario cada día para aumentar tu racha',
+    helpBtn:      '¿No sabes por dónde empezar?',
     todayEntries: 'Registros de hoy',
     gettingStarted: {
       title: '¿Por dónde empezar?',
@@ -650,6 +653,7 @@ export const hi: Translations = {
       sessions: 'सत्र',
     },
     streakHow:    'स्ट्रीक बढ़ाने के लिए हर दिन डायरी में प्रविष्टि करें',
+    helpBtn:      'कहाँ जाएँ समझ नहीं आ रहा?',
     todayEntries: 'आज की प्रविष्टियाँ',
     gettingStarted: {
       title: 'शुरुआत कैसे करें',

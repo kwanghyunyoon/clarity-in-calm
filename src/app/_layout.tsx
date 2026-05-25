@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
+import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
 import { WellnessProvider } from '@/context/wellness-context';
 import { useTranslation } from '@/hooks/use-translation';
@@ -37,6 +38,7 @@ export default function TabLayout() {
 
   return (
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <HelpProvider>
       <LanguageProvider>
       <WellnessProvider>
         <AnimatedSplashOverlay />
@@ -95,6 +97,7 @@ export default function TabLayout() {
         </Tabs>
       </WellnessProvider>
       </LanguageProvider>
+      </HelpProvider>
     </ThemeProvider>
   );
 }

@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Spacing } from '@/constants/theme';
 import { QUOTES } from '@/constants/quotes';
 import { type Locale } from '@/i18n/translations';
+import { useHelp } from '@/context/help-context';
 import { useLocale } from '@/context/language-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
@@ -27,6 +28,7 @@ export default function HomeScreen() {
   const colors = useTheme();
   const t = useTranslation();
   const { locale, setLocale } = useLocale();
+  const { showHelp } = useHelp();
   const { todayMood, entries, breathingSessions, streak } = useWellness();
 
   const moods = t.moods;
@@ -60,6 +62,16 @@ export default function HomeScreen() {
               <Text style={[s.greeting, { color: colors.text }]}>
                 {greeting} {t.home.greetingEmoji}
               </Text>
+              <TouchableOpacity
+                onPress={showHelp}
+                activeOpacity={0.7}
+                style={[s.helpBtn, { backgroundColor: colors.backgroundElement }]}
+              >
+                <Text style={s.helpBtnEmoji}>❓</Text>
+                <Text style={[s.helpBtnTxt, { color: colors.textSecondary }]}>
+                  {t.home.helpBtn}
+                </Text>
+              </TouchableOpacity>
             </View>
 
             {/* ── Language toggle (4 languages) ── */}
@@ -235,6 +247,11 @@ const s = StyleSheet.create({
   headerLeft:   { flex: 1, gap: Spacing.half },
   date:         { fontSize: 13, fontWeight: '500' },
   greeting:     { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
+  helpBtn:      { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start',
+                  borderRadius: 20, paddingHorizontal: Spacing.two, paddingVertical: 5,
+                  marginTop: Spacing.one },
+  helpBtnEmoji: { fontSize: 12 },
+  helpBtnTxt:   { fontSize: 12, fontWeight: '600' },
 
   // Language toggle pill — compact so 4 buttons fit
   langPill:     { flexDirection: 'row', borderRadius: 50, overflow: 'hidden', alignSelf: 'flex-start', marginTop: Spacing.one },
