@@ -33,7 +33,7 @@ export default function TabLayout() {
   const insets = useSafeAreaInsets();
 
   const TAB_BAR_BASE = 58;
-  const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 10 : 26) + 36;
+  const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 16);
 
   return (
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
