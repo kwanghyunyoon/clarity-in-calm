@@ -37,7 +37,7 @@ export default function ProgressScreen() {
   // Mood distribution (highest to lowest) — clamp index to [0,4] to prevent crashes
   const moodDist = [5, 4, 3, 2, 1].map((v) => {
     const count = entries.filter((e) => e.mood === v).length;
-    const idx = Math.max(0, Math.min(4, v - 1));
+    const idx = Math.max(0, Math.min(moods.length - 1, v - 1));
     return { ...moods[idx], count };
   });
   const maxCount = Math.max(...moodDist.map((m) => m.count), 1);

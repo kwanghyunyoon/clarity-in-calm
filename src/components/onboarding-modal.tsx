@@ -33,11 +33,13 @@ export function OnboardingModal() {
   const [firstLaunch, setFirstLaunch] = useState(false);
   const [page,        setPage]        = useState(0);
 
-  // Show on first launch
+  // Show on first launch — guard against setState after unmount
   useEffect(() => {
-    AsyncStorage.getItem(ONBOARDING_KEY).then((val) => {
-      if (val !== 'true') setFirstLaunch(true);
-    });
+    let mounted = true;
+    AsyncStorage.getItem(ONBOARDING_KEY)
+      .then((val) => { if (mounted && val !== 'true') setFirstLaunch(true); })
+      .catch(() => { if (mounted) setFirstLaunch(true); }); // storage failure → assume first launch
+    return () => { mounted = false; };
   }, []);
 
   // Reset to page 0 every time it's re-opened via the help button
@@ -61,7 +63,9 @@ export function OnboardingModal() {
     }
   };
 
-  const handleClose = () => {
+  const handleClose = async () => {
+    // Mark as seen so it doesn't reappear on next launch
+    await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
     setFirstLaunch(false);
     hideHelp();
     setPage(0);

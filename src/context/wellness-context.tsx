@@ -83,7 +83,10 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
       if (savedSessions) setBreathingSessions(savedSessions);
       setIsLoaded(true);
     }
-    load();
+    load().catch(() => {
+      // Storage completely unavailable — start fresh rather than freezing
+      setIsLoaded(true);
+    });
   }, []);
 
   // ── Persist entries whenever they change (skip first render) ──────────────

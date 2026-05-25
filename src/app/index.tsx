@@ -130,6 +130,9 @@ export default function HomeScreen() {
                   key={m.value}
                   onPress={() => router.push('/journal')}
                   activeOpacity={0.75}
+                  accessibilityRole="button"
+                  accessibilityLabel={m.label}
+                  accessibilityState={{ selected: active }}
                   style={[
                     s.moodBtn,
                     { backgroundColor: active ? m.color : colors.backgroundElement },

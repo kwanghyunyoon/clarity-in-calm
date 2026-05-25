@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
@@ -25,7 +25,11 @@ async function openUrl(rawUrl: string) {
     await Linking.openURL(url);
   } else if (url.startsWith('http')) {
     // Try opening HTTP links via the in-app browser as a fallback
-    await Linking.openURL(url);
+    try {
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert('Cannot open link', `Please visit:\n\n${rawUrl}`);
+    }
   } else {
     Alert.alert(
       'Cannot open link',
@@ -147,6 +151,9 @@ export default function JournalScreen() {
                     key={m.value}
                     onPress={() => setSelectedMood(m.value as MoodValue)}
                     activeOpacity={0.75}
+                    accessibilityRole="button"
+                    accessibilityLabel={m.label}
+                    accessibilityState={{ selected: active }}
                     style={[
                       s.moodBtn,
                       { backgroundColor: active ? m.color : colors.backgroundSelected },
