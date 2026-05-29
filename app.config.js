@@ -1,0 +1,65 @@
+export default {
+  expo: {
+    name: 'clarity-in-calm',
+    slug: 'clarity-in-calm',
+    version: '1.0.0',
+    orientation: 'portrait',
+    icon: './assets/images/icon.png',
+    scheme: 'clarityincalm',
+    userInterfaceStyle: 'automatic',
+    ios: {
+      bundleIdentifier: 'com.clarityincalm.app',
+      icon: './assets/images/icon.png',
+      supportsTablet: true,
+      infoPlist: {
+        NSPhotoLibraryUsageDescription: 'Used for profile photos.',
+        NSCameraUsageDescription: 'Used for profile photos.',
+      },
+    },
+    android: {
+      package: 'com.clarityincalm.app',
+      jsEngine: 'hermes',
+      adaptiveIcon: {
+        backgroundColor: '#EDEAE5',
+        foregroundImage: './assets/images/android-icon-foreground.png',
+        backgroundImage: './assets/images/android-icon-background.png',
+        monochromeImage: './assets/images/android-icon-monochrome.png',
+      },
+      predictiveBackGestureEnabled: false,
+    },
+    newArchEnabled: true,
+    web: {
+      output: 'static',
+      favicon: './assets/images/favicon.png',
+      name: 'Clarity in Calm',
+      shortName: 'Clarity',
+      description: 'A mindfulness app for breathing, journaling, and tracking your wellness.',
+      themeColor: '#208AEF',
+      backgroundColor: '#E6F4FE',
+      display: 'standalone',
+      orientation: 'portrait',
+      lang: 'en',
+    },
+    plugins: [
+      'expo-router',
+      [
+        'expo-splash-screen',
+        {
+          backgroundColor: '#EDEAE5',
+          android: {
+            image: './assets/images/splash-icon.png',
+            imageWidth: 200,
+          },
+        },
+      ],
+      'expo-secure-store',
+    ],
+    experiments: {
+      typedRoutes: true,
+      baseUrl: process.env.DEPLOY_BASE_URL || '',
+    },
+    extra: {
+      privacyPolicyUrl: 'https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html',
+    },
+  },
+};
