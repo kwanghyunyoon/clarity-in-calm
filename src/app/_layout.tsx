@@ -90,6 +90,7 @@ export default function TabLayout() {
             name="index"
             options={{
               title: t.tabs.home,
+              tabBarLabel: t.tabs.home,
               tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
             }}
           />
@@ -97,6 +98,7 @@ export default function TabLayout() {
             name="breathe"
             options={{
               title: t.tabs.breathe,
+              tabBarLabel: t.tabs.breathe,
               tabBarIcon: ({ focused }) => <TabIcon emoji="🫁" focused={focused} />,
             }}
           />
@@ -104,6 +106,7 @@ export default function TabLayout() {
             name="journal"
             options={{
               title: t.tabs.journal,
+              tabBarLabel: t.tabs.journal,
               tabBarIcon: ({ focused }) => <TabIcon emoji="📖" focused={focused} />,
             }}
           />
@@ -111,6 +114,7 @@ export default function TabLayout() {
             name="progress"
             options={{
               title: t.tabs.progress,
+              tabBarLabel: t.tabs.progress,
               tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
             }}
           />

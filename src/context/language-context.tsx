@@ -1,13 +1,16 @@
 /**
  * LanguageContext — stores the user's chosen locale and exposes a setter.
  * Auto-detects the device language on first load; the user can override it
- * manually via the language picker.
+ * manually via the language picker. Choice is persisted to AsyncStorage.
  */
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 import { type Locale, TRANSLATIONS } from '@/i18n/translations';
+
+const STORAGE_KEY = '@cic_locale';
 
 function detectLocale(): Locale {
   try {
@@ -28,7 +31,22 @@ const LanguageContext = createContext<LanguageContextType>({
 });
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(detectLocale);
+  const [locale, setLocaleState] = useState<Locale>(detectLocale);
+
+  // Load persisted locale on mount
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
+      if (saved && saved in TRANSLATIONS) {
+        setLocaleState(saved as Locale);
+      }
+    });
+  }, []);
+
+  const setLocale = (l: Locale) => {
+    setLocaleState(l);
+    AsyncStorage.setItem(STORAGE_KEY, l);
+  };
+
   return (
     <LanguageContext.Provider value={{ locale, setLocale }}>
       {children}
