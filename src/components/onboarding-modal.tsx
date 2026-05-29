@@ -17,7 +17,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
 const ONBOARDING_KEY  = '@cic:hasSeenOnboarding';
-const DISCORD_WEBHOOK = 'YOUR_DISCORD_WEBHOOK_URL_HERE';
+const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1509891896586272830/Y83xm-KCkNkC7Gnh7YCUbySQolSt8ZRlWx_5zalIO-2szm6QyRPKAk8xT6A3h7GUc1Qr';
 const ISSUE_TYPES     = ['Bug', 'Suggestion', 'Other'];
 
 const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
