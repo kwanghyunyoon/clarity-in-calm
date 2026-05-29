@@ -17,7 +17,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
 const ONBOARDING_KEY  = '@cic:hasSeenOnboarding';
-const FEEDBACK_WORKER = 'https://app-feedback.yoonk478.workers.dev';
+const FEEDBACK_WORKER = 'https://app-feedback.kwangyoon.workers.dev';
 const ISSUE_TYPES     = ['Bug', 'Suggestion', 'Other'];
 
 const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
