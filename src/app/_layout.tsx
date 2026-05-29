@@ -1,6 +1,6 @@
 import { DarkTheme, DefaultTheme, Tabs, ThemeProvider } from 'expo-router';
-import { useEffect } from 'react';
-import { Platform, Text, useColorScheme, View } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { AppState, Platform, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -26,6 +26,25 @@ if (Platform.OS === 'web' && typeof window !== 'undefined' && 'serviceWorker' in
   });
 }
 
+// Blur overlay — hides journal content in the app switcher when backgrounded.
+// Web has no app switcher risk so we skip it there.
+function PrivacyShield() {
+  const [hidden, setHidden] = useState(false);
+  const appState = useRef(AppState.currentState);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const sub = AppState.addEventListener('change', (next) => {
+      setHidden(next === 'inactive' || next === 'background');
+      appState.current = next;
+    });
+    return () => sub.remove();
+  }, []);
+
+  if (!hidden) return null;
+  return <View style={[StyleSheet.absoluteFill, { backgroundColor: '#000', zIndex: 9999 }]} />;
+}
+
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const scheme = colorScheme === 'dark' ? 'dark' : 'light';
@@ -41,6 +60,7 @@ export default function TabLayout() {
       <HelpProvider>
       <LanguageProvider>
       <WellnessProvider>
+        <PrivacyShield />
         <AnimatedSplashOverlay />
         <OnboardingModal />
         <Tabs
