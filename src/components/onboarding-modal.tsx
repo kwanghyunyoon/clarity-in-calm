@@ -17,7 +17,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
 const ONBOARDING_KEY  = '@cic:hasSeenOnboarding';
-const DISCORD_WEBHOOK = 'https://discord.com/api/webhooks/1509891896586272830/Y83xm-KCkNkC7Gnh7YCUbySQolSt8ZRlWx_5zalIO-2szm6QyRPKAk8xT6A3h7GUc1Qr';
+const FEEDBACK_WORKER = 'https://app-feedback.yoonk478.workers.dev';
 const ISSUE_TYPES     = ['Bug', 'Suggestion', 'Other'];
 
 const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
@@ -29,13 +29,11 @@ const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
 
 function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const colors = useTheme();
-  const [email, setEmail]             = useState('');
   const [issueType, setIssueType]     = useState('Bug');
   const [description, setDescription] = useState('');
   const [status, setStatus]           = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
 
   const reset = () => {
-    setEmail('');
     setIssueType('Bug');
     setDescription('');
     setStatus('idle');
@@ -47,20 +45,10 @@ function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => 
     if (!description.trim()) return;
     setStatus('sending');
     try {
-      const res = await fetch(DISCORD_WEBHOOK, {
+      const res = await fetch(FEEDBACK_WORKER, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          embeds: [{
-            title: 'Clarity in Calm Feedback',
-            color: 0x7DB59A,
-            fields: [
-              { name: 'Type', value: issueType, inline: true },
-              { name: 'Email', value: email.trim() || '—', inline: true },
-              { name: 'Description', value: description.trim() },
-            ],
-          }],
-        }),
+        body: JSON.stringify({ issueType, description: description.trim(), source: 'clarity' }),
       });
       setStatus(res.ok ? 'success' : 'error');
     } catch {
@@ -116,21 +104,6 @@ function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => 
                   </TouchableOpacity>
                 ))}
               </View>
-              <Text style={[fs.fieldLabel, { color: colors.textSecondary }]}>Email (optional)</Text>
-              <TextInput
-                style={[fs.textInput, {
-                  backgroundColor: colors.backgroundElement,
-                  borderColor: colors.backgroundSelected,
-                  color: colors.text,
-                }]}
-                placeholder="your@email.com"
-                placeholderTextColor={colors.textSecondary}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={email}
-                onChangeText={setEmail}
-              />
               <Text style={[fs.fieldLabel, { color: colors.textSecondary }]}>Description</Text>
               <TextInput
                 style={[fs.textInput, fs.textInputMulti, {

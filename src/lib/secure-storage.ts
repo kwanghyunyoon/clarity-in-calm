@@ -31,7 +31,10 @@ const SECURE_OPTS      = { keychainAccessible: SecureStore.WHEN_UNLOCKED_THIS_DE
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 
 function toBase64(buf: ArrayBuffer): string {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)));
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+  return btoa(binary);
 }
 
 function fromBase64(b64: string): Uint8Array {
