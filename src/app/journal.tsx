@@ -1,6 +1,6 @@
-import { Alert, KeyboardAvoidingView, Linking, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, FlatList, KeyboardAvoidingView, Linking, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 
 import { Spacing } from '@/constants/theme';
@@ -67,6 +67,11 @@ export default function JournalScreen() {
   const [saved,           setSaved]           = useState(false);
   const [showCrisis,      setShowCrisis]      = useState(false);
   const [deleteTargetId,  setDeleteTargetId]  = useState<string | null>(null);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (savedTimerRef.current) clearTimeout(savedTimerRef.current); };
+  }, []);
 
   function containsCrisisLanguage(text: string): boolean {
     const lower = text.toLowerCase();
@@ -85,7 +90,8 @@ export default function JournalScreen() {
     setSelectedMood(null);
     setNote('');
     setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
   };
 
   const handleDeleteEntry = (id: string) => {
@@ -104,7 +110,8 @@ export default function JournalScreen() {
     setNote('');
     setSaved(true);
     setShowCrisis(false);
-    setTimeout(() => setSaved(false), 3000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
   };
 
   // Close crisis modal without saving — entry is intentionally not saved
@@ -113,6 +120,143 @@ export default function JournalScreen() {
     // Keep the text so user can edit it if they want to save after reading resources
   };
 
+  const listHeader = (
+    <>
+      {/* Header */}
+      <View style={s.header}>
+        <Text style={[s.title, { color: colors.text }]}>{t.journal.title}</Text>
+        <Text style={[s.subtitle, { color: colors.textSecondary }]}>{t.journal.subtitle}</Text>
+      </View>
+
+      {/* ── No-filter safe space banner ── */}
+      <View style={[s.safeCard, { backgroundColor: colors.accent + '22', borderColor: colors.accent + '55' }]}>
+        <Text style={s.safeEmoji}>🔒</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={[s.safeTitle, { color: colors.text }]}>{t.journal.safeSpace.title}</Text>
+          <Text style={[s.safeText, { color: colors.textSecondary }]}>{t.journal.safeSpace.body}</Text>
+        </View>
+      </View>
+
+      {/* ── Mood picker ── */}
+      <View style={[s.card, { backgroundColor: colors.backgroundElement }]}>
+        <Text style={[s.cardLabel, { color: colors.text }]}>{t.journal.moodLabel}</Text>
+        <View style={s.moodRow}>
+          {moods.map((m) => {
+            const active = selectedMood === m.value;
+            return (
+              <TouchableOpacity
+                key={m.value}
+                onPress={() => setSelectedMood(m.value as MoodValue)}
+                activeOpacity={0.75}
+                accessibilityRole="button"
+                accessibilityLabel={m.label}
+                accessibilityState={{ selected: active }}
+                style={[
+                  s.moodBtn,
+                  { backgroundColor: active ? m.color : colors.backgroundSelected },
+                  active && s.moodBtnActive,
+                ]}
+              >
+                <Text style={s.moodEmoji}>{m.emoji}</Text>
+                <Text style={[s.moodLabel, { color: active ? '#2C2C3E' : colors.textSecondary }]}>
+                  {m.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* ── Text input ── */}
+      <View style={[s.card, { backgroundColor: colors.backgroundElement }]}>
+        <Text style={[s.cardLabel, { color: colors.text }]}>
+          {t.journal.reflectionLabel}{' '}
+          <Text style={{ fontWeight: '400', color: colors.textSecondary }}>{t.journal.optionalLabel}</Text>
+        </Text>
+        <Text style={[s.prompt, { color: colors.textSecondary }]}>{todayPrompt}</Text>
+        <TextInput
+          style={[
+            s.input,
+            { color: colors.text, borderColor: colors.backgroundSelected, backgroundColor: colors.surface },
+          ]}
+          placeholder={t.journal.placeholder}
+          placeholderTextColor={colors.textSecondary}
+          value={note}
+          onChangeText={handleNoteChange}
+          multiline
+          numberOfLines={5}
+          textAlignVertical="top"
+        />
+      </View>
+
+      {/* ── Save button ── */}
+      <TouchableOpacity
+        style={[
+          s.saveBtn,
+          { backgroundColor: selectedMood ? (saved ? colors.accent : colors.primary) : colors.backgroundSelected },
+          (!selectedMood || saved) && { opacity: 0.55 },
+        ]}
+        onPress={handleSave}
+        disabled={!selectedMood || saved}
+        activeOpacity={selectedMood && !saved ? 0.8 : 1}
+      >
+        <Text style={[s.saveTxt, { color: selectedMood ? '#ffffff' : colors.textSecondary }]}>
+          {saved ? t.journal.savedBtn : t.journal.saveBtn}
+        </Text>
+      </TouchableOpacity>
+
+      {/* ── Past entries title (only when there are entries) ── */}
+      {entries.length > 0 && (
+        <Text style={[s.historyTitle, { color: colors.text }]}>{t.journal.pastTitle}</Text>
+      )}
+    </>
+  );
+
+  const renderEntry = ({ item: entry }: { item: typeof entries[0] }) => {
+    const mood = moods[Math.max(0, Math.min(4, entry.mood - 1))];
+    if (!mood) return null;
+    return (
+      <Animated.View
+        entering={FadeInDown.duration(250)}
+        exiting={FadeOutUp.duration(200)}
+      >
+        <View style={[s.entryCard, { backgroundColor: colors.backgroundElement }]}>
+          <View style={s.entryHeader}>
+            <View style={[s.entryBadge, { backgroundColor: mood.color }]}>
+              <Text style={s.entryEmoji}>{mood.emoji}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[s.entryMoodLabel, { color: colors.text }]}>{mood.label}</Text>
+              <Text style={[s.entryDate, { color: colors.textSecondary }]}>
+                {formatEntryDate(entry.date)}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => handleDeleteEntry(entry.id)}
+              activeOpacity={0.7}
+              style={s.deleteBtn}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={s.deleteTxt}>🗑</Text>
+            </TouchableOpacity>
+          </View>
+          {!!entry.note && (
+            <Text style={[s.entryNote, { color: colors.textSecondary }]}>
+              {entry.note}
+            </Text>
+          )}
+        </View>
+      </Animated.View>
+    );
+  };
+
+  const listEmpty = (
+    <View style={[s.emptyCard, { backgroundColor: colors.backgroundElement }]}>
+      <Text style={s.emptyEmoji}>🌸</Text>
+      <Text style={[s.emptyTxt, { color: colors.textSecondary }]}>{t.journal.emptyTitle}</Text>
+    </View>
+  );
+
   return (
     <SafeAreaView edges={['top']} style={[s.root, { backgroundColor: colors.background }]}>
       <KeyboardAvoidingView
@@ -120,147 +264,16 @@ export default function JournalScreen() {
         style={{ flex: 1 }}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
-        <ScrollView
+        <FlatList
+          data={entries}
+          keyExtractor={(entry) => entry.id}
+          renderItem={renderEntry}
+          ListHeaderComponent={listHeader}
+          ListEmptyComponent={listEmpty}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={{ paddingHorizontal: Spacing.three, paddingBottom: Spacing.six }}
-        >
-          {/* Header */}
-          <View style={s.header}>
-            <Text style={[s.title, { color: colors.text }]}>{t.journal.title}</Text>
-            <Text style={[s.subtitle, { color: colors.textSecondary }]}>{t.journal.subtitle}</Text>
-          </View>
-
-          {/* ── No-filter safe space banner ── */}
-          <View style={[s.safeCard, { backgroundColor: colors.accent + '22', borderColor: colors.accent + '55' }]}>
-            <Text style={s.safeEmoji}>🔒</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={[s.safeTitle, { color: colors.text }]}>{t.journal.safeSpace.title}</Text>
-              <Text style={[s.safeText, { color: colors.textSecondary }]}>{t.journal.safeSpace.body}</Text>
-            </View>
-          </View>
-
-          {/* ── Mood picker ── */}
-          <View style={[s.card, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[s.cardLabel, { color: colors.text }]}>{t.journal.moodLabel}</Text>
-            <View style={s.moodRow}>
-              {moods.map((m) => {
-                const active = selectedMood === m.value;
-                return (
-                  <TouchableOpacity
-                    key={m.value}
-                    onPress={() => setSelectedMood(m.value as MoodValue)}
-                    activeOpacity={0.75}
-                    accessibilityRole="button"
-                    accessibilityLabel={m.label}
-                    accessibilityState={{ selected: active }}
-                    style={[
-                      s.moodBtn,
-                      { backgroundColor: active ? m.color : colors.backgroundSelected },
-                      active && s.moodBtnActive,
-                    ]}
-                  >
-                    <Text style={s.moodEmoji}>{m.emoji}</Text>
-                    <Text style={[s.moodLabel, { color: active ? '#2C2C3E' : colors.textSecondary }]}>
-                      {m.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* ── Text input ── */}
-          <View style={[s.card, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[s.cardLabel, { color: colors.text }]}>
-              {t.journal.reflectionLabel}{' '}
-              <Text style={{ fontWeight: '400', color: colors.textSecondary }}>{t.journal.optionalLabel}</Text>
-            </Text>
-            <Text style={[s.prompt, { color: colors.textSecondary }]}>{todayPrompt}</Text>
-            <TextInput
-              style={[
-                s.input,
-                { color: colors.text, borderColor: colors.backgroundSelected, backgroundColor: colors.surface },
-              ]}
-              placeholder={t.journal.placeholder}
-              placeholderTextColor={colors.textSecondary}
-              value={note}
-              onChangeText={handleNoteChange}
-              multiline
-              numberOfLines={5}
-              textAlignVertical="top"
-            />
-          </View>
-
-          {/* ── Save button ── */}
-          <TouchableOpacity
-            style={[
-              s.saveBtn,
-              { backgroundColor: selectedMood ? (saved ? colors.accent : colors.primary) : colors.backgroundSelected },
-              (!selectedMood || saved) && { opacity: 0.55 },
-            ]}
-            onPress={handleSave}
-            disabled={!selectedMood || saved}
-            activeOpacity={selectedMood && !saved ? 0.8 : 1}
-          >
-            <Text style={[s.saveTxt, { color: selectedMood ? '#ffffff' : colors.textSecondary }]}>
-              {saved ? t.journal.savedBtn : t.journal.saveBtn}
-            </Text>
-          </TouchableOpacity>
-
-          {/* ── Past entries ── */}
-          {entries.length > 0 && (
-            <View style={s.history}>
-              <Text style={[s.historyTitle, { color: colors.text }]}>{t.journal.pastTitle}</Text>
-              {entries.map((entry) => {
-                const mood = moods[Math.max(0, Math.min(4, entry.mood - 1))];
-                // Defensive: skip rendering if mood lookup returns undefined (corrupt data)
-                if (!mood) return null;
-                return (
-                  <Animated.View
-                    key={entry.id}
-                    entering={FadeInDown.duration(250)}
-                    exiting={FadeOutUp.duration(200)}
-                  >
-                    <View style={[s.entryCard, { backgroundColor: colors.backgroundElement }]}>
-                      <View style={s.entryHeader}>
-                        <View style={[s.entryBadge, { backgroundColor: mood.color }]}>
-                          <Text style={s.entryEmoji}>{mood.emoji}</Text>
-                        </View>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[s.entryMoodLabel, { color: colors.text }]}>{mood.label}</Text>
-                          <Text style={[s.entryDate, { color: colors.textSecondary }]}>
-                            {formatEntryDate(entry.date)}
-                          </Text>
-                        </View>
-                        <TouchableOpacity
-                          onPress={() => handleDeleteEntry(entry.id)}
-                          activeOpacity={0.7}
-                          style={s.deleteBtn}
-                          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                        >
-                          <Text style={s.deleteTxt}>🗑</Text>
-                        </TouchableOpacity>
-                      </View>
-                      {!!entry.note && (
-                        <Text style={[s.entryNote, { color: colors.textSecondary }]}>
-                          {entry.note}
-                        </Text>
-                      )}
-                    </View>
-                  </Animated.View>
-                );
-              })}
-            </View>
-          )}
-
-          {entries.length === 0 && (
-            <View style={[s.emptyCard, { backgroundColor: colors.backgroundElement }]}>
-              <Text style={s.emptyEmoji}>🌸</Text>
-              <Text style={[s.emptyTxt, { color: colors.textSecondary }]}>{t.journal.emptyTitle}</Text>
-            </View>
-          )}
-        </ScrollView>
+        />
       </KeyboardAvoidingView>
 
       {/* ── Delete confirmation modal ── */}
@@ -369,10 +382,9 @@ const s = StyleSheet.create({
                    marginBottom: Spacing.four },
   saveTxt:       { fontSize: 16, fontWeight: '700' },
 
-  history:       { gap: Spacing.two },
-  historyTitle:  { fontSize: 17, fontWeight: '700', marginBottom: Spacing.one },
+  historyTitle:  { fontSize: 17, fontWeight: '700', marginBottom: Spacing.two },
 
-  entryCard:     { borderRadius: 16, padding: Spacing.three, gap: Spacing.two },
+  entryCard:     { borderRadius: 16, padding: Spacing.three, gap: Spacing.two, marginBottom: Spacing.two },
   entryHeader:   { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   entryBadge:    { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   entryEmoji:    { fontSize: 22 },

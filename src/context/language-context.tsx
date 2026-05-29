@@ -35,11 +35,13 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   // Load persisted locale on mount
   useEffect(() => {
+    let mounted = true;
     AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
-      if (saved && saved in TRANSLATIONS) {
+      if (mounted && saved && saved in TRANSLATIONS) {
         setLocaleState(saved as Locale);
       }
     });
+    return () => { mounted = false; };
   }, []);
 
   const setLocale = (l: Locale) => {

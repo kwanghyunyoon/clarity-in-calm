@@ -63,10 +63,16 @@ export const en = {
         title: 'Journal & Progress',
         body: "Pick a mood, write whatever's on your mind, and watch patterns emerge in your Progress tab over time.",
       },
+      {
+        emoji: '✨',
+        title: 'Track Your Progress',
+        body: 'Your streak, mood patterns, and breathing sessions are all captured in the Progress tab — come back daily and watch the picture build.',
+      },
     ],
     next:       'Next',
     getStarted: "Let's go",
     privacy:    '🔒 Your data never leaves your device',
+    reportIssue: 'Report an issue',
   },
 
   // ── Home ──────────────────────────────────────────────────────────────────
@@ -311,10 +317,16 @@ export const ko: Translations = {
         title: '일기와 진행 상황',
         body: '기분을 선택하고, 마음에 있는 것을 자유롭게 쓰고, 시간이 지나면서 진행 탭에서 패턴을 확인하세요.',
       },
+      {
+        emoji: '✨',
+        title: '진행 상황 추적하기',
+        body: '연속 기록, 기분 패턴, 호흡 세션이 모두 진행 탭에 쌓여요 — 매일 돌아오면 그림이 만들어져요.',
+      },
     ],
     next:       '다음',
     getStarted: '시작하기',
     privacy:    '🔒 데이터는 절대 이 기기를 벗어나지 않아요',
+    reportIssue: '문제 신고하기',
   },
 
   home: {
@@ -556,10 +568,16 @@ export const es: Translations = {
         title: 'Diario y Progreso',
         body: 'Elige un estado de ánimo, escribe lo que tengas en mente y observa cómo emergen patrones en la pestaña Progreso con el tiempo.',
       },
+      {
+        emoji: '✨',
+        title: 'Sigue tu progreso',
+        body: 'Tu racha, patrones de humor y sesiones de respiración están en la pestaña Progreso — vuelve cada día y observa cómo crece tu historia.',
+      },
     ],
     next:       'Siguiente',
     getStarted: '¡Vamos!',
     privacy:    '🔒 Tus datos nunca abandonan tu dispositivo',
+    reportIssue: 'Reportar un problema',
   },
 
   home: {
@@ -799,10 +817,16 @@ export const hi: Translations = {
         title: 'डायरी और प्रगति',
         body: 'एक मूड चुनें, जो मन में हो लिखें, और समय के साथ प्रगति टैब में अपने पैटर्न देखें।',
       },
+      {
+        emoji: '✨',
+        title: 'अपनी प्रगति ट्रैक करें',
+        body: 'आपकी स्ट्रीक, मूड पैटर्न और सांस के सत्र सभी प्रगति टैब में दिखते हैं — रोज़ लौटें और अपना सफर देखें।',
+      },
     ],
     next:       'आगे',
     getStarted: 'चलते हैं',
     privacy:    '🔒 आपका डेटा कभी भी इस डिवाइस से बाहर नहीं जाता',
+    reportIssue: 'समस्या रिपोर्ट करें',
   },
 
   home: {

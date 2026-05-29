@@ -115,12 +115,14 @@ async function decryptV2(stored: string): Promise<string> {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
-export async function secureWrite(key: string, data: unknown): Promise<void> {
+export async function secureWrite(key: string, data: unknown): Promise<boolean> {
   try {
     const encrypted = await encryptV2(JSON.stringify(data));
     await AsyncStorage.setItem(STORE_PREFIX + key, encrypted);
+    return true;
   } catch (err) {
     console.error('[secure-storage] write failed for key', key, err);
+    return false;
   }
 }
 

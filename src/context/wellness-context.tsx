@@ -19,6 +19,8 @@ interface WellnessContextType {
   addBreathingSession: () => void;
   streak: number;
   isLoaded: boolean;
+  saveError: boolean;
+  clearSaveError: () => void;
 }
 
 const WellnessContext = createContext<WellnessContextType | null>(null);
@@ -71,6 +73,7 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   const [entries,           setEntries]           = useState<JournalEntry[]>([]);
   const [breathingSessions, setBreathingSessions]  = useState(0);
   const [isLoaded,          setIsLoaded]           = useState(false);
+  const [saveError,         setSaveError]          = useState(false);
 
   // ── Load encrypted data on mount ──────────────────────────────────────────
   useEffect(() => {
@@ -92,13 +95,17 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   // ── Persist entries whenever they change (skip first render) ──────────────
   useEffect(() => {
     if (!isLoaded) return;
-    secureWrite(STORAGE_KEY_ENTRIES, entries);
+    secureWrite(STORAGE_KEY_ENTRIES, entries).then((ok) => {
+      if (!ok) setSaveError(true);
+    });
   }, [entries, isLoaded]);
 
   // ── Persist sessions whenever they change ─────────────────────────────────
   useEffect(() => {
     if (!isLoaded) return;
-    secureWrite(STORAGE_KEY_SESSIONS, breathingSessions);
+    secureWrite(STORAGE_KEY_SESSIONS, breathingSessions).then((ok) => {
+      if (!ok) setSaveError(true);
+    });
   }, [breathingSessions, isLoaded]);
 
   // ── Actions ───────────────────────────────────────────────────────────────
@@ -127,6 +134,8 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
     setBreathingSessions((prev) => prev + 1);
   }, [isLoaded]);
 
+  const clearSaveError = useCallback(() => setSaveError(false), []);
+
   // ── Derived ───────────────────────────────────────────────────────────────
 
   // Use the LAST entry today (most recent update) — entries are newest-first.
@@ -151,6 +160,8 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
         addBreathingSession,
         streak,
         isLoaded,
+        saveError,
+        clearSaveError,
       }}
     >
       {children}
