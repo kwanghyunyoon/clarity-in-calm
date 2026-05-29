@@ -55,8 +55,10 @@
       "expo-secure-store"
     ],
     "experiments": {
-      "typedRoutes": true,
-      "reactCompiler": true
+      "typedRoutes": true
+    },
+    "extra": {
+      "privacyPolicyUrl": "https://clarity-in-calm.netlify.app/privacy"
     }
   }
 }

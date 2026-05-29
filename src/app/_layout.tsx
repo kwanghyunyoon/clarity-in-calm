@@ -4,6 +4,7 @@ import { AppState, Platform, StyleSheet, Text, useColorScheme, View } from 'reac
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import ErrorBoundary from '@/components/error-boundary';
 import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
 import { HelpProvider } from '@/context/help-context';
@@ -56,6 +57,7 @@ export default function TabLayout() {
   const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 16);
 
   return (
+    <ErrorBoundary>
     <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
       <HelpProvider>
       <LanguageProvider>
@@ -119,5 +121,6 @@ export default function TabLayout() {
       </LanguageProvider>
       </HelpProvider>
     </ThemeProvider>
+    </ErrorBoundary>
   );
 }
