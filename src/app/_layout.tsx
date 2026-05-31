@@ -118,8 +118,7 @@ export default function TabLayout() {
               tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
             }}
           />
-          {/* Hide the original explore screen from the tab bar */}
-          <Tabs.Screen name="explore" options={{ href: null }} />
+
         </Tabs>
       </WellnessProvider>
       </LanguageProvider>
