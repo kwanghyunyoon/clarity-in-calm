@@ -60,6 +60,10 @@ export default {
     },
     extra: {
       privacyPolicyUrl: 'https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html',
+      eas: {
+        projectId: 'bf00ce6d-48cc-42ed-ac7e-584978e2fc60',
+      },
     },
+    owner: 'yoonk478',
   },
 };
