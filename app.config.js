@@ -26,6 +26,7 @@ export default {
         monochromeImage: './assets/images/android-icon-monochrome.png',
       },
       predictiveBackGestureEnabled: false,
+      permissions: ['android.permission.CAMERA'],
     },
     newArchEnabled: true,
     web: {
