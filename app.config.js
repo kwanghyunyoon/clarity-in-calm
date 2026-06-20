@@ -42,6 +42,7 @@ export default {
       lang: 'en',
     },
     plugins: [
+      ['expo-build-properties', { android: { targetSdkVersion: 36 } }],
       'expo-router',
       [
         'expo-splash-screen',
