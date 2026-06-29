@@ -196,98 +196,112 @@ function WelcomeVisual() {
 
 type ThemeColors = ReturnType<typeof useTheme>['colors'];
 
-// Slide 1 — Breathe: animated expanding circle
-function BreatheVisual({ colors }: { colors: ThemeColors }) {
-  const scale = useRef(new Animated.Value(0.75)).current;
-  const opacity = useRef(new Animated.Value(0.5)).current;
-
-  useEffect(() => {
-    const anim = Animated.loop(
-      Animated.sequence([
-        Animated.parallel([
-          Animated.timing(scale,   { toValue: 1.2, duration: 1800, useNativeDriver: true }),
-          Animated.timing(opacity, { toValue: 1,   duration: 1800, useNativeDriver: true }),
-        ]),
-        Animated.parallel([
-          Animated.timing(scale,   { toValue: 0.75, duration: 1800, useNativeDriver: true }),
-          Animated.timing(opacity, { toValue: 0.5,  duration: 1800, useNativeDriver: true }),
-        ]),
-      ])
-    );
-    anim.start();
-    return () => anim.stop();
-  }, []);
-
+// Slide 1 — Today: mini streak card + shortcut pills
+function TodayVisual({ colors }: { colors: ThemeColors }) {
   return (
-    <View style={s.breatheWrap}>
-      {/* Outer glow ring */}
-      <Animated.View
-        style={[
-          s.breatheRing,
-          { borderColor: colors.primary + '40', transform: [{ scale }], opacity },
-        ]}
-      />
-      {/* Inner circle */}
-      <Animated.View
-        style={[
-          s.breatheCircle,
-          { backgroundColor: colors.primary + '22', transform: [{ scale }] },
-        ]}
-      >
-        <Text style={s.breatheEmoji}>🫁</Text>
-      </Animated.View>
+    <View style={s.todayWrap}>
+      <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
+        <Text style={s.streakFlame}>🔥</Text>
+        <Text style={[s.streakNum, { color: colors.text }]}>7</Text>
+        <Text style={[s.streakLabel, { color: colors.textSecondary }]}>day streak</Text>
+      </View>
+      <View style={s.pillRow}>
+        <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
+          <Text style={[s.pillText, { color: colors.primary }]}>📖 Journal</Text>
+        </View>
+        <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
+          <Text style={[s.pillText, { color: colors.primary }]}>🎡 Emotions</Text>
+        </View>
+      </View>
     </View>
   );
 }
 
-// Slide 2 — Journal: interactive mini mood row
-const MOOD_EMOJIS = ['😞', '😕', '😐', '🙂', '😊'];
+// Slide 2 — Journal: template cards
+const TEMPLATE_LABELS = [
+  { icon: '✏️', label: 'Free Write' },
+  { icon: '🙏', label: 'Gratitude' },
+  { icon: '🔄', label: 'Reframe' },
+];
 function JournalVisual({ colors }: { colors: ThemeColors }) {
-  const [selected, setSelected] = useState(2);
-
   return (
-    <View style={s.moodWrap}>
-      {MOOD_EMOJIS.map((emoji, i) => (
-        <TouchableOpacity
+    <View style={s.templateWrap}>
+      {TEMPLATE_LABELS.map((t, i) => (
+        <View
           key={i}
-          onPress={() => setSelected(i)}
-          activeOpacity={0.75}
-          style={[
-            s.moodBtn,
-            { backgroundColor: i === selected ? colors.primary + '22' : colors.backgroundElement },
-            i === selected && s.moodBtnActive,
-          ]}
+          style={[s.templateCard, { backgroundColor: colors.backgroundElement }]}
         >
-          <Text style={[s.moodEmoji, i === selected && s.moodEmojiActive]}>{emoji}</Text>
-        </TouchableOpacity>
+          <Text style={s.templateIcon}>{t.icon}</Text>
+          <Text style={[s.templateLabel, { color: colors.text }]}>{t.label}</Text>
+        </View>
       ))}
     </View>
   );
 }
 
-// Slide 3 — Progress: mini streak + 7-day dots
-function ProgressVisual({ colors }: { colors: ThemeColors }) {
-  const HAS_ENTRY = [true, true, false, true, true, true, false];
+// Slide 3 — Emotions: mini Plutchik-style colour arcs
+const WHEEL_SEGMENTS = [
+  '#ef5350', '#e57373', '#ef9a9a',
+  '#ff7043', '#ff8a65', '#ffccbc',
+  '#ffa726', '#ffb74d', '#ffe0b2',
+  '#ffee58', '#fff176', '#fff9c4',
+  '#66bb6a', '#81c784', '#c8e6c9',
+  '#26c6da', '#4dd0e1', '#b2ebf2',
+  '#42a5f5', '#64b5f6', '#bbdefb',
+  '#7e57c2', '#9575cd', '#d1c4e9',
+];
+function EmotionsVisual({ colors: _colors }: { colors: ThemeColors }) {
+  const cx = 68, cy = 68, outerR = 64, innerR = 28;
+  const count = WHEEL_SEGMENTS.length;
+  const angle = (2 * Math.PI) / count;
+
+  const paths = WHEEL_SEGMENTS.map((fill, i) => {
+    const startA = i * angle - Math.PI / 2;
+    const endA   = startA + angle;
+    const x1o = cx + outerR * Math.cos(startA);
+    const y1o = cy + outerR * Math.sin(startA);
+    const x2o = cx + outerR * Math.cos(endA);
+    const y2o = cy + outerR * Math.sin(endA);
+    const x1i = cx + innerR * Math.cos(endA);
+    const y1i = cy + innerR * Math.sin(endA);
+    const x2i = cx + innerR * Math.cos(startA);
+    const y2i = cy + innerR * Math.sin(startA);
+    const d = `M${x1o},${y1o} A${outerR},${outerR} 0 0,1 ${x2o},${y2o} L${x1i},${y1i} A${innerR},${innerR} 0 0,0 ${x2i},${y2i} Z`;
+    return { d, fill };
+  });
+
+  // Use View-based fallback if SVG unavailable; rely on react-native-svg already in project
+  const Svg = require('react-native-svg').Svg;
+  const Path = require('react-native-svg').Path;
 
   return (
-    <View style={s.progressWrap}>
-      <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
-        <Text style={s.streakFlame}>🔥</Text>
-        <Text style={[s.streakNum, { color: colors.text }]}>5</Text>
-        <Text style={[s.streakLabel, { color: colors.textSecondary }]}>day streak</Text>
-      </View>
-      <View style={s.dotRow}>
-        {HAS_ENTRY.map((has, i) => (
+    <View style={s.wheelWrap}>
+      <Svg width={136} height={136} viewBox="0 0 136 136">
+        {paths.map((p, i) => (
+          <Path key={i} d={p.d} fill={p.fill} opacity={0.85} />
+        ))}
+      </Svg>
+    </View>
+  );
+}
+
+// Slide 4 — Insights: mini bar chart
+const BAR_HEIGHTS = [40, 60, 30, 80, 55, 70, 45];
+const BAR_LABELS  = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+function InsightsVisual({ colors }: { colors: ThemeColors }) {
+  return (
+    <View style={s.chartWrap}>
+      {BAR_HEIGHTS.map((h, i) => (
+        <View key={i} style={s.barCol}>
           <View
-            key={i}
             style={[
-              s.dayDot,
-              { backgroundColor: has ? colors.primary : colors.backgroundSelected },
+              s.bar,
+              { height: h, backgroundColor: colors.primary, opacity: 0.6 + i * 0.06 },
             ]}
           />
-        ))}
-      </View>
-      <Text style={[s.progressHint, { color: colors.textSecondary }]}>Last 7 days</Text>
+          <Text style={[s.barLabel, { color: colors.textSecondary }]}>{BAR_LABELS[i]}</Text>
+        </View>
+      ))}
     </View>
   );
 }
@@ -296,9 +310,10 @@ function ProgressVisual({ colors }: { colors: ThemeColors }) {
 function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
   switch (page) {
     case 0: return <WelcomeVisual />;
-    case 1: return <BreatheVisual colors={colors} />;
+    case 1: return <TodayVisual colors={colors} />;
     case 2: return <JournalVisual colors={colors} />;
-    case 3: return <ProgressVisual colors={colors} />;
+    case 3: return <EmotionsVisual colors={colors} />;
+    case 4: return <InsightsVisual colors={colors} />;
     default: return null;
   }
 }
@@ -472,31 +487,33 @@ const s = StyleSheet.create({
                   alignItems: 'center', justifyContent: 'center' },
   welcomeEmoji: { fontSize: 64 },
 
-  // Breathe
-  breatheWrap:   { alignItems: 'center', justifyContent: 'center', width: 160, height: 160 },
-  breatheRing:   { position: 'absolute', width: 140, height: 140, borderRadius: 70, borderWidth: 2 },
-  breatheCircle: { width: 100, height: 100, borderRadius: 50,
-                   alignItems: 'center', justifyContent: 'center' },
-  breatheEmoji:  { fontSize: 44 },
-
-  // Journal mood row
-  moodWrap:     { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  moodBtn:      { width: 48, height: 48, borderRadius: 14,
-                  alignItems: 'center', justifyContent: 'center' },
-  moodBtnActive:{ transform: [{ scale: 1.2 }] },
-  moodEmoji:    { fontSize: 24 },
-  moodEmojiActive: { fontSize: 28 },
-
-  // Progress
-  progressWrap:  { alignItems: 'center', gap: Spacing.two },
+  // Today
+  todayWrap:     { alignItems: 'center', gap: Spacing.two },
   streakCard:    { borderRadius: 18, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two,
                    alignItems: 'center', flexDirection: 'row', gap: Spacing.two },
   streakFlame:   { fontSize: 28 },
   streakNum:     { fontSize: 36, fontWeight: '800', lineHeight: 42 },
   streakLabel:   { fontSize: 12, fontWeight: '600' },
-  dotRow:        { flexDirection: 'row', gap: 8 },
-  dayDot:        { width: 28, height: 28, borderRadius: 8 },
-  progressHint:  { fontSize: 11, fontWeight: '500' },
+  pillRow:       { flexDirection: 'row', gap: Spacing.two },
+  pill:          { borderRadius: 50, paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 2 },
+  pillText:      { fontSize: 13, fontWeight: '700' },
+
+  // Journal templates
+  templateWrap:  { gap: Spacing.one + 2 },
+  templateCard:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
+                   borderRadius: 12, paddingHorizontal: Spacing.three,
+                   paddingVertical: Spacing.one + 4, width: 180 },
+  templateIcon:  { fontSize: 20 },
+  templateLabel: { fontSize: 14, fontWeight: '600' },
+
+  // Emotions wheel
+  wheelWrap:     { alignItems: 'center', justifyContent: 'center' },
+
+  // Insights chart
+  chartWrap:     { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 90 },
+  barCol:        { alignItems: 'center', gap: 4 },
+  bar:           { width: 20, borderRadius: 5 },
+  barLabel:      { fontSize: 10, fontWeight: '600' },
 
   // Slide text
   slide:        { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.two,

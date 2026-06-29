@@ -1,3 +1,5 @@
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import {
@@ -18,7 +20,7 @@ import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { IAP_CONFIG } from '@/config/iap';
 import { useSettings } from '@/context/settings-context';
-import { secureDelete } from '@/lib/secure-storage';
+import { secureDelete, secureRead } from '@/lib/secure-storage';
 import {
   cancelDailyReminder,
   requestNotificationPermission,
@@ -289,6 +291,32 @@ export default function SettingsScreen() {
     );
   }
 
+  async function handleExport() {
+    try {
+      const payload: Record<string, unknown> = { exportedAt: new Date().toISOString() };
+      await Promise.all(
+        DATA_KEYS.map(async (key) => {
+          const raw = await secureRead(key);
+          if (raw) {
+            try { payload[key] = JSON.parse(raw); } catch { payload[key] = raw; }
+          }
+        }),
+      );
+      const json = JSON.stringify(payload, null, 2);
+      const filename = `clarity-export-${new Date().toISOString().slice(0, 10)}.json`;
+      const uri = (FileSystem.cacheDirectory ?? FileSystem.documentDirectory ?? '') + filename;
+      await FileSystem.writeAsStringAsync(uri, json, { encoding: FileSystem.EncodingType.UTF8 });
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
+      } else {
+        Alert.alert('Exported', `Saved to: ${uri}`);
+      }
+    } catch (e: any) {
+      Alert.alert('Export failed', e.message ?? 'Something went wrong.');
+    }
+  }
+
   function openPrivacy() {
     WebBrowser.openBrowserAsync('https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html');
   }
@@ -433,7 +461,7 @@ export default function SettingsScreen() {
         <SettingsGroup>
           <SettingsRow
             label={ts.exportData}
-            onPress={() => Alert.alert('Export', 'Data export coming soon.')}
+            onPress={handleExport}
           />
           <SettingsRow
             label={ts.deleteData}
