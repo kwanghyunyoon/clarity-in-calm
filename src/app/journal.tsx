@@ -50,6 +50,118 @@ function formatTimestamp(iso: string) {
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
 
+// ── Date picker modal ─────────────────────────────────────────────────────────
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function DatePickerModal({
+  visible,
+  onClose,
+  onConfirm,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  onConfirm: (date: Date) => void;
+}) {
+  const { colors } = useTheme();
+  const today = new Date();
+  const minYear = today.getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => minYear + i);
+
+  const [selYear,  setSelYear]  = useState(minYear);
+  const [selMonth, setSelMonth] = useState(today.getMonth());
+  const [selDay,   setSelDay]   = useState(today.getDate() + 1 > 28 ? 1 : today.getDate() + 1);
+
+  const daysInMonth = new Date(selYear, selMonth + 1, 0).getDate();
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  // Keep selDay in range when month/year changes
+  const safeDay = Math.min(selDay, daysInMonth);
+
+  function handleConfirm() {
+    const d = new Date(selYear, selMonth, safeDay, 12, 0, 0);
+    if (d <= today) return; // must be future
+    onConfirm(d);
+    onClose();
+  }
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={dp.overlay}>
+        <TouchableOpacity style={dp.backdrop} activeOpacity={1} onPress={onClose} />
+        <View style={[dp.sheet, { backgroundColor: colors.surface }]}>
+          <Text style={[dp.title, { color: colors.text }]}>Set unlock date</Text>
+          <Text style={[dp.subtitle, { color: colors.textSecondary }]}>
+            Letter will be hidden until this date
+          </Text>
+          <View style={dp.pickerRow}>
+            {/* Month */}
+            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+              {MONTHS.map((m, idx) => (
+                <TouchableOpacity key={m} onPress={() => setSelMonth(idx)} style={dp.item}>
+                  <Text style={[dp.itemText, { color: idx === selMonth ? colors.primary : colors.textSecondary },
+                    idx === selMonth && dp.itemSelected]}>
+                    {m}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            {/* Day */}
+            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+              {days.map(d => (
+                <TouchableOpacity key={d} onPress={() => setSelDay(d)} style={dp.item}>
+                  <Text style={[dp.itemText, { color: d === safeDay ? colors.primary : colors.textSecondary },
+                    d === safeDay && dp.itemSelected]}>
+                    {String(d).padStart(2, '0')}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            {/* Year */}
+            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
+              {years.map(y => (
+                <TouchableOpacity key={y} onPress={() => setSelYear(y)} style={dp.item}>
+                  <Text style={[dp.itemText, { color: y === selYear ? colors.primary : colors.textSecondary },
+                    y === selYear && dp.itemSelected]}>
+                    {y}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+          <TouchableOpacity
+            style={[dp.btn, { backgroundColor: colors.primary }]}
+            onPress={handleConfirm}
+          >
+            <Text style={dp.btnText}>Set date</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose} style={dp.cancel}>
+            <Text style={[dp.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const dp = StyleSheet.create({
+  overlay:    { flex: 1, justifyContent: 'flex-end' },
+  backdrop:   { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.5)' },
+  sheet:      { borderTopLeftRadius: 24, borderTopRightRadius: 24,
+                padding: Spacing.four, paddingBottom: Spacing.four + 16, gap: Spacing.two },
+  title:      { fontSize: 20, fontWeight: '800' },
+  subtitle:   { fontSize: 13, fontWeight: '500' },
+  pickerRow:  { flexDirection: 'row', gap: Spacing.two, height: 180 },
+  col:        { flex: 1 },
+  item:       { paddingVertical: Spacing.two, alignItems: 'center' },
+  itemText:   { fontSize: 16, fontWeight: '500' },
+  itemSelected: { fontWeight: '700' as const },
+  btn:        { borderRadius: 50, paddingVertical: Spacing.two + 6,
+                alignItems: 'center', marginTop: Spacing.two },
+  btnText:    { fontSize: 16, fontWeight: '700', color: '#fff' },
+  cancel:     { alignItems: 'center', paddingVertical: Spacing.two },
+  cancelText: { fontSize: 15, fontWeight: '500' },
+});
+
 export default function JournalScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
@@ -68,6 +180,8 @@ export default function JournalScreen() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [showTagInput, setShowTagInput] = useState(false);
   const [newTagText, setNewTagText] = useState('');
+  const [unlockDate, setUnlockDate] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const bottomPad = 88 + insets.bottom;
 
@@ -101,9 +215,12 @@ export default function JournalScreen() {
   }
 
   function doSave(m: MoodValue, n: string) {
+    const isFuture = selectedTemplate.id === 'future-self';
     addEntry(m, n, {
       templateId: selectedTemplate.id !== 'free' ? selectedTemplate.id : undefined,
       tags: selectedTags.length > 0 ? [...selectedTags] : undefined,
+      isFutureSelf: isFuture || undefined,
+      unlockAt: isFuture && unlockDate ? unlockDate.toISOString() : undefined,
     });
     setSavedAnim(true);
     setTimeout(() => {
@@ -111,6 +228,7 @@ export default function JournalScreen() {
       setMood(null);
       setNote('');
       setSelectedTags([]);
+      setUnlockDate(null);
     }, 1600);
   }
 
@@ -151,11 +269,37 @@ export default function JournalScreen() {
 
   const renderEntry = useCallback(({ item: entry, index: i }: ListRenderItemInfo<EntryItem>) => {
     const moodDef = t.moods.find(m => m.value === entry.mood);
+    const isSealed = entry.isFutureSelf && entry.unlockAt && new Date() < new Date(entry.unlockAt);
+
+    if (isSealed) {
+      const unlockDateObj = new Date(entry.unlockAt!);
+      return (
+        <Animated.View
+          entering={FadeInDown.delay(Math.min(i, 8) * 30).springify()}
+          style={[styles.entryCard, styles.sealedCard, { backgroundColor: colors.surface, borderColor: colors.primary + '44' }]}
+        >
+          <Text style={styles.sealedEnvelope}>💌</Text>
+          <Text style={[styles.sealedTitle, { color: colors.text }]}>{te.futureSelfLocked}</Text>
+          <Text style={[styles.sealedDate, { color: colors.primary }]}>
+            {unlockDateObj.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}
+          </Text>
+          <Text style={[styles.sealedHint, { color: colors.textSecondary }]}>
+            {formatTimestamp(entry.date)}
+          </Text>
+        </Animated.View>
+      );
+    }
+
     return (
       <Animated.View
         entering={FadeInDown.delay(Math.min(i, 8) * 30).springify()}
         style={[styles.entryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
       >
+        {entry.isFutureSelf && (
+          <View style={[styles.futureSelfBadge, { backgroundColor: colors.primary + '18' }]}>
+            <Text style={[styles.futureSelfBadgeText, { color: colors.primary }]}>💌 {te.futureSelfUnlock}</Text>
+          </View>
+        )}
         <View style={styles.entryHeader}>
           <View style={styles.entryMoodRow}>
             <View style={[styles.moodDot, { backgroundColor: moodDef?.color ?? colors.border }]} />
@@ -224,6 +368,7 @@ export default function JournalScreen() {
                   setSelectedTemplate(tmpl);
                   if (tmpl.id !== 'free') setNote(tmpl.prompts.join('\n\n'));
                   else setNote('');
+                  if (tmpl.id !== 'future-self') setUnlockDate(null);
                 }}
                 style={[
                   styles.templateCard,
@@ -289,6 +434,28 @@ export default function JournalScreen() {
           accessibilityLabel="Journal entry"
         />
       </View>
+
+      {/* ── Future Self unlock date ── */}
+      {selectedTemplate.id === 'future-self' && (
+        <TouchableOpacity
+          style={[styles.unlockBanner, { backgroundColor: colors.surface, borderColor: colors.primary + '55' }]}
+          onPress={() => setShowDatePicker(true)}
+          activeOpacity={0.8}
+        >
+          <Text style={styles.unlockBannerIcon}>💌</Text>
+          <View style={styles.unlockBannerText}>
+            <Text style={[styles.unlockBannerLabel, { color: colors.textSecondary }]}>
+              {te.unlockDate}
+            </Text>
+            <Text style={[styles.unlockBannerValue, { color: unlockDate ? colors.primary : colors.textSecondary }]}>
+              {unlockDate
+                ? unlockDate.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })
+                : te.setDate}
+            </Text>
+          </View>
+          <Text style={[styles.unlockBannerChevron, { color: colors.textSecondary }]}>›</Text>
+        </TouchableOpacity>
+      )}
 
       {/* ── Tags ── */}
       <View style={styles.section}>
@@ -421,6 +588,13 @@ export default function JournalScreen() {
         initialNumToRender={8}
         maxToRenderPerBatch={8}
         windowSize={5}
+      />
+
+      {/* ── Future Self date picker ── */}
+      <DatePickerModal
+        visible={showDatePicker}
+        onClose={() => setShowDatePicker(false)}
+        onConfirm={(d) => setUnlockDate(d)}
       />
 
       {/* ── Crisis modal ── */}
@@ -620,4 +794,28 @@ const styles = StyleSheet.create({
   crisisBtn: { borderRadius: BorderRadius.xl, paddingVertical: Spacing.three, alignItems: 'center' },
   crisisBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   crisisSaveLink: { textAlign: 'center', fontSize: 14, paddingVertical: Spacing.two },
+
+  // Future Self
+  unlockBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1.5,
+    padding: Spacing.three,
+    gap: Spacing.two,
+  },
+  unlockBannerIcon:    { fontSize: 22 },
+  unlockBannerText:    { flex: 1, gap: 2 },
+  unlockBannerLabel:   { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.6 },
+  unlockBannerValue:   { fontSize: 15, fontWeight: '700' },
+  unlockBannerChevron: { fontSize: 22, fontWeight: '300' },
+
+  sealedCard:     { alignItems: 'center', paddingVertical: Spacing.five },
+  sealedEnvelope: { fontSize: 48, marginBottom: Spacing.one },
+  sealedTitle:    { fontSize: 14, fontWeight: '600' },
+  sealedDate:     { fontSize: 18, fontWeight: '800' },
+  sealedHint:     { fontSize: 12, marginTop: Spacing.one },
+
+  futureSelfBadge:     { borderRadius: BorderRadius.sm, paddingVertical: 4, paddingHorizontal: Spacing.two, alignSelf: 'flex-start' },
+  futureSelfBadgeText: { fontSize: 12, fontWeight: '700' },
 });

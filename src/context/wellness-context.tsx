@@ -7,7 +7,7 @@ export type { MoodValue, JournalEntry };
 
 interface WellnessContextType {
   entries: JournalEntry[];
-  addEntry: (mood: MoodValue, note: string, extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title'>>) => void;
+  addEntry: (mood: MoodValue, note: string, extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title' | 'isFutureSelf' | 'unlockAt'>>) => void;
   updateEntry: (id: string, patch: Partial<JournalEntry>) => void;
   deleteEntry: (id: string) => void;
   customTags: string[];
@@ -92,7 +92,7 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   const addEntry = useCallback((
     mood: MoodValue,
     note: string,
-    extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title'>>,
+    extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title' | 'isFutureSelf' | 'unlockAt'>>,
   ) => {
     if (!isLoaded) return;
     setEntries(prev => [{
