@@ -21,7 +21,7 @@ function toFixed1OrDash(val: number | null) {
 }
 
 export default function ProgressScreen() {
-  const colors = useTheme();
+  const { colors } = useTheme();
   const t = useTranslation();
   const { locale } = useLocale();
   const { entries, breathingSessions, streak } = useWellness();

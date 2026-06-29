@@ -45,6 +45,14 @@ export default {
       ['expo-build-properties', { android: { targetSdkVersion: 36 } }],
       'expo-router',
       [
+        'expo-notifications',
+        {
+          icon: './assets/images/icon.png',
+          color: '#F0A855',
+          sounds: [],
+        },
+      ],
+      [
         'expo-splash-screen',
         {
           backgroundColor: '#EDEAE5',

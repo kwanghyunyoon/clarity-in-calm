@@ -23,7 +23,7 @@ const PHASE_IDS = ['inhale', 'hold1', 'exhale', 'rest'] as const;
 const CYCLE_MS = PHASE_DURATIONS.reduce((s, d) => s + d, 0); // 16 000 ms
 
 export default function BreatheScreen() {
-  const colors = useTheme();
+  const { colors } = useTheme();
   const t = useTranslation();
   const { addBreathingSession } = useWellness();
 

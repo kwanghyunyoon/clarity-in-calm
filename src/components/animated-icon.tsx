@@ -58,7 +58,7 @@ export function AnimatedSplashOverlay() {
 
 const styles = StyleSheet.create({
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: '#EDEAE5',
     alignItems: 'center',
     justifyContent: 'center',

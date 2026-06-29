@@ -14,7 +14,7 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
 export default function GroundScreen() {
-  const colors = useTheme();
+  const { colors } = useTheme();
   const t = useTranslation();
   const g = t.ground;
 
