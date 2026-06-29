@@ -1,8 +1,8 @@
 import * as WebBrowser from 'expo-web-browser';
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
-  Linking,
+  Modal,
   Platform,
   ScrollView,
   StyleSheet,
@@ -11,12 +11,19 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, Spacing } from '@/constants/theme';
+import { IAP_CONFIG } from '@/config/iap';
 import { useSettings } from '@/context/settings-context';
 import { secureDelete } from '@/lib/secure-storage';
+import {
+  cancelDailyReminder,
+  requestNotificationPermission,
+  scheduleDailyReminder,
+} from '@/lib/notifications';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useLocale } from '@/context/language-context';
@@ -76,6 +83,89 @@ function SettingsGroup({ children }: { children: React.ReactNode }) {
   );
 }
 
+// ── Time picker modal ──────────────────────────────────────────────────────────
+function TimePicker({
+  visible,
+  hour,
+  minute,
+  onConfirm,
+  onClose,
+}: {
+  visible: boolean;
+  hour: number;
+  minute: number;
+  onConfirm: (h: number, m: number) => void;
+  onClose: () => void;
+}) {
+  const { colors } = useTheme();
+  const [h, setH] = useState(hour);
+  const [m, setM] = useState(minute);
+
+  const HOURS = Array.from({ length: 24 }, (_, i) => i);
+  const MINUTES = [0, 15, 30, 45];
+
+  return (
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={tp.overlay}>
+        <View style={[tp.sheet, { backgroundColor: colors.surface }]}>
+          <Text style={[tp.title, { color: colors.text }]}>Reminder time</Text>
+
+          <View style={tp.row}>
+            {/* Hour picker */}
+            <View style={tp.col}>
+              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>Hour</Text>
+              <ScrollView style={tp.scroll} showsVerticalScrollIndicator={false}>
+                {HOURS.map(hh => (
+                  <TouchableOpacity
+                    key={hh}
+                    onPress={() => setH(hh)}
+                    style={[tp.item, hh === h && { backgroundColor: colors.primary + '22' }]}
+                  >
+                    <Text style={[tp.itemText, { color: hh === h ? colors.primary : colors.text }]}>
+                      {String(hh).padStart(2, '0')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            <Text style={[tp.colon, { color: colors.text }]}>:</Text>
+
+            {/* Minute picker */}
+            <View style={tp.col}>
+              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>Min</Text>
+              <ScrollView style={tp.scroll} showsVerticalScrollIndicator={false}>
+                {MINUTES.map(mm => (
+                  <TouchableOpacity
+                    key={mm}
+                    onPress={() => setM(mm)}
+                    style={[tp.item, mm === m && { backgroundColor: colors.primary + '22' }]}
+                  >
+                    <Text style={[tp.itemText, { color: mm === m ? colors.primary : colors.text }]}>
+                      {String(mm).padStart(2, '0')}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={[tp.btn, { backgroundColor: colors.primary }]}
+            onPress={() => onConfirm(h, m)}
+          >
+            <Text style={tp.btnText}>Set reminder</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={onClose} style={tp.cancel}>
+            <Text style={[tp.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ── Main screen ───────────────────────────────────────────────────────────────
 export default function SettingsScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
@@ -83,39 +173,103 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { settings, setNotificationSettings, setIAPStatus, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
-  const notifEnabled = settings.notifications.enabled;
 
+  const [iapLoading, setIapLoading] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const notifEnabled = settings.notifications.enabled;
   const bottomPad = 88 + insets.bottom;
   const isUnlocked = settings.iap.unlocked;
 
+  // ── IAP ────────────────────────────────────────────────────────────────────
+
+  async function initRC() {
+    Purchases.setLogLevel(LOG_LEVEL.ERROR);
+    Purchases.configure({
+      apiKey: Platform.select({
+        ios: IAP_CONFIG.REVENUECAT_API_KEY_IOS,
+        android: IAP_CONFIG.REVENUECAT_API_KEY_ANDROID,
+        default: IAP_CONFIG.REVENUECAT_API_KEY_IOS,
+      })!,
+    });
+  }
+
   async function handleUnlock() {
-    // IAP integration placeholder — shows confirmation for now
-    Alert.alert(
-      ts.unlockTitle,
-      'This will open the App Store to complete your purchase.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: ts.unlockBtn,
-          onPress: () => {
-            // In production: call expo-in-app-purchases here
-            setIAPStatus({ unlocked: true });
-          },
-        },
-      ],
-    );
+    if (iapLoading) return;
+    setIapLoading(true);
+    try {
+      await initRC();
+      const offerings = await Purchases.getOfferings();
+      const pkg = offerings.current?.availablePackages.find(
+        p => p.product.identifier === IAP_CONFIG.PRODUCT_ID,
+      ) ?? offerings.current?.availablePackages[0];
+
+      if (!pkg) {
+        Alert.alert('Not available', 'Purchase not available right now. Try again later.');
+        return;
+      }
+
+      const { customerInfo } = await Purchases.purchasePackage(pkg);
+      const unlocked = customerInfo.entitlements.active[IAP_CONFIG.ENTITLEMENT_ID] !== undefined;
+      setIAPStatus({ unlocked });
+
+      if (!unlocked) {
+        Alert.alert('Purchase failed', 'Purchase could not be verified. Please contact support.');
+      }
+    } catch (e: any) {
+      if (!e.userCancelled) {
+        Alert.alert('Purchase error', e.message ?? 'Something went wrong.');
+      }
+    } finally {
+      setIapLoading(false);
+    }
   }
 
   async function handleRestore() {
-    // IAP restore placeholder
-    Alert.alert('Restore', 'Checking for previous purchases…', [
-      { text: 'OK' },
-    ]);
+    if (iapLoading) return;
+    setIapLoading(true);
+    try {
+      await initRC();
+      const customerInfo = await Purchases.restorePurchases();
+      const unlocked = customerInfo.entitlements.active[IAP_CONFIG.ENTITLEMENT_ID] !== undefined;
+      setIAPStatus({ unlocked });
+      Alert.alert(
+        unlocked ? 'Restored!' : 'Nothing to restore',
+        unlocked ? 'Your purchase has been restored.' : 'No previous purchase found for this account.',
+      );
+    } catch (e: any) {
+      Alert.alert('Restore failed', e.message ?? 'Something went wrong.');
+    } finally {
+      setIapLoading(false);
+    }
   }
 
-  function toggleNotifications(value: boolean) {
+  // ── Notifications ──────────────────────────────────────────────────────────
+
+  async function toggleNotifications(value: boolean) {
+    if (value) {
+      const granted = await requestNotificationPermission();
+      if (!granted) {
+        Alert.alert(
+          'Permission required',
+          'Please enable notifications in your device settings to receive daily reminders.',
+        );
+        return;
+      }
+      await scheduleDailyReminder(settings.notifications.hour, settings.notifications.minute);
+    } else {
+      await cancelDailyReminder();
+    }
     setNotificationSettings({ ...settings.notifications, enabled: value });
   }
+
+  async function handleTimeConfirm(h: number, m: number) {
+    setShowTimePicker(false);
+    await scheduleDailyReminder(h, m);
+    setNotificationSettings({ ...settings.notifications, hour: h, minute: m });
+  }
+
+  // ── Data ───────────────────────────────────────────────────────────────────
 
   function handleDeleteAll() {
     Alert.alert(
@@ -138,6 +292,8 @@ export default function SettingsScreen() {
   function openPrivacy() {
     WebBrowser.openBrowserAsync('https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html');
   }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
@@ -172,12 +328,14 @@ export default function SettingsScreen() {
               </View>
               <AnimatedPressable
                 onPress={handleUnlock}
-                style={[styles.unlockBtn, { backgroundColor: colors.primary }]}
+                style={[styles.unlockBtn, { backgroundColor: colors.primary, opacity: iapLoading ? 0.6 : 1 }]}
                 accessibilityRole="button"
               >
-                <Text style={styles.unlockBtnText}>{ts.unlockBtn}</Text>
+                <Text style={styles.unlockBtnText}>
+                  {iapLoading ? 'Processing…' : ts.unlockBtn}
+                </Text>
               </AnimatedPressable>
-              <TouchableOpacity onPress={handleRestore} style={styles.restoreBtn}>
+              <TouchableOpacity onPress={handleRestore} style={styles.restoreBtn} disabled={iapLoading}>
                 <Text style={[styles.restoreBtnText, { color: colors.textSecondary }]}>{ts.restoreBtn}</Text>
               </TouchableOpacity>
             </View>
@@ -211,7 +369,7 @@ export default function SettingsScreen() {
             <SettingsRow
               label={ts.reminderTime}
               value={`${String(settings.notifications.hour).padStart(2, '0')}:${String(settings.notifications.minute).padStart(2, '0')}`}
-              onPress={() => Alert.alert('Time Picker', 'Time picker coming soon.')}
+              onPress={() => setShowTimePicker(true)}
             />
           )}
         </SettingsGroup>
@@ -294,6 +452,14 @@ export default function SettingsScreen() {
           {ts.aboutBody}
         </Text>
       </ScrollView>
+
+      <TimePicker
+        visible={showTimePicker}
+        hour={settings.notifications.hour}
+        minute={settings.notifications.minute}
+        onConfirm={handleTimeConfirm}
+        onClose={() => setShowTimePicker(false)}
+      />
     </View>
   );
 }
@@ -371,4 +537,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingVertical: Spacing.three,
   },
+});
+
+const tp = StyleSheet.create({
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: Spacing.four },
+  sheet: { borderRadius: BorderRadius.xl, padding: Spacing.four, gap: Spacing.three },
+  title: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.four },
+  col: { alignItems: 'center', gap: Spacing.two },
+  colLabel: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
+  scroll: { height: 180 },
+  item: { paddingVertical: 10, paddingHorizontal: Spacing.three, borderRadius: BorderRadius.md, minWidth: 56, alignItems: 'center' },
+  itemText: { fontSize: 18, fontWeight: '600' },
+  colon: { fontSize: 24, fontWeight: '700', marginTop: 28 },
+  btn: { borderRadius: BorderRadius.xl, paddingVertical: Spacing.three, alignItems: 'center' },
+  btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  cancel: { alignItems: 'center', paddingVertical: Spacing.two },
+  cancelText: { fontSize: 14 },
 });
