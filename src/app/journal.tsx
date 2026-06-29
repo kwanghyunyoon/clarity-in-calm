@@ -281,7 +281,7 @@ export default function JournalScreen() {
             <Animated.View entering={FadeInDown.springify()} style={styles.tagInputRow}>
               <TextInput
                 style={[styles.tagInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-                placeholder="custom tag…"
+                placeholder={te.customTagPlaceholder}
                 placeholderTextColor={colors.textSecondary}
                 value={newTagText}
                 onChangeText={setNewTagText}
@@ -290,7 +290,7 @@ export default function JournalScreen() {
                 autoFocus
               />
               <TouchableOpacity onPress={handleAddCustomTag} style={[styles.tagAddConfirm, { backgroundColor: colors.primary }]}>
-                <Text style={styles.tagAddConfirmText}>Add</Text>
+                <Text style={styles.tagAddConfirmText}>{te.addTagConfirm}</Text>
               </TouchableOpacity>
             </Animated.View>
           )}
@@ -404,7 +404,7 @@ export default function JournalScreen() {
                     accessibilityLabel="Delete entry"
                     accessibilityRole="button"
                   >
-                    <Text style={[styles.deleteText, { color: colors.textSecondary }]}>Delete</Text>
+                    <Text style={[styles.deleteText, { color: colors.textSecondary }]}>{te.deleteEntry}</Text>
                   </TouchableOpacity>
                 </Animated.View>
               );
@@ -414,7 +414,7 @@ export default function JournalScreen() {
       </ScrollView>
 
       {/* ── Crisis modal ── */}
-      <Modal visible={showCrisis} transparent animationType="fade">
+      <Modal visible={showCrisis} transparent animationType="fade" onRequestClose={() => { setShowCrisis(false); setPendingSave(null); }}>
         <View style={styles.modalOverlay}>
           <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
             <Text style={[styles.crisisTitle, { color: colors.text }]}>{tj.crisis.title}</Text>

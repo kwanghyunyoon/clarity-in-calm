@@ -58,7 +58,7 @@ interface Props {
 }
 
 export function PlutchikWheel({ selectedId, onSelect }: Props) {
-  const { colors } = useTheme();
+  const { colors, scheme } = useTheme();
 
   const rings: Array<{ ring: 1 | 2 | 3; innerR: number; outerR: number }> = [
     { ring: 1, innerR: RING_RADII.inner, outerR: RING_RADII.ring1 },
@@ -66,9 +66,6 @@ export function PlutchikWheel({ selectedId, onSelect }: Props) {
     { ring: 3, innerR: RING_RADII.ring2, outerR: RING_RADII.ring3 },
   ];
 
-  const emotionsByRingAndAngle = EMOTIONS.reduce<Record<string, PlutchikEmotion>>(
-    (acc, e) => { acc[`${e.ring}-${e.angle}`] = e; return acc; }, {},
-  );
 
   return (
     <View style={styles.container} accessibilityLabel="Emotion wheel">
@@ -105,7 +102,7 @@ export function PlutchikWheel({ selectedId, onSelect }: Props) {
                   y={lp.y + fontSize / 2.5}
                   fontSize={fontSize}
                   textAnchor="middle"
-                  fill={ring === 1 ? '#fff' : '#1a1a1a'}
+                  fill={ring === 1 ? '#fff' : scheme === 'dark' ? '#f0f0f0' : '#1a1a1a'}
                   fontWeight="600"
                   pointerEvents="none"
                 >

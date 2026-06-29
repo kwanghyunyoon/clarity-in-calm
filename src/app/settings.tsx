@@ -1,5 +1,5 @@
 import * as WebBrowser from 'expo-web-browser';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Alert,
   Linking,
@@ -14,8 +14,9 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
-import { BorderRadius, Colors, Spacing } from '@/constants/theme';
+import { BorderRadius, Spacing } from '@/constants/theme';
 import { useSettings } from '@/context/settings-context';
+import { secureDelete } from '@/lib/secure-storage';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useLocale } from '@/context/language-context';
@@ -28,13 +29,12 @@ const LANGUAGES: { code: Locale; label: string; flag: string }[] = [
   { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
 ];
 
-const IAP_FEATURES = [
-  'Full Plutchik emotion wheel (32 emotions)',
-  'Unlimited history & analytics',
-  'PDF reports & data export',
-  'Future Self Letters',
-  'Advanced pattern insights',
-  'All journal templates',
+const DATA_KEYS = [
+  'wellness_entries_v1',
+  'wellness_entries_v2',
+  'wellness_emotions_v1',
+  'wellness_settings_v1',
+  'wellness_custom_tags_v1',
 ];
 
 function SectionHeader({ label }: { label: string }) {
@@ -83,7 +83,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { settings, setNotificationSettings, setIAPStatus, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
-  const [notifEnabled, setNotifEnabled] = useState(settings.notifications.enabled);
+  const notifEnabled = settings.notifications.enabled;
 
   const bottomPad = 88 + insets.bottom;
   const isUnlocked = settings.iap.unlocked;
@@ -114,7 +114,6 @@ export default function SettingsScreen() {
   }
 
   function toggleNotifications(value: boolean) {
-    setNotifEnabled(value);
     setNotificationSettings({ ...settings.notifications, enabled: value });
   }
 
@@ -127,8 +126,8 @@ export default function SettingsScreen() {
         {
           text: ts.deleteConfirm.confirm,
           style: 'destructive',
-          onPress: () => {
-            // In production: call secureWrite to clear all keys
+          onPress: async () => {
+            await Promise.all(DATA_KEYS.map(k => secureDelete(k)));
             Alert.alert('Done', 'All data has been deleted.');
           },
         },
@@ -164,7 +163,7 @@ export default function SettingsScreen() {
               <Text style={[styles.iapTitle, { color: colors.text }]}>{ts.unlockTitle}</Text>
               <Text style={[styles.iapPrice, { color: colors.textSecondary }]}>{ts.unlockPrice}</Text>
               <View style={styles.featureList}>
-                {IAP_FEATURES.map(f => (
+                {ts.unlockFeatures.map(f => (
                   <View key={f} style={styles.featureRow}>
                     <Text style={[styles.featureCheck, { color: colors.primary }]}>✓</Text>
                     <Text style={[styles.featureText, { color: colors.text }]}>{f}</Text>

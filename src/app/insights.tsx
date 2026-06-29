@@ -42,7 +42,7 @@ export default function InsightsScreen() {
 
   const bottomPad = 88 + insets.bottom;
 
-  const last7Days = getLast7Days();
+  const last7Days = useMemo(() => getLast7Days(), []);
 
   // ── Stats
   const avgMood = useMemo(() => {

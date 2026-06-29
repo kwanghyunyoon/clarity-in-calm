@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { PanResponder, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -10,7 +10,6 @@ import { useTheme } from '@/hooks/use-theme';
 
 const TRACK_HEIGHT = 8;
 const THUMB_SIZE = 28;
-const TRACK_WIDTH = 260;
 
 interface Props {
   value: number; // 1-10
@@ -22,9 +21,10 @@ interface Props {
 
 export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', highLabel = 'intense' }: Props) {
   const { colors } = useTheme();
+  const [trackWidth, setTrackWidth] = useState(260);
 
-  const toX = (v: number) => ((v - 1) / 9) * TRACK_WIDTH;
-  const toValue = (x: number) => Math.round((Math.max(0, Math.min(x, TRACK_WIDTH)) / TRACK_WIDTH) * 9) + 1;
+  const toX = (v: number) => ((v - 1) / 9) * trackWidth;
+  const toValue = (x: number) => Math.round((Math.max(0, Math.min(x, trackWidth)) / trackWidth) * 9) + 1;
 
   const thumbX = useSharedValue(toX(value));
   const startX = useRef(toX(value));
@@ -37,7 +37,7 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
         startX.current = thumbX.value;
       },
       onPanResponderMove: (_, gestureState) => {
-        const newX = Math.max(0, Math.min(startX.current + gestureState.dx, TRACK_WIDTH));
+        const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
         thumbX.value = newX;
         onChange(toValue(newX));
       },
@@ -61,8 +61,15 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
         style={styles.track}
         accessibilityRole="adjustable"
         accessibilityValue={{ min: 1, max: 10, now: value }}
+        onLayout={e => {
+          const w = e.nativeEvent.layout.width;
+          if (w > 0 && w !== trackWidth) {
+            setTrackWidth(w);
+            thumbX.value = toX(value);
+          }
+        }}
       >
-        <View style={[styles.trackBg, { backgroundColor: colors.backgroundElement, width: TRACK_WIDTH }]} />
+        <View style={[styles.trackBg, { backgroundColor: colors.backgroundElement }]} />
         <Animated.View style={[styles.trackFill, { backgroundColor: color }, fillStyle]} />
         <Animated.View
           style={[styles.thumb, { backgroundColor: color, borderColor: '#fff' }, thumbStyle]}
@@ -81,8 +88,8 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
 
 const styles = StyleSheet.create({
   container: { gap: Spacing.two },
-  track: { height: THUMB_SIZE, justifyContent: 'center', position: 'relative', width: TRACK_WIDTH },
-  trackBg: { height: TRACK_HEIGHT, borderRadius: BorderRadius.pill, position: 'absolute', left: 0 },
+  track: { height: THUMB_SIZE, justifyContent: 'center', position: 'relative' },
+  trackBg: { height: TRACK_HEIGHT, borderRadius: BorderRadius.pill, position: 'absolute', left: 0, right: 0 },
   trackFill: { height: TRACK_HEIGHT, borderRadius: BorderRadius.pill, position: 'absolute', left: 0 },
   thumb: {
     width: THUMB_SIZE,

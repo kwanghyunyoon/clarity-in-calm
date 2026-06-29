@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { secureRead, secureWrite } from '@/lib/secure-storage';
 import { EmotionLog } from '@/types';
 
@@ -53,10 +53,10 @@ export function EmotionProvider({ children }: { children: React.ReactNode }) {
     setEmotionLogs(prev => prev.filter(e => e.id !== id));
   }, [isLoaded]);
 
-  const today = toLocalDateStr(new Date());
-  const todayEmotions = emotionLogs.filter(
-    e => toLocalDateStr(new Date(e.date)) === today,
-  );
+  const todayEmotions = useMemo(() => {
+    const today = toLocalDateStr(new Date());
+    return emotionLogs.filter(e => toLocalDateStr(new Date(e.date)) === today);
+  }, [emotionLogs]);
 
   return (
     <EmotionContext.Provider value={{ emotionLogs, addEmotionLog, deleteEmotionLog, todayEmotions, isLoaded }}>

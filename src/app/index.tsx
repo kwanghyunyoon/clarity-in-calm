@@ -139,6 +139,8 @@ export default function TodayScreen() {
             streakStart={t.today.streakStart}
             totalEntries={entries.length}
             totalEmotions={emotionLogs.length}
+            entriesLabel={t.today.journalEntries}
+            emotionsLabel={t.today.emotionsLogged}
           />
         </Animated.View>
 

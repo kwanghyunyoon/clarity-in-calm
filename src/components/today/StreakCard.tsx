@@ -17,9 +17,11 @@ interface Props {
   streakStart: string;
   totalEntries: number;
   totalEmotions: number;
+  entriesLabel: string;
+  emotionsLabel: string;
 }
 
-export function StreakCard({ streak, streakLabel, streakStart, totalEntries, totalEmotions }: Props) {
+export function StreakCard({ streak, streakLabel, streakStart, totalEntries, totalEmotions, entriesLabel, emotionsLabel }: Props) {
   const { colors } = useTheme();
   const flameScale = useSharedValue(1);
 
@@ -69,12 +71,12 @@ export function StreakCard({ streak, streakLabel, streakStart, totalEntries, tot
       <View style={styles.statsRow}>
         <View style={styles.stat}>
           <Text style={[styles.statNum, { color: colors.text }]}>{totalEntries}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>journal{'\n'}entries</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{entriesLabel}</Text>
         </View>
         <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
         <View style={styles.stat}>
           <Text style={[styles.statNum, { color: colors.text }]}>{totalEmotions}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>emotions{'\n'}logged</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{emotionsLabel}</Text>
         </View>
       </View>
     </View>
