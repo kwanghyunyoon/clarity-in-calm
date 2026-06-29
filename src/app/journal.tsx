@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   FlatList,
   KeyboardAvoidingView,
   Linking,
+  ListRenderItemInfo,
   Modal,
   Platform,
   ScrollView,
@@ -146,6 +147,251 @@ export default function JournalScreen() {
     ...customTags,
   ];
 
+  type EntryItem = typeof filteredEntries[number];
+
+  const renderEntry = useCallback(({ item: entry, index: i }: ListRenderItemInfo<EntryItem>) => {
+    const moodDef = t.moods.find(m => m.value === entry.mood);
+    return (
+      <Animated.View
+        entering={FadeInDown.delay(Math.min(i, 8) * 30).springify()}
+        style={[styles.entryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+      >
+        <View style={styles.entryHeader}>
+          <View style={styles.entryMoodRow}>
+            <View style={[styles.moodDot, { backgroundColor: moodDef?.color ?? colors.border }]} />
+            <Text style={[styles.entryMoodLabel, { color: colors.text }]}>{moodDef?.label}</Text>
+            {entry.templateId && (
+              <View style={[styles.templateBadge, { backgroundColor: colors.backgroundElement }]}>
+                <Text style={[styles.templateBadgeText, { color: colors.textSecondary }]}>
+                  {JOURNAL_TEMPLATES.find(t => t.id === entry.templateId)?.emoji ?? '📝'}{' '}
+                  {entry.templateId}
+                </Text>
+              </View>
+            )}
+          </View>
+          <Text style={[styles.entryTime, { color: colors.textSecondary }]}>
+            {formatTimestamp(entry.date)}
+          </Text>
+        </View>
+
+        {entry.note ? (
+          <Text style={[styles.entryNote, { color: colors.text }]} numberOfLines={4}>
+            {entry.note}
+          </Text>
+        ) : null}
+
+        {(entry.tags ?? []).length > 0 && (
+          <View style={styles.entryTagRow}>
+            {(entry.tags ?? []).map(tag => (
+              <View key={tag} style={[styles.entryTag, { backgroundColor: colors.backgroundElement }]}>
+                <Text style={[styles.entryTagText, { color: colors.textSecondary }]}>#{tag}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+
+        <TouchableOpacity
+          onPress={() => Alert.alert(
+            tj.deleteConfirm.title,
+            tj.deleteConfirm.body,
+            [
+              { text: tj.deleteConfirm.cancel, style: 'cancel' },
+              { text: tj.deleteConfirm.confirm, style: 'destructive', onPress: () => deleteEntry(entry.id) },
+            ],
+          )}
+          style={styles.deleteRow}
+          accessibilityLabel="Delete entry"
+          accessibilityRole="button"
+        >
+          <Text style={[styles.deleteText, { color: colors.textSecondary }]}>{te.deleteEntry}</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  }, [colors, t.moods, tj, te, deleteEntry]);
+
+  const listHeader = (
+    <>
+      {/* ── Template selector ── */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.templates}</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
+          {JOURNAL_TEMPLATES.map(tmpl => {
+            const isSelected = selectedTemplate.id === tmpl.id;
+            return (
+              <AnimatedPressable
+                key={tmpl.id}
+                onPress={() => {
+                  setSelectedTemplate(tmpl);
+                  if (tmpl.id !== 'free') setNote(tmpl.prompts.join('\n\n'));
+                  else setNote('');
+                }}
+                style={[
+                  styles.templateCard,
+                  {
+                    backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: isSelected }}
+              >
+                <Text style={styles.templateEmoji}>{tmpl.emoji}</Text>
+                <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
+                  {tmpl.label}
+                </Text>
+              </AnimatedPressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* ── Mood picker ── */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.moodLabel}</Text>
+        <View style={styles.moodRow}>
+          {t.moods.map(m => {
+            const isSelected = mood === m.value;
+            return (
+              <AnimatedPressable
+                key={m.value}
+                onPress={() => setMood(m.value as MoodValue)}
+                style={[
+                  styles.moodBtn,
+                  {
+                    backgroundColor: isSelected ? m.color + '33' : colors.backgroundElement,
+                    borderColor: isSelected ? m.color : 'transparent',
+                  },
+                ]}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: isSelected }}
+                accessibilityLabel={m.label}
+              >
+                <Text style={styles.moodEmoji}>{m.emoji}</Text>
+                <Text style={[styles.moodLabel, { color: isSelected ? colors.text : colors.textSecondary }]}>
+                  {m.label}
+                </Text>
+              </AnimatedPressable>
+            );
+          })}
+        </View>
+      </View>
+
+      {/* ── Note input ── */}
+      <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <TextInput
+          style={[styles.input, { color: colors.text }]}
+          placeholder={placeholder}
+          placeholderTextColor={colors.textSecondary}
+          value={note}
+          onChangeText={setNote}
+          multiline
+          textAlignVertical="top"
+          accessibilityLabel="Journal entry"
+        />
+      </View>
+
+      {/* ── Tags ── */}
+      <View style={styles.section}>
+        <View style={styles.tagsHeader}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.tags}</Text>
+          <TouchableOpacity onPress={() => setShowTagInput(!showTagInput)}>
+            <Text style={[styles.addTagBtn, { color: colors.primary }]}>{te.addTag}</Text>
+          </TouchableOpacity>
+        </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagRow}>
+          {allTags.map(tag => {
+            const isSelected = selectedTags.includes(tag);
+            return (
+              <TouchableOpacity
+                key={tag}
+                onPress={() => toggleTag(tag)}
+                style={[
+                  styles.tagChip,
+                  {
+                    backgroundColor: isSelected ? colors.accent + '22' : colors.backgroundElement,
+                    borderColor: isSelected ? colors.accent : colors.border,
+                  },
+                ]}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: isSelected }}
+              >
+                <Text style={[styles.tagText, { color: isSelected ? colors.accent : colors.textSecondary }]}>
+                  #{tag}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+        {showTagInput && (
+          <Animated.View entering={FadeInDown.springify()} style={styles.tagInputRow}>
+            <TextInput
+              style={[styles.tagInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
+              placeholder={te.customTagPlaceholder}
+              placeholderTextColor={colors.textSecondary}
+              value={newTagText}
+              onChangeText={setNewTagText}
+              onSubmitEditing={handleAddCustomTag}
+              returnKeyType="done"
+              autoFocus
+            />
+            <TouchableOpacity onPress={handleAddCustomTag} style={[styles.tagAddConfirm, { backgroundColor: colors.primary }]}>
+              <Text style={styles.tagAddConfirmText}>{te.addTagConfirm}</Text>
+            </TouchableOpacity>
+          </Animated.View>
+        )}
+      </View>
+
+      {/* ── Save button ── */}
+      <AnimatedPressable
+        onPress={handleSaveAttempt}
+        disabled={!mood || savedAnim}
+        style={[
+          styles.saveBtn,
+          {
+            backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
+            opacity: mood ? 1 : 0.5,
+          },
+        ]}
+        accessibilityRole="button"
+        accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
+      >
+        <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
+          {savedAnim ? tj.savedBtn : tj.saveBtn}
+        </Text>
+      </AnimatedPressable>
+
+      {/* ── Search ── */}
+      <View style={styles.section}>
+        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.pastTitle}</Text>
+        <View style={[styles.searchBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
+          <Text style={[styles.searchIcon, { color: colors.textSecondary }]}>🔍</Text>
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder={te.searchPlaceholder}
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')}>
+              <Text style={[styles.searchClear, { color: colors.textSecondary }]}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </>
+  );
+
+  const listEmpty = (
+    <View style={styles.emptyState}>
+      <Text style={styles.emptyEmoji}>📖</Text>
+      <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+        {searchQuery ? te.noResults : tj.emptyTitle}
+      </Text>
+    </View>
+  );
+
   return (
     <KeyboardAvoidingView
       style={[styles.root, { backgroundColor: colors.background }]}
@@ -160,258 +406,22 @@ export default function JournalScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>{tj.title}</Text>
       </View>
 
-      <ScrollView
+      <FlatList
         style={styles.scroll}
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
-      >
-        {/* ── Template selector ── */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.templates}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
-            {JOURNAL_TEMPLATES.map(tmpl => {
-              const isSelected = selectedTemplate.id === tmpl.id;
-              return (
-                <AnimatedPressable
-                  key={tmpl.id}
-                  onPress={() => {
-                    setSelectedTemplate(tmpl);
-                    if (tmpl.id !== 'free') setNote(tmpl.prompts.join('\n\n'));
-                    else setNote('');
-                  }}
-                  style={[
-                    styles.templateCard,
-                    {
-                      backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                    },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: isSelected }}
-                >
-                  <Text style={styles.templateEmoji}>{tmpl.emoji}</Text>
-                  <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
-                    {tmpl.label}
-                  </Text>
-                </AnimatedPressable>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* ── Mood picker ── */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.moodLabel}</Text>
-          <View style={styles.moodRow}>
-            {t.moods.map(m => {
-              const isSelected = mood === m.value;
-              return (
-                <AnimatedPressable
-                  key={m.value}
-                  onPress={() => setMood(m.value as MoodValue)}
-                  style={[
-                    styles.moodBtn,
-                    {
-                      backgroundColor: isSelected ? m.color + '33' : colors.backgroundElement,
-                      borderColor: isSelected ? m.color : 'transparent',
-                    },
-                  ]}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSelected }}
-                  accessibilityLabel={m.label}
-                >
-                  <Text style={styles.moodEmoji}>{m.emoji}</Text>
-                  <Text style={[styles.moodLabel, { color: isSelected ? colors.text : colors.textSecondary }]}>
-                    {m.label}
-                  </Text>
-                </AnimatedPressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* ── Note input ── */}
-        <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <TextInput
-            style={[styles.input, { color: colors.text }]}
-            placeholder={placeholder}
-            placeholderTextColor={colors.textSecondary}
-            value={note}
-            onChangeText={setNote}
-            multiline
-            textAlignVertical="top"
-            accessibilityLabel="Journal entry"
-          />
-        </View>
-
-        {/* ── Tags ── */}
-        <View style={styles.section}>
-          <View style={styles.tagsHeader}>
-            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.tags}</Text>
-            <TouchableOpacity onPress={() => setShowTagInput(!showTagInput)}>
-              <Text style={[styles.addTagBtn, { color: colors.primary }]}>{te.addTag}</Text>
-            </TouchableOpacity>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagRow}>
-            {allTags.map(tag => {
-              const isSelected = selectedTags.includes(tag);
-              return (
-                <TouchableOpacity
-                  key={tag}
-                  onPress={() => toggleTag(tag)}
-                  style={[
-                    styles.tagChip,
-                    {
-                      backgroundColor: isSelected ? colors.accent + '22' : colors.backgroundElement,
-                      borderColor: isSelected ? colors.accent : colors.border,
-                    },
-                  ]}
-                  accessibilityRole="checkbox"
-                  accessibilityState={{ checked: isSelected }}
-                >
-                  <Text style={[styles.tagText, { color: isSelected ? colors.accent : colors.textSecondary }]}>
-                    #{tag}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-          {showTagInput && (
-            <Animated.View entering={FadeInDown.springify()} style={styles.tagInputRow}>
-              <TextInput
-                style={[styles.tagInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-                placeholder={te.customTagPlaceholder}
-                placeholderTextColor={colors.textSecondary}
-                value={newTagText}
-                onChangeText={setNewTagText}
-                onSubmitEditing={handleAddCustomTag}
-                returnKeyType="done"
-                autoFocus
-              />
-              <TouchableOpacity onPress={handleAddCustomTag} style={[styles.tagAddConfirm, { backgroundColor: colors.primary }]}>
-                <Text style={styles.tagAddConfirmText}>{te.addTagConfirm}</Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        </View>
-
-        {/* ── Save button ── */}
-        <AnimatedPressable
-          onPress={handleSaveAttempt}
-          disabled={!mood || savedAnim}
-          style={[
-            styles.saveBtn,
-            {
-              backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
-              opacity: mood ? 1 : 0.5,
-            },
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
-        >
-          <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
-            {savedAnim ? tj.savedBtn : tj.saveBtn}
-          </Text>
-        </AnimatedPressable>
-
-        {/* ── Search ── */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.pastTitle}</Text>
-          <View style={[styles.searchBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-            <Text style={[styles.searchIcon, { color: colors.textSecondary }]}>🔍</Text>
-            <TextInput
-              style={[styles.searchInput, { color: colors.text }]}
-              placeholder={te.searchPlaceholder}
-              placeholderTextColor={colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              returnKeyType="search"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Text style={[styles.searchClear, { color: colors.textSecondary }]}>✕</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {/* ── Entries list ── */}
-        {filteredEntries.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyEmoji}>📖</Text>
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-              {searchQuery ? te.noResults : tj.emptyTitle}
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.entriesList}>
-            {filteredEntries.map((entry, i) => {
-              const moodDef = t.moods.find(m => m.value === entry.mood);
-              return (
-                <Animated.View
-                  key={entry.id}
-                  entering={FadeInDown.delay(i * 30).springify()}
-                  style={[styles.entryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-                >
-                  <View style={styles.entryHeader}>
-                    <View style={styles.entryMoodRow}>
-                      <View style={[styles.moodDot, { backgroundColor: moodDef?.color ?? colors.border }]} />
-                      <Text style={[styles.entryMoodLabel, { color: colors.text }]}>{moodDef?.label}</Text>
-                      {entry.templateId && (
-                        <View style={[styles.templateBadge, { backgroundColor: colors.backgroundElement }]}>
-                          <Text style={[styles.templateBadgeText, { color: colors.textSecondary }]}>
-                            {JOURNAL_TEMPLATES.find(t => t.id === entry.templateId)?.emoji ?? '📝'}{' '}
-                            {entry.templateId}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                    <Text style={[styles.entryTime, { color: colors.textSecondary }]}>
-                      {formatTimestamp(entry.date)}
-                    </Text>
-                  </View>
-
-                  {entry.note ? (
-                    <Text
-                      style={[styles.entryNote, { color: colors.text }]}
-                      numberOfLines={4}
-                    >
-                      {entry.note}
-                    </Text>
-                  ) : null}
-
-                  {(entry.tags ?? []).length > 0 && (
-                    <View style={styles.entryTagRow}>
-                      {(entry.tags ?? []).map(tag => (
-                        <View key={tag} style={[styles.entryTag, { backgroundColor: colors.backgroundElement }]}>
-                          <Text style={[styles.entryTagText, { color: colors.textSecondary }]}>#{tag}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  )}
-
-                  <TouchableOpacity
-                    onPress={() => Alert.alert(
-                      tj.deleteConfirm.title,
-                      tj.deleteConfirm.body,
-                      [
-                        { text: tj.deleteConfirm.cancel, style: 'cancel' },
-                        { text: tj.deleteConfirm.confirm, style: 'destructive', onPress: () => deleteEntry(entry.id) },
-                      ],
-                    )}
-                    style={styles.deleteRow}
-                    accessibilityLabel="Delete entry"
-                    accessibilityRole="button"
-                  >
-                    <Text style={[styles.deleteText, { color: colors.textSecondary }]}>{te.deleteEntry}</Text>
-                  </TouchableOpacity>
-                </Animated.View>
-              );
-            })}
-          </View>
-        )}
-      </ScrollView>
+        data={filteredEntries}
+        keyExtractor={item => item.id}
+        renderItem={renderEntry}
+        ListHeaderComponent={listHeader}
+        ListEmptyComponent={listEmpty}
+        ItemSeparatorComponent={() => <View style={styles.entrySeparator} />}
+        removeClippedSubviews
+        initialNumToRender={8}
+        maxToRenderPerBatch={8}
+        windowSize={5}
+      />
 
       {/* ── Crisis modal ── */}
       <Modal visible={showCrisis} transparent animationType="fade" onRequestClose={() => { setShowCrisis(false); setPendingSave(null); }}>
@@ -549,7 +559,7 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', paddingVertical: Spacing.six, gap: Spacing.two },
   emptyEmoji: { fontSize: 40 },
   emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
-  entriesList: { gap: Spacing.two + 4 },
+  entrySeparator: { height: Spacing.two + 4 },
   entryCard: {
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
