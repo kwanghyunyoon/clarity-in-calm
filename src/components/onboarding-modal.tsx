@@ -28,7 +28,7 @@ const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
 ];
 
 function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
-  const colors = useTheme();
+  const { colors } = useTheme();
   const [issueType, setIssueType]     = useState('Bug');
   const [description, setDescription] = useState('');
   const [status, setStatus]           = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -146,7 +146,7 @@ function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => 
 
 const fs = StyleSheet.create({
   overlay:           { flex: 1, justifyContent: 'flex-end' },
-  backdrop:          { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.55)' },
+  backdrop:          { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.55)' },
   sheet:             { borderTopLeftRadius: 24, borderTopRightRadius: 24,
                        padding: Spacing.four, paddingBottom: Spacing.four + 16, gap: Spacing.two },
   sheetTitle:        { fontSize: 22, fontWeight: '800', marginBottom: Spacing.one },
@@ -194,8 +194,10 @@ function WelcomeVisual() {
   );
 }
 
+type ThemeColors = ReturnType<typeof useTheme>['colors'];
+
 // Slide 1 — Breathe: animated expanding circle
-function BreatheVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
+function BreatheVisual({ colors }: { colors: ThemeColors }) {
   const scale = useRef(new Animated.Value(0.75)).current;
   const opacity = useRef(new Animated.Value(0.5)).current;
 
@@ -240,7 +242,7 @@ function BreatheVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
 
 // Slide 2 — Journal: interactive mini mood row
 const MOOD_EMOJIS = ['😞', '😕', '😐', '🙂', '😊'];
-function JournalVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
+function JournalVisual({ colors }: { colors: ThemeColors }) {
   const [selected, setSelected] = useState(2);
 
   return (
@@ -264,7 +266,7 @@ function JournalVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
 }
 
 // Slide 3 — Progress: mini streak + 7-day dots
-function ProgressVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
+function ProgressVisual({ colors }: { colors: ThemeColors }) {
   const HAS_ENTRY = [true, true, false, true, true, true, false];
 
   return (
@@ -291,7 +293,7 @@ function ProgressVisual({ colors }: { colors: ReturnType<typeof useTheme> }) {
 }
 
 // ─── Slide visual router ──────────────────────────────────────────────────────
-function SlideVisual({ page, colors }: { page: number; colors: ReturnType<typeof useTheme> }) {
+function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
   switch (page) {
     case 0: return <WelcomeVisual />;
     case 1: return <BreatheVisual colors={colors} />;
@@ -303,7 +305,7 @@ function SlideVisual({ page, colors }: { page: number; colors: ReturnType<typeof
 
 // ─── Main modal ───────────────────────────────────────────────────────────────
 export function OnboardingModal() {
-  const colors                = useTheme();
+  const { colors }            = useTheme();
   const t                     = useTranslation();
   const { locale, setLocale } = useLocale();
   const { isHelpVisible, hideHelp } = useHelp();

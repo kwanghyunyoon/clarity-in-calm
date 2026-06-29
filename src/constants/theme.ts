@@ -1,11 +1,3 @@
-/**
- * Wellness colour palette — earthy & grounded.
- * Light: warm sand + terracotta + sage green
- * Dark:  deep forest + warm clay + moss green
- */
-
-import '@/global.css';
-
 import { Platform } from 'react-native';
 
 export const Colors = {
@@ -19,44 +11,75 @@ export const Colors = {
     accent: '#C17A4A',
     surface: '#FAF3EA',
     border: '#C8E3C9',
+    // New tokens
+    amber: '#D4870A',
+    positive: '#4A8C50',
+    negative: '#C0404A',
+    cardShadow: 'rgba(26,46,28,0.08)',
+    overlay: 'rgba(26,46,28,0.4)',
+    tabBar: '#FAF3EA',
+    tabBarBorder: '#C8E3C9',
   },
   dark: {
-    text: '#F0E8DC',
-    background: '#1C1A14',
-    backgroundElement: '#2A2519',
-    backgroundSelected: '#3A3225',
-    textSecondary: '#A89880',
-    primary: '#D4935E',
-    accent: '#6B9470',
-    surface: '#231F17',
-    border: '#3A3225',
+    text: '#E8E0D4',
+    background: '#0D1117',
+    backgroundElement: '#161B22',
+    backgroundSelected: '#1C2128',
+    textSecondary: '#8B949E',
+    primary: '#F0A855',
+    accent: '#6AA96F',
+    surface: '#161B22',
+    border: '#21262D',
+    // New tokens
+    amber: '#F0A855',
+    positive: '#6AA96F',
+    negative: '#F47067',
+    cardShadow: 'rgba(0,0,0,0.4)',
+    overlay: 'rgba(0,0,0,0.6)',
+    tabBar: '#0D1117',
+    tabBarBorder: '#21262D',
   },
 } as const;
 
 export type ThemeColor = keyof typeof Colors.light & keyof typeof Colors.dark;
 
+export const EmotionColors = {
+  joy:          '#F5C842',
+  trust:        '#82C341',
+  fear:         '#4CAF7D',
+  surprise:     '#29B6D6',
+  sadness:      '#5B7FD6',
+  disgust:      '#9C6BBF',
+  anger:        '#EF5350',
+  anticipation: '#FF9800',
+} as const;
+
+export type PrimaryEmotion = keyof typeof EmotionColors;
+
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
+    journalSerif: 'Georgia',
+    displaySans: 'system-ui',
   },
   default: {
     sans: 'normal',
     serif: 'serif',
     rounded: 'normal',
     mono: 'monospace',
+    journalSerif: 'serif',
+    displaySans: 'normal',
   },
   web: {
     sans: 'var(--font-display)',
     serif: 'var(--font-serif)',
     rounded: 'var(--font-rounded)',
     mono: 'var(--font-mono)',
+    journalSerif: 'Georgia, "Times New Roman", serif',
+    displaySans: 'var(--font-display)',
   },
 });
 
@@ -68,6 +91,17 @@ export const Spacing = {
   four: 24,
   five: 32,
   six: 64,
+  seven: 80,
+  eight: 120,
+} as const;
+
+export const BorderRadius = {
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+  pill: 999,
 } as const;
 
 export const BottomTabInset = Platform.select({ ios: 50, android: 80 }) ?? 0;

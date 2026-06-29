@@ -1,21 +1,23 @@
 import { DarkTheme, DefaultTheme, Tabs, ThemeProvider } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { AppState, Platform, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { AppState, Platform, StyleSheet, Text, View, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import ErrorBoundary from '@/components/error-boundary';
 import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
+import { EmotionProvider } from '@/context/emotion-context';
 import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
+import { SettingsProvider } from '@/context/settings-context';
 import { WellnessProvider } from '@/context/wellness-context';
 import { useTranslation } from '@/hooks/use-translation';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
   return (
     <View style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', opacity: focused ? 1 : 0.45 }}>
-      <Text style={{ fontSize: 22 }}>{emoji}</Text>
+      <Text style={{ fontSize: 20 }}>{emoji}</Text>
     </View>
   );
 }
@@ -23,19 +25,17 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 // Register service worker for PWA offline support (web only)
 if (Platform.OS === 'web' && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => { /* ignore in dev */ });
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
 
-// Blur overlay — hides journal content in the app switcher when backgrounded.
-// Web has no app switcher risk so we skip it there.
 function PrivacyShield() {
   const [hidden, setHidden] = useState(false);
   const appState = useRef(AppState.currentState);
 
   useEffect(() => {
     if (Platform.OS === 'web') return;
-    const sub = AppState.addEventListener('change', (next) => {
+    const sub = AppState.addEventListener('change', next => {
       setHidden(next === 'inactive' || next === 'background');
       appState.current = next;
     });
@@ -53,77 +53,97 @@ export default function TabLayout() {
   const t = useTranslation();
   const insets = useSafeAreaInsets();
 
-  const TAB_BAR_BASE = 58;
-  const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 16);
+  const TAB_BAR_BASE = 54;
+  const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 4);
 
   return (
     <ErrorBoundary>
-    <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <HelpProvider>
-      <LanguageProvider>
-      <WellnessProvider>
-        <PrivacyShield />
-        <AnimatedSplashOverlay />
-        <OnboardingModal />
-        <Tabs
-          screenOptions={{
-            headerShown: false,
-            tabBarHideOnKeyboard: false,
-            tabBarStyle: {
-              backgroundColor: colors.surface,
-              borderTopColor: colors.border,
-              borderTopWidth: 1,
-              height: TAB_BAR_BASE + bottomPad,
-              paddingBottom: bottomPad,
-              paddingTop: 8,
-            },
-            tabBarActiveTintColor: colors.primary,
-            tabBarInactiveTintColor: colors.textSecondary,
-            tabBarLabelStyle: {
-              fontSize: 11,
-              fontWeight: '600',
-              marginTop: 0,
-            },
-          }}
-        >
-          <Tabs.Screen
-            name="index"
-            options={{
-              title: t.tabs.home,
-              tabBarLabel: t.tabs.home,
-              tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" focused={focused} />,
-            }}
-          />
-          <Tabs.Screen
-            name="breathe"
-            options={{
-              title: t.tabs.breathe,
-              tabBarLabel: t.tabs.breathe,
-              tabBarIcon: ({ focused }) => <TabIcon emoji="🫁" focused={focused} />,
-            }}
-          />
-          <Tabs.Screen
-            name="journal"
-            options={{
-              title: t.tabs.journal,
-              tabBarLabel: t.tabs.journal,
-              tabBarIcon: ({ focused }) => <TabIcon emoji="📖" focused={focused} />,
-            }}
-          />
-          <Tabs.Screen
-            name="progress"
-            options={{
-              title: t.tabs.progress,
-              tabBarLabel: t.tabs.progress,
-              tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
-            }}
-          />
+      <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <SettingsProvider>
+          <HelpProvider>
+            <LanguageProvider>
+              <WellnessProvider>
+                <EmotionProvider>
+                  <PrivacyShield />
+                  <AnimatedSplashOverlay />
+                  <OnboardingModal />
+                  <Tabs
+                    screenOptions={{
+                      headerShown: false,
+                      tabBarHideOnKeyboard: false,
+                      tabBarStyle: {
+                        backgroundColor: colors.tabBar,
+                        borderTopColor: colors.tabBarBorder,
+                        borderTopWidth: StyleSheet.hairlineWidth,
+                        height: TAB_BAR_BASE + bottomPad,
+                        paddingBottom: bottomPad,
+                        paddingTop: 6,
+                        elevation: 0,
+                        shadowOpacity: 0,
+                      },
+                      tabBarActiveTintColor: colors.primary,
+                      tabBarInactiveTintColor: colors.textSecondary,
+                      tabBarLabelStyle: {
+                        fontSize: 10,
+                        fontWeight: '600',
+                        letterSpacing: 0.2,
+                        marginTop: -2,
+                      },
+                    }}
+                  >
+                    {/* ── Visible tabs ─────────────────────────────── */}
+                    <Tabs.Screen
+                      name="index"
+                      options={{
+                        title: t.tabs.today,
+                        tabBarLabel: t.tabs.today,
+                        tabBarIcon: ({ focused }) => <TabIcon emoji="☀️" focused={focused} />,
+                      }}
+                    />
+                    <Tabs.Screen
+                      name="journal"
+                      options={{
+                        title: t.tabs.journal,
+                        tabBarLabel: t.tabs.journal,
+                        tabBarIcon: ({ focused }) => <TabIcon emoji="📖" focused={focused} />,
+                      }}
+                    />
+                    <Tabs.Screen
+                      name="emotions"
+                      options={{
+                        title: t.tabs.emotions,
+                        tabBarLabel: t.tabs.emotions,
+                        tabBarIcon: ({ focused }) => <TabIcon emoji="🌀" focused={focused} />,
+                      }}
+                    />
+                    <Tabs.Screen
+                      name="insights"
+                      options={{
+                        title: t.tabs.insights,
+                        tabBarLabel: t.tabs.insights,
+                        tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
+                      }}
+                    />
+                    <Tabs.Screen
+                      name="settings"
+                      options={{
+                        title: t.tabs.settings,
+                        tabBarLabel: t.tabs.settings,
+                        tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
+                      }}
+                    />
 
-        </Tabs>
-      </WellnessProvider>
-      </LanguageProvider>
-      </HelpProvider>
-    </ThemeProvider>
+                    {/* ── Hidden utility routes (still navigable) ── */}
+                    <Tabs.Screen name="breathe"  options={{ href: null }} />
+                    <Tabs.Screen name="ground"   options={{ href: null }} />
+                    <Tabs.Screen name="progress" options={{ href: null }} />
+                  </Tabs>
+                </EmotionProvider>
+              </WellnessProvider>
+            </LanguageProvider>
+          </HelpProvider>
+        </SettingsProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

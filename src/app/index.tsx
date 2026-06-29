@@ -1,341 +1,302 @@
 import { router } from 'expo-router';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo } from 'react';
+import {
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Spacing } from '@/constants/theme';
+import { StreakCard } from '@/components/today/StreakCard';
+import { ToolCard } from '@/components/today/ToolCard';
+import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { QUOTES } from '@/constants/quotes';
-import { type Locale } from '@/i18n/translations';
+import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
+import { EMOTIONS_BY_ID } from '@/constants/emotions';
+import { useEmotions } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
-import { useLocale } from '@/context/language-context';
+import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { useWellness } from '@/context/wellness-context';
 
-// ── Language toggle config ────────────────────────────────────────────────────
-const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
-  { locale: 'en', flag: '🇺🇸', label: 'EN' },
-  { locale: 'ko', flag: '🇰🇷', label: '한' },
-  { locale: 'es', flag: '🇲🇽', label: 'ES' },
-  { locale: 'hi', flag: '🇮🇳', label: 'हि' },
-];
+function getGreeting(t: ReturnType<typeof useTranslation>): string {
+  const h = new Date().getHours();
+  if (h < 12) return t.home.greeting.morning;
+  if (h < 18) return t.home.greeting.afternoon;
+  return t.home.greeting.evening;
+}
 
 function getDailyQuote() {
   const day = Math.floor(Date.now() / 86400000);
   return QUOTES[day % QUOTES.length];
 }
 
-export default function HomeScreen() {
-  const colors = useTheme();
+export default function TodayScreen() {
+  const { colors } = useTheme();
   const t = useTranslation();
-  const { locale, setLocale } = useLocale();
+  const insets = useSafeAreaInsets();
+  const { entries, streak } = useWellness();
+  const { todayEmotions, emotionLogs } = useEmotions();
   const { showHelp } = useHelp();
-  const { todayMood, entries, breathingSessions, streak } = useWellness();
 
-  const moods = t.moods;
-  const quote = getDailyQuote();
-  const today = new Date();
-  const h = today.getHours();
-  const greeting =
-    h < 12 ? t.home.greeting.morning :
-    h < 17 ? t.home.greeting.afternoon :
-             t.home.greeting.evening;
-  const dateLabel = today.toLocaleDateString(undefined, {
-    weekday: 'long', month: 'long', day: 'numeric',
-  });
+  const quote = useMemo(getDailyQuote, []);
+  const greeting = getGreeting(t);
 
-  const toLocalDateStr = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-  const todayEntries = entries.filter(
-    (e) => toLocalDateStr(new Date(e.date)) === toLocalDateStr(today)
-  );
-
-  // True when the user has never logged anything yet
-  const isFirstTime = entries.length === 0 && breathingSessions === 0;
+  // Bottom padding = tab bar height (approx 80) + safe area bottom
+  const bottomPad = 88 + insets.bottom;
 
   return (
-    <SafeAreaView edges={['top']} style={[s.root, { backgroundColor: colors.background }]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      {/* ── Header — sits below system status bar ── */}
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: insets.top + Spacing.two,
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
+        <Text style={[styles.greeting, { color: colors.text }]}>{greeting}</Text>
+        <TouchableOpacity
+          onPress={showHelp}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          accessibilityLabel="Help"
+          accessibilityRole="button"
+        >
+          <Text style={[styles.helpBtn, { color: colors.textSecondary }]}>?</Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* ── Header ── */}
-        <View style={s.header}>
-          <View style={s.headerTop}>
-            <View style={s.headerLeft}>
-              <Text style={[s.date, { color: colors.textSecondary }]}>{dateLabel}</Text>
-              <Text style={[s.greeting, { color: colors.text }]}>
-                {greeting} {t.home.greetingEmoji}
-              </Text>
-              <TouchableOpacity
-                onPress={showHelp}
-                activeOpacity={0.7}
-                style={[s.helpBtn, { backgroundColor: colors.backgroundElement }]}
-              >
-                <Text style={s.helpBtnEmoji}>❓</Text>
-                <Text style={[s.helpBtnTxt, { color: colors.textSecondary }]}>
-                  {t.home.helpBtn}
-                </Text>
-              </TouchableOpacity>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Emotion check-in prompt ── */}
+        <Animated.View entering={FadeInDown.delay(50).springify()}>
+          <AnimatedPressable
+            onPress={() => router.push('/emotions')}
+            style={[styles.checkInCard, {
+              backgroundColor: colors.primary + '18',
+              borderColor: colors.primary + '44',
+            }]}
+            accessibilityRole="button"
+            accessibilityLabel={t.today.checkIn}
+          >
+            <Text style={[styles.checkInLabel, { color: colors.text }]}>
+              {t.today.checkIn}
+            </Text>
+            <View style={[styles.checkInBtn, { backgroundColor: colors.primary }]}>
+              <Text style={styles.checkInBtnText}>{t.today.logEmotion} →</Text>
             </View>
+          </AnimatedPressable>
+        </Animated.View>
 
-            {/* ── Language toggle (4 languages) ── */}
-            <View style={[s.langPill, { backgroundColor: colors.backgroundElement }]}>
-              {LANGUAGES.map((lang, i) => {
-                const active = locale === lang.locale;
+        {/* ── Today's emotions row ── */}
+        {todayEmotions.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+              {t.today.todayEmotions}
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.emotionRow}
+            >
+              {todayEmotions.map(log => {
+                const emotion = EMOTIONS_BY_ID[log.emotionId];
+                const color = emotion?.color ?? colors.primary;
                 return (
-                  <TouchableOpacity
-                    key={lang.locale}
-                    onPress={() => setLocale(lang.locale)}
-                    activeOpacity={0.75}
-                    style={[
-                      s.langBtn,
-                      active && { backgroundColor: colors.primary },
-                      i === 0 && s.langBtnFirst,
-                      i === LANGUAGES.length - 1 && s.langBtnLast,
-                    ]}
+                  <View
+                    key={log.id}
+                    style={[styles.emotionPill, {
+                      backgroundColor: color + '22',
+                      borderColor: color + '66',
+                    }]}
                   >
-                    <Text style={s.langFlag}>{lang.flag}</Text>
-                    <Text style={[s.langLabel, { color: active ? '#fff' : colors.textSecondary }]}>
-                      {lang.label}
+                    <Text style={[styles.emotionPillText, { color }]}>{log.emotionLabel}</Text>
+                    <Text style={[styles.emotionIntensity, { color: colors.textSecondary }]}>
+                      {' '}·{log.intensity}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                 );
               })}
-            </View>
-          </View>
-        </View>
-
-        {/* ── Daily Quote ── */}
-        <View style={[s.quoteCard, { backgroundColor: colors.backgroundElement }]}>
-          <Text style={[s.quoteText, { color: colors.text }]}>"{quote.text}"</Text>
-          <Text style={[s.quoteAuthor, { color: colors.textSecondary }]}>— {quote.author}</Text>
-        </View>
-
-        {/* ── Today's mood ── */}
-        <View style={s.section}>
-          <View style={s.moodHeader}>
-            <Text style={[s.sectionTitle, { color: colors.text, marginBottom: 0 }]}>
-              {todayMood ? t.home.moodToday : t.home.moodPrompt}
-            </Text>
-            {todayMood && (
-              <Text style={[s.moodUpdateHint, { color: colors.textSecondary }]}>
-                {t.home.moodUpdateHint}
-              </Text>
-            )}
-          </View>
-          <View style={s.moodRow}>
-            {moods.map((m) => {
-              const active = todayMood === m.value;
-              return (
-                <TouchableOpacity
-                  key={m.value}
-                  onPress={() => router.push('/journal')}
-                  activeOpacity={0.75}
-                  accessibilityRole="button"
-                  accessibilityLabel={m.label}
-                  accessibilityState={{ selected: active }}
-                  style={[
-                    s.moodBtn,
-                    { backgroundColor: active ? m.color : colors.backgroundElement },
-                    active && s.moodBtnActive,
-                  ]}
-                >
-                  <Text style={s.moodEmoji}>{m.emoji}</Text>
-                  <Text style={[s.moodLabel, { color: active ? '#2C2C3E' : colors.textSecondary }]}>
-                    {m.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* ── Quick actions ── */}
-        <View style={s.section}>
-          <Text style={[s.sectionTitle, { color: colors.text }]}>{t.home.startSession}</Text>
-          <View style={s.actionsRow}>
-            <TouchableOpacity
-              style={[s.actionCard, { backgroundColor: colors.backgroundElement }]}
-              activeOpacity={0.8}
-              onPress={() => router.push('/breathe')}
-            >
-              <View style={[s.actionIcon, { backgroundColor: colors.accent + '33' }]}>
-                <Text style={{ fontSize: 28 }}>🌬️</Text>
-              </View>
-              <Text style={[s.actionTitle, { color: colors.text }]}>{t.home.actions.breatheTitle}</Text>
-              <Text style={[s.actionSub, { color: colors.textSecondary }]}>{t.home.actions.breatheSub}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[s.actionCard, { backgroundColor: colors.backgroundElement }]}
-              activeOpacity={0.8}
-              onPress={() => router.push('/journal')}
-            >
-              <View style={[s.actionIcon, { backgroundColor: colors.primary + '33' }]}>
-                <Text style={{ fontSize: 28 }}>📖</Text>
-              </View>
-              <Text style={[s.actionTitle, { color: colors.text }]}>{t.home.actions.journalTitle}</Text>
-              <Text style={[s.actionSub, { color: colors.textSecondary }]}>{t.home.actions.journalSub}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[s.actionCard, { backgroundColor: colors.backgroundElement }]}
-              activeOpacity={0.8}
-              onPress={() => router.push('/ground')}
-            >
-              <View style={[s.actionIcon, { backgroundColor: '#9C6FDE' + '33' }]}>
-                <Text style={{ fontSize: 28 }}>🌿</Text>
-              </View>
-              <Text style={[s.actionTitle, { color: colors.text }]}>{t.home.actions.groundTitle}</Text>
-              <Text style={[s.actionSub, { color: colors.textSecondary }]}>{t.home.actions.groundSub}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* ── Progress / Getting started ── */}
-        <View style={s.section}>
-          <Text style={[s.sectionTitle, { color: colors.text }]}>
-            {isFirstTime ? t.home.gettingStarted.title : t.home.progress.title}
-          </Text>
-
-          {isFirstTime ? (
-            /* ── Getting-started checklist (shown only before any data) ── */
-            <View style={[s.gettingStartedCard, { backgroundColor: colors.backgroundElement }]}>
-              {(t.home.gettingStarted.steps as readonly { emoji: string; label: string; sub: string }[]).map((step, i) => (
-                <View key={i} style={[s.stepRow, i > 0 && { borderTopWidth: 1, borderTopColor: colors.backgroundSelected }]}>
-                  <Text style={s.stepEmoji}>{step.emoji}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[s.stepLabel, { color: colors.text }]}>{step.label}</Text>
-                    <Text style={[s.stepSub, { color: colors.textSecondary }]}>{step.sub}</Text>
-                  </View>
-                  <Text style={[s.stepArrow, { color: colors.textSecondary }]}>→</Text>
-                </View>
-              ))}
-            </View>
-          ) : (
-            /* ── Regular stats row ── */
-            <View style={s.statsRow}>
-              {[
-                { emoji: '🔥', value: streak,            label: t.home.progress.streak   },
-                { emoji: '📝', value: entries.length,    label: t.home.progress.entries  },
-                { emoji: '🫁', value: breathingSessions, label: t.home.progress.sessions },
-              ].map((stat) => (
-                <View key={stat.label} style={[s.statCard, { backgroundColor: colors.backgroundElement }]}>
-                  <Text style={s.statEmoji}>{stat.emoji}</Text>
-                  <Text style={[s.statValue, { color: colors.text }]}>{stat.value}</Text>
-                  <Text style={[s.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Streak explanation — shown once there is data but streak is 0 */}
-          {!isFirstTime && streak === 0 && (
-            <Text style={[s.streakHint, { color: colors.textSecondary }]}>
-              💡 {t.home.streakHow}
-            </Text>
-          )}
-        </View>
-
-        {/* ── Today's journal entries ── */}
-        {todayEntries.length > 0 && (
-          <View style={s.section}>
-            <Text style={[s.sectionTitle, { color: colors.text }]}>{t.home.todayEntries}</Text>
-            {todayEntries.slice(0, 3).map((entry) => {
-              const mood = moods[Math.max(0, Math.min(moods.length - 1, entry.mood - 1))] ?? moods[0];
-              return (
-                <View key={entry.id} style={[s.entryCard, { backgroundColor: colors.backgroundElement }]}>
-                  <Text style={s.entryEmoji}>{mood?.emoji}</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={[s.entryMood, { color: colors.text }]}>{mood?.label}</Text>
-                    {!!entry.note && (
-                      <Text style={[s.entryNote, { color: colors.textSecondary }]} numberOfLines={2}>
-                        {entry.note}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-              );
-            })}
-            {todayEntries.length > 3 && (
-              <Text style={[s.moreEntries, { color: colors.textSecondary }]}>
-                +{todayEntries.length - 3} {t.home.moreEntries}
-              </Text>
-            )}
-          </View>
+            </ScrollView>
+          </Animated.View>
         )}
 
+        {/* ── Streak & stats ── */}
+        <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.section}>
+          <StreakCard
+            streak={streak}
+            streakLabel={t.today.streakDays}
+            streakStart={t.today.streakStart}
+            totalEntries={entries.length}
+            totalEmotions={emotionLogs.length}
+          />
+        </Animated.View>
+
+        {/* ── Tool cards ── */}
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+            {t.today.tools}
+          </Text>
+          <View style={styles.toolsGrid}>
+            <ToolCard
+              emoji="🌬️"
+              title={t.today.breatheTitle}
+              subtitle={t.today.breatheSub}
+              accentColor={EmotionColors.fear}
+              onPress={() => router.push('/breathe')}
+            />
+            <ToolCard
+              emoji="🌿"
+              title={t.today.groundTitle}
+              subtitle={t.today.groundSub}
+              accentColor={EmotionColors.trust}
+              onPress={() => router.push('/ground')}
+            />
+          </View>
+        </Animated.View>
+
+        {/* ── Daily quote ── */}
+        <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.section}>
+          <View style={[styles.quoteCard, {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+          }]}>
+            <Text style={[styles.quoteLabel, { color: colors.textSecondary }]}>
+              {t.today.quote}
+            </Text>
+            <Text style={[styles.quoteText, { color: colors.text }]}>
+              "{quote.text}"
+            </Text>
+            <Text style={[styles.quoteAuthor, { color: colors.textSecondary }]}>
+              — {quote.author}
+            </Text>
+          </View>
+        </Animated.View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  root:         { flex: 1 },
-  scroll:       { paddingHorizontal: Spacing.three, paddingBottom: Spacing.six },
-  header:       { paddingTop: Spacing.three, paddingBottom: Spacing.two },
-  headerTop:    { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: Spacing.two },
-  headerLeft:   { flex: 1, gap: Spacing.half },
-  date:         { fontSize: 13, fontWeight: '500' },
-  greeting:     { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-  helpBtn:      { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start',
-                  borderRadius: 20, paddingHorizontal: Spacing.two, paddingVertical: 5,
-                  marginTop: Spacing.one },
-  helpBtnEmoji: { fontSize: 12 },
-  helpBtnTxt:   { fontSize: 12, fontWeight: '600' },
-
-  // Language toggle pill — compact so 4 buttons fit
-  langPill:     { flexDirection: 'row', borderRadius: 50, overflow: 'hidden', alignSelf: 'flex-start', marginTop: Spacing.one },
-  langBtn:      { flexDirection: 'row', alignItems: 'center', gap: 3,
-                  paddingHorizontal: Spacing.one + 4, paddingVertical: Spacing.one + 2 },
-  langBtnFirst: { borderTopLeftRadius: 50, borderBottomLeftRadius: 50 },
-  langBtnLast:  { borderTopRightRadius: 50, borderBottomRightRadius: 50 },
-  langFlag:     { fontSize: 12 },
-  langLabel:    { fontSize: 11, fontWeight: '700' },
-
-  quoteCard:    { borderRadius: 16, padding: Spacing.three, gap: Spacing.one, marginBottom: Spacing.three },
-  quoteText:    { fontSize: 15, lineHeight: 22, fontStyle: 'italic', fontWeight: '500' },
-  quoteAuthor:  { fontSize: 12, fontWeight: '600' },
-
-  section:      { marginBottom: Spacing.three },
-  sectionTitle: { fontSize: 17, fontWeight: '700', marginBottom: Spacing.two },
-
-  moodHeader:     { marginBottom: Spacing.two, gap: 3 },
-  moodUpdateHint: { fontSize: 12, fontWeight: '500' },
-  moodRow:      { flexDirection: 'row', gap: Spacing.one },
-  moodBtn:      { flex: 1, alignItems: 'center', borderRadius: 14, paddingVertical: Spacing.two, gap: 4 },
-  moodBtnActive:{ transform: [{ scale: 1.08 }] },
-  moodEmoji:    { fontSize: 22 },
-  moodLabel:    { fontSize: 10, fontWeight: '600' },
-
-  actionsRow:   { flexDirection: 'row', gap: Spacing.two },
-  actionCard:   { flex: 1, borderRadius: 18, padding: Spacing.three, gap: Spacing.two },
-  actionIcon:   { width: 52, height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  actionTitle:  { fontSize: 16, fontWeight: '700' },
-  actionSub:    { fontSize: 12, fontWeight: '500' },
-
-  // Getting-started card
-  gettingStartedCard: { borderRadius: 18, overflow: 'hidden' },
-  stepRow:      { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
-                  paddingHorizontal: Spacing.three, paddingVertical: Spacing.two + 4 },
-  stepEmoji:    { fontSize: 24, width: 32, textAlign: 'center' },
-  stepLabel:    { fontSize: 14, fontWeight: '700' },
-  stepSub:      { fontSize: 12, fontWeight: '500', marginTop: 2 },
-  stepArrow:    { fontSize: 16 },
-
-  statsRow:     { flexDirection: 'row', gap: Spacing.two },
-  statCard:     { flex: 1, borderRadius: 16, padding: Spacing.two, alignItems: 'center', gap: Spacing.half },
-  statEmoji:    { fontSize: 20 },
-  statValue:    { fontSize: 22, fontWeight: '700' },
-  statLabel:    { fontSize: 11, fontWeight: '500' },
-
-  streakHint:   { fontSize: 12, fontWeight: '500', marginTop: Spacing.two,
-                  textAlign: 'center', lineHeight: 18 },
-
-  entryCard:    { flexDirection: 'row', alignItems: 'flex-start', borderRadius: 14,
-                  padding: Spacing.two, gap: Spacing.two, marginBottom: Spacing.one },
-  entryEmoji:   { fontSize: 24 },
-  entryMood:    { fontSize: 14, fontWeight: '700' },
-  entryNote:    { fontSize: 13, marginTop: 2, lineHeight: 18 },
-  moreEntries:  { fontSize: 12, fontWeight: '600', textAlign: 'center',
-                  paddingVertical: Spacing.two },
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.four,
+    paddingBottom: Spacing.two + 4,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  greeting: {
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: -0.5,
+  },
+  helpBtn: {
+    fontSize: 18,
+    fontWeight: '700',
+    width: 32,
+    height: 32,
+    textAlign: 'center',
+    lineHeight: 32,
+    borderRadius: 16,
+  },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.three,
+    gap: Spacing.three,
+  },
+  section: {
+    gap: Spacing.two,
+  },
+  sectionLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  checkInCard: {
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    padding: Spacing.four,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.three,
+  },
+  checkInLabel: {
+    fontSize: 17,
+    fontWeight: '500',
+    flex: 1,
+  },
+  checkInBtn: {
+    borderRadius: BorderRadius.pill,
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.three,
+  },
+  checkInBtnText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  emotionRow: {
+    gap: Spacing.two,
+    paddingBottom: 2,
+  },
+  emotionPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: BorderRadius.pill,
+    borderWidth: 1,
+    paddingVertical: 6,
+    paddingHorizontal: Spacing.two + 4,
+  },
+  emotionPillText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  emotionIntensity: {
+    fontSize: 12,
+  },
+  toolsGrid: {
+    flexDirection: 'row',
+    gap: Spacing.two + 4,
+  },
+  quoteCard: {
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    padding: Spacing.four,
+    gap: Spacing.two,
+  },
+  quoteLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  quoteText: {
+    fontSize: 16,
+    lineHeight: 25,
+    fontStyle: 'italic',
+    fontFamily: Platform.select({ ios: 'Georgia', default: 'serif' }),
+  },
+  quoteAuthor: {
+    fontSize: 13,
+    fontWeight: '500',
+  },
 });
