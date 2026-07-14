@@ -69,7 +69,7 @@ export default {
       baseUrl: process.env.DEPLOY_BASE_URL || '',
     },
     extra: {
-      privacyPolicyUrl: 'https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html',
+      privacyPolicyUrl: 'https://kwanghyunyoon.github.io/clarity-in-calm-privacy/',
       eas: {
         projectId: 'bf00ce6d-48cc-42ed-ac7e-584978e2fc60',
       },

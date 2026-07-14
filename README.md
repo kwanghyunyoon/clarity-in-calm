@@ -2,7 +2,7 @@
 
 A wellness app built with React Native and Expo. Journal your thoughts with end-to-end encryption, practice guided breathing, and track your emotional progress over time.
 
-**Privacy Policy:** https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html
+**Privacy Policy:** https://kwanghyunyoon.github.io/clarity-in-calm-privacy/
 
 ---
 
