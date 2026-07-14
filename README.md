@@ -2,8 +2,7 @@
 
 A wellness app built with React Native and Expo. Journal your thoughts with end-to-end encryption, practice guided breathing, and track your emotional progress over time.
 
-**Live PWA:** https://clarityincalmjournalv1.netlify.app
-**Privacy Policy:** https://clarityincalmjournalv1.netlify.app/privacy
+**Privacy Policy:** https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html
 
 ---
 
