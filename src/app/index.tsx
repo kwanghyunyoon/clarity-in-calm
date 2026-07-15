@@ -36,13 +36,14 @@ function getDailyQuote() {
   return QUOTES[day % QUOTES.length];
 }
 
-// Deliberately partial: only wheel ids with an honest, non-forced match to a
-// Feelings Library category are included. Everything else (joy, trust, disgust,
-// anticipation, dyads, etc.) falls back to the generic QUOTES rotation.
-const PLUTCHIK_TO_FEELINGS_CATEGORY: Partial<Record<string, FeelingsLibraryEntry['id']>> = {
-  rage: 'anger', anger: 'anger', annoyance: 'anger',
-  terror: 'fear', fear: 'fear', apprehension: 'fear',
-  grief: 'sadness', sadness: 'sadness', pensiveness: 'sadness',
+// Deliberately partial: only emotion ids with an honest, non-forced match to a
+// Feelings Library category are included. Everything else (happiness, disgust,
+// contempt, surprise, and any free-typed custom emotion) falls back to the
+// generic QUOTES rotation.
+const EMOTION_TO_FEELINGS_CATEGORY: Partial<Record<string, FeelingsLibraryEntry['id']>> = {
+  anger: 'anger',
+  fear: 'fear',
+  sadness: 'sadness',
 };
 
 export default function TodayScreen() {
@@ -58,7 +59,7 @@ export default function TodayScreen() {
 
   const affirmation = useMemo(() => {
     const mostRecentEmotionId = emotionLogs[0]?.emotionId;
-    const libraryId = mostRecentEmotionId ? PLUTCHIK_TO_FEELINGS_CATEGORY[mostRecentEmotionId] : undefined;
+    const libraryId = mostRecentEmotionId ? EMOTION_TO_FEELINGS_CATEGORY[mostRecentEmotionId] : undefined;
     return libraryId ? FEELINGS_LIBRARY_BY_ID[libraryId] : undefined;
   }, [emotionLogs]);
 

@@ -68,9 +68,9 @@ export const en = {
         body: 'Choose from 6 templates — free write, gratitude, reframe, future self, and more. Add tags and search past entries.',
       },
       {
-        emoji: '🎡',
-        title: 'Map Your Emotions',
-        body: 'Log from 32 emotions on the Plutchik wheel. Add intensity and context tags to understand what drives how you feel.',
+        emoji: '🏷️',
+        title: 'Name What You Feel',
+        body: 'Tap one of 7 core emotions, or type your own. Add intensity and context tags to understand what drives how you feel.',
       },
       {
         emoji: '📊',
@@ -545,9 +545,9 @@ export const ko: Translations = {
         body: '6가지 템플릿 중 선택하세요 — 자유 쓰기, 감사, 재구성, 미래의 나에게 등. 태그를 추가하고 이전 항목을 검색하세요.',
       },
       {
-        emoji: '🎡',
-        title: '감정 지도 그리기',
-        body: 'Plutchik 바퀴에서 32가지 감정을 기록하세요. 강도와 맥락 태그를 추가해 자신의 감정을 더 잘 이해해보세요.',
+        emoji: '🏷️',
+        title: '느끼는 감정에 이름 붙이기',
+        body: '7가지 기본 감정 중 하나를 선택하거나 직접 입력하세요. 강도와 맥락 태그를 추가해 자신의 감정을 더 잘 이해해보세요.',
       },
       {
         emoji: '📊',
@@ -835,9 +835,9 @@ export const es: Translations = {
         body: 'Elige entre 6 plantillas — escritura libre, gratitud, reencuadre, carta a tu yo futuro y más. Agrega etiquetas y busca entradas pasadas.',
       },
       {
-        emoji: '🎡',
-        title: 'Mapea tus emociones',
-        body: 'Registra desde 32 emociones en la rueda de Plutchik. Añade intensidad y etiquetas de contexto para entender qué impulsa cómo te sientes.',
+        emoji: '🏷️',
+        title: 'Nombra lo que sientes',
+        body: 'Toca una de las 7 emociones básicas, o escribe la tuya. Añade intensidad y etiquetas de contexto para entender qué impulsa cómo te sientes.',
       },
       {
         emoji: '📊',
@@ -1122,9 +1122,9 @@ export const hi: Translations = {
         body: '6 टेम्पलेट में से चुनें — स्वतंत्र लेखन, कृतज्ञता, पुनर्रचना, भविष्य के स्व को पत्र और अधिक। टैग जोड़ें और पुरानी प्रविष्टियाँ खोजें।',
       },
       {
-        emoji: '🎡',
-        title: 'अपनी भावनाओं का नक्शा',
-        body: 'Plutchik पहिए पर 32 भावनाओं में से लॉग करें। तीव्रता और संदर्भ टैग जोड़ें ताकि समझ सकें कि आप ऐसा क्यों महसूस करते हैं।',
+        emoji: '🏷️',
+        title: 'अपनी भावना को नाम दें',
+        body: '7 मुख्य भावनाओं में से किसी एक को चुनें, या अपनी खुद की लिखें। तीव्रता और संदर्भ टैग जोड़ें ताकि समझ सकें कि आप ऐसा क्यों महसूस करते हैं।',
       },
       {
         emoji: '📊',

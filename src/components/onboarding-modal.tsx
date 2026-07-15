@@ -9,7 +9,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Animated, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated2, { FadeIn } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BASIC_EMOTIONS } from '@/constants/emotions';
 import { LANGUAGES } from '@/constants/languages';
 import { Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
@@ -63,7 +65,7 @@ function TodayVisual({ colors }: { colors: ThemeColors }) {
           <Text style={[s.pillText, { color: colors.primary }]}>📖 Journal</Text>
         </View>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>🎡 Emotions</Text>
+          <Text style={[s.pillText, { color: colors.primary }]}>🎭 Emotions</Text>
         </View>
       </View>
     </View>
@@ -92,48 +94,18 @@ function JournalVisual({ colors }: { colors: ThemeColors }) {
   );
 }
 
-// Slide 3 — Emotions: mini Plutchik-style colour arcs
-const WHEEL_SEGMENTS = [
-  '#ef5350', '#e57373', '#ef9a9a',
-  '#ff7043', '#ff8a65', '#ffccbc',
-  '#ffa726', '#ffb74d', '#ffe0b2',
-  '#ffee58', '#fff176', '#fff9c4',
-  '#66bb6a', '#81c784', '#c8e6c9',
-  '#26c6da', '#4dd0e1', '#b2ebf2',
-  '#42a5f5', '#64b5f6', '#bbdefb',
-  '#7e57c2', '#9575cd', '#d1c4e9',
-];
-function EmotionsVisual({ colors: _colors }: { colors: ThemeColors }) {
-  const cx = 68, cy = 68, outerR = 64, innerR = 28;
-  const count = WHEEL_SEGMENTS.length;
-  const angle = (2 * Math.PI) / count;
-
-  const paths = WHEEL_SEGMENTS.map((fill, i) => {
-    const startA = i * angle - Math.PI / 2;
-    const endA   = startA + angle;
-    const x1o = cx + outerR * Math.cos(startA);
-    const y1o = cy + outerR * Math.sin(startA);
-    const x2o = cx + outerR * Math.cos(endA);
-    const y2o = cy + outerR * Math.sin(endA);
-    const x1i = cx + innerR * Math.cos(endA);
-    const y1i = cy + innerR * Math.sin(endA);
-    const x2i = cx + innerR * Math.cos(startA);
-    const y2i = cy + innerR * Math.sin(startA);
-    const d = `M${x1o},${y1o} A${outerR},${outerR} 0 0,1 ${x2o},${y2o} L${x1i},${y1i} A${innerR},${innerR} 0 0,0 ${x2i},${y2i} Z`;
-    return { d, fill };
-  });
-
-  // Use View-based fallback if SVG unavailable; rely on react-native-svg already in project
-  const Svg = require('react-native-svg').Svg;
-  const Path = require('react-native-svg').Path;
-
+// Slide 3 — Emotions: mini preview of the emotion pill selector
+function EmotionsVisual() {
   return (
-    <View style={s.wheelWrap}>
-      <Svg width={136} height={136} viewBox="0 0 136 136">
-        {paths.map((p, i) => (
-          <Path key={i} d={p.d} fill={p.fill} opacity={0.85} />
-        ))}
-      </Svg>
+    <View style={s.pillPreviewWrap}>
+      {BASIC_EMOTIONS.map((emotion) => (
+        <View
+          key={emotion.id}
+          style={[s.pillPreview, { backgroundColor: emotion.color + '22', borderColor: emotion.color }]}
+        >
+          <Text style={[s.pillPreviewText, { color: emotion.color }]}>{emotion.label}</Text>
+        </View>
+      ))}
     </View>
   );
 }
@@ -203,7 +175,7 @@ function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
     case 0: return <WelcomeVisual />;
     case 1: return <TodayVisual colors={colors} />;
     case 2: return <JournalVisual colors={colors} />;
-    case 3: return <EmotionsVisual colors={colors} />;
+    case 3: return <EmotionsVisual />;
     case 4: return <InsightsVisual colors={colors} />;
     case 5: return <SettingsVisual colors={colors} />;
     case 6: return <ShieldVisual />;
@@ -272,6 +244,7 @@ export function OnboardingModal() {
   const t                     = useTranslation();
   const { locale, setLocale } = useLocale();
   const { isHelpVisible, hideHelp } = useHelp();
+  const insets                = useSafeAreaInsets();
 
   const [firstLaunch,      setFirstLaunch]      = useState(false);
   const [showLanguageStep, setShowLanguageStep] = useState(false);
@@ -344,10 +317,23 @@ export function OnboardingModal() {
       transparent={false}
       statusBarTranslucent
     >
-      <View style={[s.root, { backgroundColor: colors.background }]}>
+      <View
+        style={[
+          s.root,
+          {
+            backgroundColor: colors.background,
+            paddingTop: insets.top + Spacing.three,
+            paddingBottom: insets.bottom + Spacing.three,
+          },
+        ]}
+      >
 
         {/* ── Close / skip button (top-right) ── */}
-        <TouchableOpacity style={s.closeBtn} onPress={handleClose} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={[s.closeBtn, { top: insets.top + Spacing.two }]}
+          onPress={handleClose}
+          activeOpacity={0.7}
+        >
           <Text style={[s.closeTxt, { color: colors.textSecondary }]}>✕</Text>
         </TouchableOpacity>
 
@@ -386,26 +372,27 @@ export function OnboardingModal() {
               })}
             </View>
 
-            {/* ── Visual component for this slide ── */}
-            <Animated2.View key={`visual-${page}`} entering={FadeIn.duration(300)} style={s.visualWrap}>
-              <SlideVisual page={page} colors={colors} />
-            </Animated2.View>
+            {/* ── Icon + text, centered together as one group ── */}
+            <View style={s.contentCenter}>
+              <Animated2.View key={`visual-${page}`} entering={FadeIn.duration(300)} style={s.visualWrap}>
+                <SlideVisual page={page} colors={colors} />
+              </Animated2.View>
 
-            {/* ── Text content ── */}
-            <Animated2.View key={`text-${page}`} entering={FadeIn.duration(280)} style={s.slide}>
-              <Text style={[s.title, { color: colors.text }]}>{slide.title}</Text>
-              <Text style={[s.body,  { color: colors.textSecondary }]}>{slide.body}</Text>
-              {isLast && (
-                <View style={s.checklist}>
-                  {checklist.map((item, i) => (
-                    <View key={i} style={s.checklistRow}>
-                      <Text style={s.checklistCheck}>✅</Text>
-                      <Text style={[s.checklistText, { color: colors.text }]}>{item}</Text>
-                    </View>
-                  ))}
-                </View>
-              )}
-            </Animated2.View>
+              <Animated2.View key={`text-${page}`} entering={FadeIn.duration(280)} style={s.slide}>
+                <Text style={[s.title, { color: colors.text }]}>{slide.title}</Text>
+                <Text style={[s.body,  { color: colors.textSecondary }]}>{slide.body}</Text>
+                {isLast && (
+                  <View style={s.checklist}>
+                    {checklist.map((item, i) => (
+                      <View key={i} style={s.checklistRow}>
+                        <Text style={s.checklistCheck}>✅</Text>
+                        <Text style={[s.checklistText, { color: colors.text }]}>{item}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </Animated2.View>
+            </View>
 
             {/* ── Bottom ── */}
             <View style={s.bottom}>
@@ -455,9 +442,9 @@ export function OnboardingModal() {
 }
 
 const s = StyleSheet.create({
-  root:         { flex: 1, paddingHorizontal: Spacing.four, paddingTop: 52, paddingBottom: 40 },
+  root:         { flex: 1, paddingHorizontal: Spacing.four },
 
-  closeBtn:     { position: 'absolute', top: 56, right: Spacing.four,
+  closeBtn:     { position: 'absolute', right: Spacing.four,
                   width: 36, height: 36, alignItems: 'center', justifyContent: 'center',
                   zIndex: 10 },
   closeTxt:     { fontSize: 18, fontWeight: '600' },
@@ -487,8 +474,12 @@ const s = StyleSheet.create({
                     marginTop: Spacing.one, maxWidth: 300 },
   btnDisabled:    { opacity: 0.4 },
 
+  // Icon + text block, centered as one group in the space between the
+  // language row and the footer (see contentCenter below)
+  contentCenter: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.three },
+
   // Visual area
-  visualWrap:   { alignItems: 'center', justifyContent: 'center', height: 160, marginTop: Spacing.three },
+  visualWrap:   { alignItems: 'center', justifyContent: 'center' },
 
   // Welcome
   welcomeOrb:   { width: 120, height: 120, borderRadius: 60,
@@ -515,8 +506,12 @@ const s = StyleSheet.create({
   templateIcon:  { fontSize: 20 },
   templateLabel: { fontSize: 14, fontWeight: '600' },
 
-  // Emotions wheel
-  wheelWrap:     { alignItems: 'center', justifyContent: 'center' },
+  // Emotions pill preview
+  pillPreviewWrap:  { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two,
+                      justifyContent: 'center', maxWidth: 280 },
+  pillPreview:      { borderRadius: 50, borderWidth: 1.5,
+                      paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 4 },
+  pillPreviewText:  { fontSize: 14, fontWeight: '700' },
 
   // Insights chart
   chartWrap:     { flexDirection: 'row', alignItems: 'flex-end', gap: 6, height: 90 },
@@ -538,10 +533,10 @@ const s = StyleSheet.create({
                   alignItems: 'center', justifyContent: 'center' },
 
   // Slide text
-  slide:        { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.two,
+  slide:        { alignItems: 'center', gap: Spacing.two,
                   paddingHorizontal: Spacing.two },
   title:        { fontSize: 28, fontWeight: '800', textAlign: 'center',
-                  letterSpacing: -0.5, lineHeight: 36 },
+                  letterSpacing: -0.5, lineHeight: 36, alignSelf: 'stretch' },
   body:         { fontSize: 15, lineHeight: 23, textAlign: 'center', fontWeight: '500',
                   maxWidth: 300 },
   checklist:      { gap: Spacing.one + 4, alignSelf: 'stretch', marginTop: Spacing.one },
