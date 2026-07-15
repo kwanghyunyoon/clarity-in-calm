@@ -10,7 +10,7 @@ import { Animated, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, Text
 import Animated2, { FadeIn } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 
-import { LANGUAGES as LANGUAGE_OPTIONS } from '@/constants/languages';
+import { LANGUAGES } from '@/constants/languages';
 import { Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useLocale } from '@/context/language-context';
@@ -22,13 +22,6 @@ const ONBOARDING_KEY    = '@cic:hasSeenOnboarding';
 const LANGUAGE_STEP_KEY = '@cic:hasChosenLanguage';
 const FEEDBACK_WORKER = 'https://app-feedback.kwangyoon.workers.dev';
 const ISSUE_TYPES     = ['Bug', 'Suggestion', 'Other'];
-
-const LANGUAGES: { locale: Locale; flag: string; label: string }[] = [
-  { locale: 'en', flag: '🇺🇸', label: 'EN' },
-  { locale: 'ko', flag: '🇰🇷', label: '한' },
-  { locale: 'es', flag: '🇲🇽', label: 'ES' },
-  { locale: 'hi', flag: '🇮🇳', label: 'हि' },
-];
 
 function FeedbackModal({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const { colors } = useTheme();
@@ -382,7 +375,7 @@ function LanguageStepView({
       <Text style={[s.body, { color: colors.textSecondary }]}>{t.onboarding.languageStepBody}</Text>
 
       <View style={s.langCards}>
-        {LANGUAGE_OPTIONS.map((opt) => {
+        {LANGUAGES.map((opt) => {
           const active = selected === opt.locale;
           return (
             <TouchableOpacity
@@ -529,7 +522,7 @@ export function OnboardingModal() {
                   >
                     <Text style={s.langFlag}>{lang.flag}</Text>
                     <Text style={[s.langLabel, { color: active ? '#fff' : colors.textSecondary }]}>
-                      {lang.label}
+                      {lang.shortLabel}
                     </Text>
                   </TouchableOpacity>
                 );

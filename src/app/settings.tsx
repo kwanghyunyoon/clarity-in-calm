@@ -17,6 +17,7 @@ import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { IAP_CONFIG } from '@/config/iap';
 import { EMOTION_STORAGE_KEY } from '@/context/emotion-context';
@@ -32,14 +33,6 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useLocale } from '@/context/language-context';
-import { Locale } from '@/i18n/translations';
-
-const LANGUAGES: { code: Locale; label: string; flag: string }[] = [
-  { code: 'en', label: 'English', flag: '🇺🇸' },
-  { code: 'ko', label: '한국어', flag: '🇰🇷' },
-  { code: 'es', label: 'Español', flag: '🇲🇽' },
-  { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
-];
 
 const DATA_KEYS = [...WELLNESS_STORAGE_KEYS, EMOTION_STORAGE_KEY, SETTINGS_STORAGE_KEY];
 
@@ -439,15 +432,15 @@ export default function SettingsScreen() {
         <SettingsGroup>
           {LANGUAGES.map(lang => (
             <TouchableOpacity
-              key={lang.code}
-              onPress={() => setLocale(lang.code)}
+              key={lang.locale}
+              onPress={() => setLocale(lang.locale)}
               style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}
               accessibilityRole="radio"
-              accessibilityState={{ selected: locale === lang.code }}
+              accessibilityState={{ selected: locale === lang.locale }}
             >
               <Text style={styles.langFlag}>{lang.flag}</Text>
-              <Text style={[styles.rowLabel, { color: colors.text }]}>{lang.label}</Text>
-              {locale === lang.code && (
+              <Text style={[styles.rowLabel, { color: colors.text }]}>{lang.nativeName}</Text>
+              {locale === lang.locale && (
                 <Text style={[styles.checkmark, { color: colors.primary }]}>✓</Text>
               )}
             </TouchableOpacity>
