@@ -198,7 +198,9 @@ export default function JournalScreen() {
 
   function checkCrisis(text: string): boolean {
     const lower = text.toLowerCase();
-    return (tj.crisisKeywords as readonly string[]).some(kw => lower.includes(kw));
+    return Object.values(tj.crisisKeywords)
+      .flat()
+      .some(kw => lower.includes(kw));
   }
 
   function handleSaveAttempt() {

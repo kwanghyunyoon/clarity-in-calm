@@ -247,14 +247,21 @@ export const en = {
       saveBtn:    'Save my entry anyway',
     },
 
-    crisisKeywords: [
-      'suicide', 'suicidal', 'kill myself', 'end my life', 'take my life',
-      "don't want to live", 'dont want to live', 'want to die', 'wanted to die',
-      'no reason to live', 'better off dead', 'better off without me',
-      "can't go on", 'cant go on', 'ending it', 'end it all',
-      'hurt myself', 'self harm', 'self-harm', 'cutting myself',
-      'overdose', 'not worth living',
-    ],
+    // Categorized so every locale is compiler-checked to cover the same concepts —
+    // see Loosen<typeof en> below and __tests__/CrisisKeywordsParity.test.ts.
+    crisisKeywords: {
+      suicidalIdeation: [
+        'suicide', 'suicidal', 'kill myself', 'end my life', 'take my life',
+        'want to die', 'wanted to die',
+      ],
+      hopelessness: [
+        "don't want to live", 'dont want to live', 'no reason to live',
+        'better off dead', 'better off without me', 'not worth living',
+      ],
+      givingUp: ["can't go on", 'cant go on', 'ending it', 'end it all'],
+      selfHarm: ['hurt myself', 'self harm', 'self-harm', 'cutting myself'],
+      overdose: ['overdose'],
+    },
 
     deleteConfirm: {
       title:   'Delete entry?',
@@ -711,16 +718,19 @@ export const ko: Translations = {
       saveBtn:    '그래도 저장하기',
     },
 
-    crisisKeywords: [
-      '자살', '자살하고 싶다', '자살하고싶다',
-      '죽고 싶다', '죽고싶다', '죽어버리고 싶다', '죽고 싶어',
-      '살기 싫다', '살기싫다', '살고 싶지 않다',
-      '삶을 끝내고 싶다', '삶을 포기', '삶을 포기하고 싶다',
-      '목숨을 끊다', '스스로 목숨을 끊다',
-      '자해', '스스로를 해치다', '스스로 해치고 싶다',
-      '사라지고 싶다', '더 이상 살고 싶지 않다',
-      '죽겠다', '죽을 것 같다', '죽는 게 낫다',
-    ],
+    crisisKeywords: {
+      suicidalIdeation: [
+        '자살', '자살하고 싶다', '자살하고싶다',
+        '죽고 싶다', '죽고싶다', '죽어버리고 싶다', '죽고 싶어',
+        '목숨을 끊다', '스스로 목숨을 끊다',
+        '죽겠다', '죽을 것 같다',
+      ],
+      hopelessness: ['살기 싫다', '살기싫다', '살고 싶지 않다', '더 이상 살고 싶지 않다', '죽는 게 낫다'],
+      givingUp: ['삶을 끝내고 싶다', '삶을 포기', '삶을 포기하고 싶다', '사라지고 싶다'],
+      selfHarm: ['자해', '스스로를 해치다', '스스로 해치고 싶다'],
+      // No Korean overdose phrase translated yet — known content gap, tracked separately.
+      overdose: [],
+    },
 
     deleteConfirm: {
       title:   '기록을 삭제할까요?',
@@ -998,14 +1008,16 @@ export const es: Translations = {
       saveBtn:    'Guardar mi entrada de todas formas',
     },
 
-    crisisKeywords: [
-      'suicidio', 'suicida', 'matarme', 'terminar con mi vida', 'quitarme la vida',
-      'no quiero vivir', 'quiero morir', 'sin razón para vivir',
-      'mejor muerto', 'mejor muerta', 'mejor sin mí',
-      'no puedo más', 'acabar con todo', 'hacerme daño',
-      'autolesión', 'autolesionarme', 'cortarme', 'sobredosis',
-      'no vale la pena vivir', 'desaparecer para siempre',
-    ],
+    crisisKeywords: {
+      suicidalIdeation: ['suicidio', 'suicida', 'matarme', 'terminar con mi vida', 'quitarme la vida', 'quiero morir'],
+      hopelessness: [
+        'no quiero vivir', 'sin razón para vivir', 'mejor muerto', 'mejor muerta',
+        'mejor sin mí', 'no vale la pena vivir',
+      ],
+      givingUp: ['no puedo más', 'acabar con todo', 'desaparecer para siempre'],
+      selfHarm: ['hacerme daño', 'autolesión', 'autolesionarme', 'cortarme'],
+      overdose: ['sobredosis'],
+    },
 
     deleteConfirm: {
       title:   '¿Eliminar entrada?',
@@ -1283,13 +1295,17 @@ export const hi: Translations = {
       saveBtn:    'फिर भी मेरी प्रविष्टि सहेजें',
     },
 
-    crisisKeywords: [
-      'आत्महत्या', 'खुदकुशी', 'मरना चाहता हूँ', 'मरना चाहती हूँ',
-      'मर जाना चाहता हूँ', 'जीना नहीं चाहता', 'जीना नहीं चाहती',
-      'जिंदगी खत्म करना', 'खुद को नुकसान', 'खुद को चोट',
-      'आत्मघात', 'सब छोड़ देना चाहता हूँ', 'सब छोड़ देना चाहती हूँ',
-      'गायब हो जाना चाहता हूँ', 'गायब हो जाना चाहती हूँ',
-    ],
+    crisisKeywords: {
+      suicidalIdeation: ['आत्महत्या', 'खुदकुशी', 'मरना चाहता हूँ', 'मरना चाहती हूँ', 'मर जाना चाहता हूँ', 'आत्मघात'],
+      hopelessness: ['जीना नहीं चाहता', 'जीना नहीं चाहती'],
+      givingUp: [
+        'जिंदगी खत्म करना', 'सब छोड़ देना चाहता हूँ', 'सब छोड़ देना चाहती हूँ',
+        'गायब हो जाना चाहता हूँ', 'गायब हो जाना चाहती हूँ',
+      ],
+      selfHarm: ['खुद को नुकसान', 'खुद को चोट'],
+      // No Hindi overdose phrase translated yet — known content gap, tracked separately.
+      overdose: [],
+    },
 
     deleteConfirm: {
       title:   'प्रविष्टि हटाएँ?',
