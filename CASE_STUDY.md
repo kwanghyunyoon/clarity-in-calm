@@ -339,3 +339,25 @@ Ran the architecture-review skill twice this session (first at default effort, t
 **Top recommendation given to user:** fix the `settings.tsx` storage-key leak first (real bug, cheap fix), ideally as part of the `usePersistedState`/`dateKey` consolidation so `settings.tsx` gets one place to ask "what keys exist" instead of a hand-copied list.
 
 **Not yet decided:** user had not picked a candidate to implement as of end of session — next session should ask which of the above to build, starting with the storage-key bug if no preference is stated.
+
+---
+
+## 2026-07-15 (final) — Fixed the settings.tsx DATA_KEYS bug, committed and pushed
+
+Asked the user which architecture-review candidate to tackle first; they picked the recommended option, the `settings.tsx` storage-key bug.
+
+**Fix implemented:**
+- `src/context/wellness-context.tsx` — added `export const WELLNESS_STORAGE_KEYS = [STORAGE_KEY_ENTRIES, STORAGE_KEY_ENTRIES_LEGACY, STORAGE_KEY_SESSIONS, STORAGE_KEY_TAGS]`.
+- `src/context/emotion-context.tsx` — added `export const EMOTION_STORAGE_KEY = STORAGE_KEY`.
+- `src/context/settings-context.tsx` — added `export const SETTINGS_STORAGE_KEY = STORAGE_KEY`.
+- `src/app/settings.tsx` — replaced the hand-copied `DATA_KEYS` string array with `const DATA_KEYS = [...WELLNESS_STORAGE_KEYS, EMOTION_STORAGE_KEY, SETTINGS_STORAGE_KEY]`, importing from the three contexts above.
+
+Net effect: `wellness_sessions_v1` (breathing-session data) is now included in "Delete All Data" and "Export Data"; any future storage key added to one of these contexts flows into settings.tsx automatically instead of requiring a manual, easily-forgotten edit.
+
+**Verification:** `npx tsc --noEmit` and `npx eslint` on the four touched files. Both showed pre-existing errors (untyped `__tests__/*.test.ts` files missing jest globals; `settings.tsx`'s unrelated `expo-file-system` `cacheDirectory`/`documentDirectory` typing mismatch) — confirmed unchanged by diffing against a `git stash` of the fix, so nothing new was introduced. Not run against a live app session (no UI surface for this change beyond the two settings-screen buttons; logic-only fix).
+
+**Outcome:** Code fix committed as `404d266` ("fix: settings.tsx no longer drops wellness_sessions_v1 from delete/export") and pushed to `origin/main` (`b012b7b..404d266`). This log entry was written afterward and committed separately.
+
+**Still open from the architecture review** (not started): `usePersistedState`/`dateKey` consolidation across the 4-5 persistence contexts (including `language-context.tsx` bypassing `secure-storage.ts`), pointing the 3 `__tests__/*.test.ts` files at real `src/` code, the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`. Full detail in the "2026-07-15 (later)" entry above.
+
+**Separately, still uncommitted in the working tree** (untouched this session, not part of this fix): `.agents/`, `.claude/skills/`, `Feelings.pdf`, `eslint.config.js`, `gradlelog.md`, `skills-lock.json` — these predate this session; see prior CASE_STUDY.md entries and MEMORY.md for the Feelings Library and onboarding/language-pill features they relate to.
