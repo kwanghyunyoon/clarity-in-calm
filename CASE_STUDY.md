@@ -571,8 +571,8 @@ Same-day follow-up. Reconnected to the already-running Metro instance and the pr
 
 **Verification:** Live device walkthrough of all 7 onboarding slides after the fix — slide 3 ("Journal Your Way") now renders in full; spot-checked slides 1, 4 ("Name What You Feel"), 5 ("Discover Your Patterns"), and 7 (privacy checklist) to confirm the shared style change didn't regress any other title. `npx tsc --noEmit` and `npx eslint src/components/onboarding-modal.tsx` — same pre-existing baseline only (3 known issues: `WelcomeVisual`'s `useRef` access, `setPage` in an effect, one `exhaustive-deps` warning), zero new.
 
-**Outcome:** All four fixes from the prior entry, plus this corrected slide-3 fix, are made locally in `src/app/index.tsx`, `src/components/onboarding-modal.tsx`, and `src/i18n/translations.ts` — **still not committed**, pending the user's go-ahead.
+**Outcome:** All four fixes committed as `673784a` ("fix: repair three leftover-wheel onboarding bugs and a text-clipping bug"), at explicit user request. Not yet pushed.
 
 **Still open:**
-- All four fixes are now device-verified and ready to commit as a single batch, pending user confirmation.
+- Push `673784a` to `origin/main` when the user asks.
 - Same standing ko/es/hi native-speaker review gap as before.
