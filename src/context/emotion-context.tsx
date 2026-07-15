@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { secureRead, secureWrite } from '@/lib/secure-storage';
+import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import { toLocalDateStr } from '@/lib/date-utils';
+import { usePersistedState } from '@/lib/use-persisted-state';
 import { EmotionLog } from '@/types';
 
 interface EmotionContextType {
@@ -15,27 +16,8 @@ const EmotionContext = createContext<EmotionContextType | null>(null);
 const STORAGE_KEY = 'wellness_emotions_v1';
 export const EMOTION_STORAGE_KEY = STORAGE_KEY;
 
-function toLocalDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 export function EmotionProvider({ children }: { children: React.ReactNode }) {
-  const [emotionLogs, setEmotionLogs] = useState<EmotionLog[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    secureRead<EmotionLog[]>(STORAGE_KEY)
-      .then(saved => {
-        if (saved) setEmotionLogs(saved);
-        setIsLoaded(true);
-      })
-      .catch(() => setIsLoaded(true));
-  }, []);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    secureWrite(STORAGE_KEY, emotionLogs);
-  }, [emotionLogs, isLoaded]);
+  const [emotionLogs, setEmotionLogs, isLoaded] = usePersistedState<EmotionLog[]>(STORAGE_KEY, []);
 
   const addEmotionLog = useCallback((log: Omit<EmotionLog, 'id' | 'date'>) => {
     if (!isLoaded) return;
@@ -47,12 +29,12 @@ export function EmotionProvider({ children }: { children: React.ReactNode }) {
       },
       ...prev,
     ]);
-  }, [isLoaded]);
+  }, [isLoaded, setEmotionLogs]);
 
   const deleteEmotionLog = useCallback((id: string) => {
     if (!isLoaded) return;
     setEmotionLogs(prev => prev.filter(e => e.id !== id));
-  }, [isLoaded]);
+  }, [isLoaded, setEmotionLogs]);
 
   const todayEmotions = useMemo(() => {
     const today = toLocalDateStr(new Date());

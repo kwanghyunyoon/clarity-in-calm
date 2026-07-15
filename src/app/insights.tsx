@@ -17,10 +17,7 @@ import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-
-function toLocalDateStr(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
+import { toLocalDateStr } from '@/lib/date-utils';
 
 function getLast7Days() {
   const days: string[] = [];

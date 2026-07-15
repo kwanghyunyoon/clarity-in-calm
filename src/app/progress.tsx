@@ -6,6 +6,7 @@ import { useLocale } from '@/context/language-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
+import { toLocalDateStr } from '@/lib/date-utils';
 
 
 function last7Days(): Date[] {
@@ -41,10 +42,6 @@ export default function ProgressScreen() {
     return { ...moods[idx], count };
   });
   const maxCount = Math.max(...moodDist.map((m) => m.count), 1);
-
-  // YYYY-MM-DD helper — consistent local-timezone date key (mirrors wellness-context)
-  const toLocalDateStr = (d: Date) =>
-    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   // Weekly activity
   const weekActivity = week.map((day) => {

@@ -361,3 +361,29 @@ Net effect: `wellness_sessions_v1` (breathing-session data) is now included in "
 **Still open from the architecture review** (not started): `usePersistedState`/`dateKey` consolidation across the 4-5 persistence contexts (including `language-context.tsx` bypassing `secure-storage.ts`), pointing the 3 `__tests__/*.test.ts` files at real `src/` code, the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`. Full detail in the "2026-07-15 (later)" entry above.
 
 **Separately, still uncommitted in the working tree** (untouched this session, not part of this fix): `.agents/`, `.claude/skills/`, `Feelings.pdf`, `eslint.config.js`, `gradlelog.md`, `skills-lock.json` — these predate this session; see prior CASE_STUDY.md entries and MEMORY.md for the Feelings Library and onboarding/language-pill features they relate to.
+
+---
+
+## 2026-07-15 (next) — `usePersistedState`/`dateKey` consolidation
+
+Picked the next architecture-review candidate off the still-open list: consolidating the duplicated `toLocalDateStr` helper and the hand-rolled load→isLoaded→save boilerplate across the persistence contexts.
+
+**`toLocalDateStr`:** extracted the byte-identical implementation (duplicated 6x — `journal.tsx`, `insights.tsx`, `progress.tsx`, `emotion-context.tsx`, `wellness-context.tsx` x2) into `src/lib/date-utils.ts`; all six call sites now import it instead of redefining it.
+
+**`usePersistedState`:** added `src/lib/use-persisted-state.ts`, a hook wrapping `secureRead`/`secureWrite` with the load→isLoaded→save effect pair every context re-implemented by hand. Options: `legacyKey` (read a fallback key if the primary key has no saved value — used for `wellness-entries` v1→v2 migration), `transform` (applied to whatever loaded, e.g. merging defaults), `onSaveResult` (surfaces save failures, e.g. `wellness-context`'s `saveError`).
+
+**Migrated all four contexts:**
+- `emotion-context.tsx` — straightforward swap, single key.
+- `settings-context.tsx` — uses `transform` to merge `DEFAULT_SETTINGS` with whatever was saved.
+- `wellness-context.tsx` — three `usePersistedState` calls (entries w/ `legacyKey` fallback to v1, breathing sessions, custom tags), combined `isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded`, shared `onSaveResult` callback feeding the existing `saveError` state (tags save was never wired to `saveError` before either — preserved that asymmetry rather than changing behavior).
+- `language-context.tsx` — the one flagged as bypassing `secure-storage.ts` entirely (talked to raw `AsyncStorage` with its own `@cic_locale` key). Now goes through `usePersistedState` like everything else, with `transform` re-validating the saved value is a known locale (falls back to device-detected locale otherwise, same as before). **Known behavior change:** since the encrypted store uses a different underlying `AsyncStorage` key (`@cic_enc:@cic_locale` vs. the old plain `@cic_locale`), existing installs will not read their previously-saved language preference on first launch after this update — it re-detects from the device locale instead, which is a low-stakes, self-healing fallback (not lost data, just a preference reset).
+
+**Deliberately left open:** `settings.tsx`'s `DATA_KEYS` (used by "Delete All Data"/"Export Data") does *not* include the locale key — locale was never covered by that flow even when it lived in plain `AsyncStorage`, and folding it in is a product-scope decision (should "Delete All Data" also reset the language pref?), not a mechanical part of this refactor.
+
+**Lint note:** moving the `useState` setters behind a custom hook made ESLint's `react-hooks/exhaustive-deps` stop recognizing them as stable identities (it special-cases setters returned directly from `useState`, not from wrapping hooks), producing 10 new warnings across the three contexts with `useCallback`s. Fixed by adding the setter to each callback's deps array — zero behavior change, since the setter actually is stable, just satisfies the linter explicitly.
+
+**Verification:** `npx tsc --noEmit` — output identical to the pre-refactor baseline (only the pre-existing test-file/expo-file-system errors, confirmed via diff). `npx eslint` on all touched files — 9 warnings, matching the pre-refactor baseline exactly (all pre-existing unused-import/unused-var warnings, unrelated to this change). Not run against a live app session — logic-only refactor preserving existing gating (`isLoaded` checks) and effect timing; no new UI surface.
+
+**Net:** 124 lines of duplicated load/save/date-key boilerplate removed, 42 lines added (two new small `src/lib/` modules) — net -82 lines across 7 modified + 2 new files.
+
+**Still open from the architecture review:** pointing the 3 `__tests__/*.test.ts` files at real `src/` code, the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.

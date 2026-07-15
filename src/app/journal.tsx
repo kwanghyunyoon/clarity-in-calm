@@ -23,6 +23,7 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { toLocalDateStr } from '@/lib/date-utils';
 import type { MoodValue } from '@/types';
 
 async function openUrl(rawUrl: string) {
@@ -36,10 +37,6 @@ async function openUrl(rawUrl: string) {
   } else {
     Alert.alert('Cannot open', url);
   }
-}
-
-function toLocalDateStr(d: Date) {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
 function formatTimestamp(iso: string) {

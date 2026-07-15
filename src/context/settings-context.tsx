@@ -1,5 +1,5 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { secureRead, secureWrite } from '@/lib/secure-storage';
+import React, { createContext, useCallback, useContext } from 'react';
+import { usePersistedState } from '@/lib/use-persisted-state';
 import { AppSettings, DEFAULT_SETTINGS, IAPStatus, NotificationSettings, ThemeOverride } from '@/types';
 
 interface SettingsContextType {
@@ -16,34 +16,21 @@ const STORAGE_KEY = 'wellness_settings_v1';
 export const SETTINGS_STORAGE_KEY = STORAGE_KEY;
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useEffect(() => {
-    secureRead<AppSettings>(STORAGE_KEY)
-      .then(saved => {
-        if (saved) setSettings({ ...DEFAULT_SETTINGS, ...saved });
-        setIsLoaded(true);
-      })
-      .catch(() => setIsLoaded(true));
-  }, []);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    secureWrite(STORAGE_KEY, settings);
-  }, [settings, isLoaded]);
+  const [settings, setSettings, isLoaded] = usePersistedState<AppSettings>(STORAGE_KEY, DEFAULT_SETTINGS, {
+    transform: saved => ({ ...DEFAULT_SETTINGS, ...saved }),
+  });
 
   const setNotificationSettings = useCallback((n: NotificationSettings) => {
     setSettings(prev => ({ ...prev, notifications: n }));
-  }, []);
+  }, [setSettings]);
 
   const setIAPStatus = useCallback((s: IAPStatus) => {
     setSettings(prev => ({ ...prev, iap: s }));
-  }, []);
+  }, [setSettings]);
 
   const setThemeOverride = useCallback((t: ThemeOverride) => {
     setSettings(prev => ({ ...prev, themeOverride: t }));
-  }, []);
+  }, [setSettings]);
 
   return (
     <SettingsContext.Provider value={{ settings, setNotificationSettings, setIAPStatus, setThemeOverride, isLoaded }}>

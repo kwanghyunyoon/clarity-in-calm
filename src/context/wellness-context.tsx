@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { secureRead, secureWrite } from '@/lib/secure-storage';
+import React, { createContext, useCallback, useContext, useState } from 'react';
+import { toLocalDateStr } from '@/lib/date-utils';
+import { usePersistedState } from '@/lib/use-persisted-state';
 import { JournalEntry, MoodValue } from '@/types';
 
 // Re-export for backward compat
@@ -35,10 +36,6 @@ export const WELLNESS_STORAGE_KEYS = [
   STORAGE_KEY_TAGS,
 ];
 
-function toLocalDateStr(d: Date): string {
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
 function computeStreak(entries: JournalEntry[]): number {
   if (entries.length === 0) return 0;
   const uniqueDays = [...new Set(entries.map(e => toLocalDateStr(new Date(e.date))))].sort((a, b) => (a < b ? 1 : -1));
@@ -57,44 +54,19 @@ function computeStreak(entries: JournalEntry[]): number {
 }
 
 export function WellnessProvider({ children }: { children: React.ReactNode }) {
-  const [entries,           setEntries]           = useState<JournalEntry[]>([]);
-  const [breathingSessions, setBreathingSessions]  = useState(0);
-  const [customTags,        setCustomTags]         = useState<string[]>([]);
-  const [isLoaded,          setIsLoaded]           = useState(false);
-  const [saveError,         setSaveError]          = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const onSaveResult = useCallback((ok: boolean) => { if (!ok) setSaveError(true); }, []);
 
-  useEffect(() => {
-    async function load() {
-      const [savedEntries, legacyEntries, savedSessions, savedTags] = await Promise.all([
-        secureRead<JournalEntry[]>(STORAGE_KEY_ENTRIES),
-        secureRead<JournalEntry[]>(STORAGE_KEY_ENTRIES_LEGACY),
-        secureRead<number>(STORAGE_KEY_SESSIONS),
-        secureRead<string[]>(STORAGE_KEY_TAGS),
-      ]);
-      // Prefer v2; fall back to legacy v1 on first upgrade
-      const loaded = savedEntries ?? legacyEntries ?? [];
-      setEntries(loaded);
-      if (savedSessions) setBreathingSessions(savedSessions);
-      if (savedTags) setCustomTags(savedTags);
-      setIsLoaded(true);
-    }
-    load().catch(() => setIsLoaded(true));
-  }, []);
+  // Prefer v2; fall back to legacy v1 on first upgrade
+  const [entries, setEntries, entriesLoaded] = usePersistedState<JournalEntry[]>(
+    STORAGE_KEY_ENTRIES, [], { legacyKey: STORAGE_KEY_ENTRIES_LEGACY, onSaveResult },
+  );
+  const [breathingSessions, setBreathingSessions, sessionsLoaded] = usePersistedState<number>(
+    STORAGE_KEY_SESSIONS, 0, { onSaveResult },
+  );
+  const [customTags, setCustomTags, tagsLoaded] = usePersistedState<string[]>(STORAGE_KEY_TAGS, []);
 
-  useEffect(() => {
-    if (!isLoaded) return;
-    secureWrite(STORAGE_KEY_ENTRIES, entries).then(ok => { if (!ok) setSaveError(true); });
-  }, [entries, isLoaded]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    secureWrite(STORAGE_KEY_SESSIONS, breathingSessions).then(ok => { if (!ok) setSaveError(true); });
-  }, [breathingSessions, isLoaded]);
-
-  useEffect(() => {
-    if (!isLoaded) return;
-    secureWrite(STORAGE_KEY_TAGS, customTags);
-  }, [customTags, isLoaded]);
+  const isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded;
 
   const addEntry = useCallback((
     mood: MoodValue,
@@ -109,28 +81,28 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
       note,
       ...extras,
     }, ...prev]);
-  }, [isLoaded]);
+  }, [isLoaded, setEntries]);
 
   const updateEntry = useCallback((id: string, patch: Partial<JournalEntry>) => {
     if (!isLoaded) return;
     setEntries(prev => prev.map(e => e.id === id ? { ...e, ...patch } : e));
-  }, [isLoaded]);
+  }, [isLoaded, setEntries]);
 
   const deleteEntry = useCallback((id: string) => {
     if (!isLoaded) return;
     setEntries(prev => prev.filter(e => e.id !== id));
-  }, [isLoaded]);
+  }, [isLoaded, setEntries]);
 
   const addCustomTag = useCallback((tag: string) => {
     const t = tag.trim().toLowerCase();
     if (!t) return;
     setCustomTags(prev => prev.includes(t) ? prev : [...prev, t]);
-  }, []);
+  }, [setCustomTags]);
 
   const addBreathingSession = useCallback(() => {
     if (!isLoaded) return;
     setBreathingSessions(prev => prev + 1);
-  }, [isLoaded]);
+  }, [isLoaded, setBreathingSessions]);
 
   const clearSaveError = useCallback(() => setSaveError(false), []);
 
