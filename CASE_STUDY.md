@@ -406,6 +406,6 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 
 **Verification:** `npx jest` — all 3 suites, 18 tests pass. `npx tsc --noEmit` — clean on every touched/new file (had to fix a lib.dom.d.ts `Uint8Array<ArrayBufferLike>` vs `Uint8Array<ArrayBuffer>` generic mismatch in the new `expo-crypto` mock — same class of issue `secure-storage.ts` already works around with `as ArrayBuffer` casts); remaining `tsc` output is the pre-existing `settings.tsx` `expo-file-system` typing mismatch only (confirmed via `git stash` diff — the jest-globals-in-test-files errors are gone now that `@types/jest` question is moot for these files' *logic*, but no `@types/jest` package was installed so the `describe`/`test`/`expect` global-name errors are unchanged, pre-existing, and out of scope for this fix). `npx eslint` on all touched/new files — zero warnings or errors. Not run against a live app session — pure logic/test-infra change, no UI surface.
 
-**Outcome:** Not yet committed — awaiting explicit commit instruction per this session's working style.
+**Outcome:** Committed as `9b7f054` ("fix: point the 3 __tests__ files at real src/ code instead of reimplementing it"). Not yet pushed to `origin/main` — awaiting explicit push instruction.
 
 **Still open from the architecture review:** the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.
