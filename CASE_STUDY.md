@@ -386,4 +386,26 @@ Picked the next architecture-review candidate off the still-open list: consolida
 
 **Net:** 124 lines of duplicated load/save/date-key boilerplate removed, 42 lines added (two new small `src/lib/` modules) — net -82 lines across 7 modified + 2 new files.
 
+**Outcome:** Committed as `0e88366` ("refactor: consolidate persistence-context boilerplate and date-key helper") and pushed to `origin/main` (`417e6cc..0e88366`).
+
 **Still open from the architecture review:** pointing the 3 `__tests__/*.test.ts` files at real `src/` code, the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.
+
+---
+
+## 2026-07-15 (still later) — Pointed the 3 dead test files at real `src/` code
+
+Asked the user which remaining architecture-review candidate to tackle next; they picked the dead-test-files finding. All three `__tests__/*.test.ts` files reimplemented the logic they claimed to test inline, so they exercised zero shipped code — confirmed by reading each test against its supposed source. Also discovered along the way: `package.json` had no `test` script at all, so `npm test` couldn't even run them.
+
+**`BreathingExercise.test.ts`:** `breathe.tsx`'s phase-timing logic (which phase is active at elapsed-ms `t`, and the countdown display) lived inline inside a `setInterval` callback, not exported anywhere. Extracted it to a new `src/lib/breathing.ts` (`PHASE_DURATIONS`, `CYCLE_MS`, `getPhaseAtTime`, `getPhaseCountdownAtTime`), rewired `breathe.tsx`'s phase tracker to call the extracted functions instead of the inline loop (identical behavior, same 80ms poll), and rewrote the test to import from `@/lib/breathing` instead of redeclaring the same duration table and loop.
+
+**`MoodTracker.test.ts`:** `computeStreak` was a private, unexported function in `wellness-context.tsx`; the test had a byte-identical private copy, including a redeclared `toLocalDateStr` that already exists as an export in `src/lib/date-utils.ts` (from the prior session's consolidation). Exported `computeStreak` from `wellness-context.tsx` and rewired the test to import both real functions.
+
+**`EncryptedJournal.test.ts`:** the worst case — it tested raw `globalThis.crypto.subtle` AES-GCM directly, disconnected from `secure-storage.ts` entirely, and per [[hermes_no_web_crypto]] that Web Crypto API doesn't even exist on-device (Hermes has no `crypto.subtle`); the test was validating a capability the app doesn't use. Rewired it to call `secure-storage.ts`'s real exported API (`secureWrite`/`secureRead`/`secureDelete`) instead. That required jest-mocking three native modules `secure-storage.ts` imports: added `__mocks__/expo-crypto.ts` (real AES-256-GCM via the `globalThis.crypto` WebCrypto global — unavailable on-device but genuine AES-GCM under test, so encrypt/decrypt/tamper-detection behavior is authentic, standing in only for the native Keystore/CryptoKit call), `__mocks__/expo-secure-store.ts` (in-memory key/value map standing in for Keychain/Keystore), and `__mocks__/@react-native-async-storage/async-storage.js` (re-exports the package's own official jest mock). New test cases cover roundtrip, ciphertext-doesn't-contain-plaintext, GCM tamper detection (flip a ciphertext byte → `secureRead` returns `null`), missing-key read, delete, and empty-string roundtrip.
+
+**Added `"test": "jest"` to `package.json` scripts** — previously missing, so these tests had no run path via `npm test` (unclear if any CI step called `npx jest` directly; either way this closes the gap).
+
+**Verification:** `npx jest` — all 3 suites, 18 tests pass. `npx tsc --noEmit` — clean on every touched/new file (had to fix a lib.dom.d.ts `Uint8Array<ArrayBufferLike>` vs `Uint8Array<ArrayBuffer>` generic mismatch in the new `expo-crypto` mock — same class of issue `secure-storage.ts` already works around with `as ArrayBuffer` casts); remaining `tsc` output is the pre-existing `settings.tsx` `expo-file-system` typing mismatch only (confirmed via `git stash` diff — the jest-globals-in-test-files errors are gone now that `@types/jest` question is moot for these files' *logic*, but no `@types/jest` package was installed so the `describe`/`test`/`expect` global-name errors are unchanged, pre-existing, and out of scope for this fix). `npx eslint` on all touched/new files — zero warnings or errors. Not run against a live app session — pure logic/test-infra change, no UI surface.
+
+**Outcome:** Not yet committed — awaiting explicit commit instruction per this session's working style.
+
+**Still open from the architecture review:** the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.

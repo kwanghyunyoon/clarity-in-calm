@@ -15,12 +15,9 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
+import { CYCLE_MS, getPhaseAtTime, getPhaseCountdownAtTime, PHASE_DURATIONS } from '@/lib/breathing';
 
-const PHASE_DURATIONS = [4000, 4000, 4000, 4000] as const;
 const PHASE_END_SCALES = [1.00, 1.00, 0.58, 0.58] as const;
-const PHASE_IDS = ['inhale', 'hold1', 'exhale', 'rest'] as const;
-
-const CYCLE_MS = PHASE_DURATIONS.reduce((s, d) => s + d, 0); // 16 000 ms
 
 export default function BreatheScreen() {
   const { colors } = useTheme();
@@ -107,21 +104,14 @@ export default function BreatheScreen() {
     }
 
     const interval = setInterval(() => {
-      const elapsed  = (Date.now() - startTimeRef.current) % CYCLE_MS;
-      const totalMs  = Date.now() - startTimeRef.current;
-
+      const totalMs = Date.now() - startTimeRef.current;
       setRounds(Math.floor(totalMs / CYCLE_MS));
 
-      let cum = 0;
-      for (const phase of PHASES) {
-        cum += phase.duration;
-        if (elapsed < cum) {
-          setPhaseLabel(phase.label);
-          setPhaseHint(phase.hint);
-          setCountdown(Math.max(1, Math.ceil((cum - elapsed) / 1000)));
-          break;
-        }
-      }
+      const phaseId = getPhaseAtTime(totalMs);
+      const phase = PHASES.find((p) => p.id === phaseId)!;
+      setPhaseLabel(phase.label);
+      setPhaseHint(phase.hint);
+      setCountdown(getPhaseCountdownAtTime(totalMs));
     }, 80);
 
     return () => clearInterval(interval);

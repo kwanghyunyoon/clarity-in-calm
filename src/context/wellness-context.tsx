@@ -36,7 +36,7 @@ export const WELLNESS_STORAGE_KEYS = [
   STORAGE_KEY_TAGS,
 ];
 
-function computeStreak(entries: JournalEntry[]): number {
+export function computeStreak(entries: JournalEntry[]): number {
   if (entries.length === 0) return 0;
   const uniqueDays = [...new Set(entries.map(e => toLocalDateStr(new Date(e.date))))].sort((a, b) => (a < b ? 1 : -1));
   const today = toLocalDateStr(new Date());

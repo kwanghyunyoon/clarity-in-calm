@@ -69,6 +69,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "test": "jest",
     "build:web": "expo export --platform web"
   },
   "private": true
