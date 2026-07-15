@@ -488,3 +488,21 @@ Picked up the last open architecture-review candidate: the placeholder RevenueCa
 **Outcome:** Committed as `1a8d081` ("fix: guard IAP unlock/restore against placeholder RevenueCat keys") and pushed to `origin/main` (`3bd9e1a..1a8d081`) at explicit user request.
 
 **Architecture-review status: all 7 original findings now addressed** (6 fixed outright, this 7th mitigated with a guard pending the user's real RevenueCat credentials). Still separately tracked, not part of the original 7: `ko`/`hi` missing translated `overdose`-category crisis phrases (needs a native speaker or clinician-reviewed source).
+
+---
+
+## 2026-07-15 (post-review cleanup) — Triaged the 6 files that had sat untouched all session
+
+The RevenueCat-guard commit (`1a8d081`) closed out the architecture review, but `.agents/`, `.claude/skills/`, `Feelings.pdf`, `eslint.config.js`, `gradlelog.md`, and `skills-lock.json` had been sitting uncommitted in the working tree since before this session started. User asked for a recommendation on each, then asked to act on it.
+
+**Findings, one by one:**
+- `eslint.config.js` — the live Expo flat-config ESLint file; `npm run lint` (`expo lint`) already depends on it and no other ESLint config was tracked in the repo. Genuine project config that had never been committed.
+- `gradlelog.md` — a raw pasted Gradle daemon/task log from the earlier Android-build troubleshooting session (see [[local_android_build_setup]]), not curated notes. No lasting value.
+- `.agents/skills/` and `.claude/skills/` — near-duplicate installs (~40 skills each, two agent formats) from a Claude Code skill-marketplace tool, keyed by `skills-lock.json` as their lockfile. Confirmed `.claude/settings.json` is separately already tracked in this repo (left alone); the bulk skill content is regenerable tooling, structurally like `node_modules/`, unrelated to the wellness app.
+- `Feelings.pdf` (10.7MB) — the emotion-content source-of-truth reference (per [[feelings_journal_source_of_truth]]); its content is already diff-verified into `src/`, so the binary itself doesn't need to ship with the app.
+
+**Fix:** added a new `.gitignore` block for `/.agents/`, `/.claude/skills/`, `skills-lock.json`, and `/Feelings.pdf`; deleted `gradlelog.md` outright (it was untracked, so this only cleaned the working tree, no history to purge); staged and committed `eslint.config.js` for real.
+
+**Outcome:** Committed as `1f87dba` ("chore: add eslint.config.js, gitignore skill-tooling and content reference files") and pushed to `origin/main` (`46ba9e0..1f87dba`) at explicit user request. Working tree is now fully clean — `git status` shows nothing untracked or modified.
+
+**Nothing open from this thread.** Only remaining product-level open item across the whole engagement: real RevenueCat credentials (see above) and the `ko`/`hi` overdose-phrase translation gap (see architecture-review entries above) — both are user/content decisions, not mechanical work.
