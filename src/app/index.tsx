@@ -16,7 +16,7 @@ import { ToolCard } from '@/components/today/ToolCard';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { QUOTES } from '@/constants/quotes';
 import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
-import { EMOTIONS_BY_ID } from '@/constants/emotions';
+import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
 import { useEmotions } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
@@ -126,7 +126,7 @@ export default function TodayScreen() {
               contentContainerStyle={styles.emotionRow}
             >
               {todayEmotions.map(log => {
-                const emotion = EMOTIONS_BY_ID[log.emotionId];
+                const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
                 const color = emotion?.color ?? colors.primary;
                 return (
                   <View

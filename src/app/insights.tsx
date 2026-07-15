@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
-import { EMOTIONS_BY_ID } from '@/constants/emotions';
+import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -54,11 +54,14 @@ export default function InsightsScreen() {
 
   // ── Top emotion
   const topEmotion = useMemo(() => {
-    const counts: Record<string, number> = {};
-    emotionLogs.forEach(log => { counts[log.emotionId] = (counts[log.emotionId] ?? 0) + 1; });
-    const top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
-    return top ? EMOTIONS_BY_ID[top[0]] : null;
-  }, [emotionLogs]);
+    const counts: Record<string, { count: number; label: string; color: string }> = {};
+    emotionLogs.forEach(log => {
+      const color = BASIC_EMOTIONS_BY_ID[log.emotionId]?.color ?? colors.primary;
+      if (!counts[log.emotionId]) counts[log.emotionId] = { count: 0, label: log.emotionLabel, color };
+      counts[log.emotionId].count++;
+    });
+    return Object.values(counts).sort((a, b) => b.count - a.count)[0] ?? null;
+  }, [emotionLogs, colors.primary]);
 
   // ── Top context triggers
   const triggerCounts = useMemo(() => {
@@ -162,9 +165,6 @@ export default function InsightsScreen() {
             <View style={styles.topEmotionRow}>
               <View style={[styles.emotionColorDot, { backgroundColor: topEmotion.color }]} />
               <Text style={[styles.topEmotionName, { color: colors.text }]}>{topEmotion.label}</Text>
-              <Text style={[styles.topEmotionPrimary, { color: colors.textSecondary }]}>
-                · {topEmotion.primary}
-              </Text>
             </View>
           </Animated.View>
         )}
@@ -316,7 +316,6 @@ const styles = StyleSheet.create({
   topEmotionRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   emotionColorDot: { width: 14, height: 14, borderRadius: 7 },
   topEmotionName: { fontSize: 20, fontWeight: '700' },
-  topEmotionPrimary: { fontSize: 14 },
   chart: { flexDirection: 'row', alignItems: 'flex-end', gap: Spacing.two, height: 72 },
   chartCol: { flex: 1, alignItems: 'center', gap: 4, justifyContent: 'flex-end' },
   bar: { width: '100%', borderRadius: BorderRadius.sm, minHeight: 4 },

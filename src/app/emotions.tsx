@@ -16,10 +16,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BodyCheckIn } from '@/components/emotions/BodyCheckIn';
 import { CopingActionsSelector } from '@/components/emotions/CopingActionsSelector';
 import { ContextTagSelector } from '@/components/emotions/ContextTagSelector';
+import { EmotionPillSelector, SelectedEmotion } from '@/components/emotions/EmotionPillSelector';
 import { IntensitySlider } from '@/components/emotions/IntensitySlider';
-import { PlutchikWheel } from '@/components/emotions/PlutchikWheel';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
-import { EMOTIONS_BY_ID, PlutchikEmotion } from '@/constants/emotions';
+import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
@@ -45,7 +45,7 @@ export default function EmotionsScreen() {
   const { emotionLogs, addEmotionLog, deleteEmotionLog } = useEmotions();
   const { customTags } = useWellness();
 
-  const [selectedEmotion, setSelectedEmotion] = useState<PlutchikEmotion | null>(null);
+  const [selectedEmotion, setSelectedEmotion] = useState<SelectedEmotion | null>(null);
   const [intensity, setIntensity] = useState(5);
   const [contextTags, setContextTags] = useState<string[]>([]);
   const [bodyRegions, setBodyRegions] = useState<string[]>([]);
@@ -73,7 +73,7 @@ export default function EmotionsScreen() {
     addEmotionLog({
       emotionId: selectedEmotion.id,
       emotionLabel: selectedEmotion.label,
-      primaryEmotion: selectedEmotion.primary,
+      primaryEmotion: selectedEmotion.id,
       intensity,
       contextTags,
       bodyRegions,
@@ -139,7 +139,12 @@ export default function EmotionsScreen() {
               </TouchableOpacity>
             </Animated.View>
           )}
-          <PlutchikWheel selectedId={selectedEmotion?.id ?? null} onSelect={setSelectedEmotion} />
+          <EmotionPillSelector
+            selected={selectedEmotion}
+            onSelect={setSelectedEmotion}
+            otherLabel={te.otherPill}
+            customPlaceholder={te.customPlaceholder}
+          />
         </Animated.View>
 
         {/* ── Intensity ── */}
@@ -228,7 +233,7 @@ export default function EmotionsScreen() {
           <View style={styles.pastSection}>
             <Text style={[styles.pastTitle, { color: colors.textSecondary }]}>{te.pastTitle}</Text>
             {emotionLogs.slice(0, 20).map((log, i) => {
-              const emotion = EMOTIONS_BY_ID[log.emotionId];
+              const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
               const color = emotion?.color ?? colors.primary;
               return (
                 <Animated.View
