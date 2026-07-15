@@ -448,3 +448,19 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 **Outcome:** Committed as `cd88236` ("fix: categorize crisisKeywords per locale so parity is compiler-enforced"). Not yet pushed to `origin/main` — awaiting explicit push instruction. User decided to leave the `ko`/`hi` missing-overdose-phrase gap as a tracked issue rather than have phrases drafted — needs a native speaker or clinician, not a guess.
 
 **Still open from the architecture review:** the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`. Also newly surfaced: `ko`/`hi` missing translated `overdose`-category crisis phrases (see above).
+
+---
+
+## 2026-07-15 (last) — Extracted `FeedbackModal` out of `onboarding-modal.tsx`
+
+Asked the user which remaining architecture-review candidate to tackle next; they picked the `FeedbackModal` finding — a fully unrelated "Report an issue" sheet (its own Cloudflare Worker POST, issue-type state machine, styles) had been living inline inside `onboarding-modal.tsx`, the only connection being that the onboarding tour happens to be the current entry point for the "Report an issue" link.
+
+**Fix:** moved the component, its two module constants (`FEEDBACK_WORKER`, `ISSUE_TYPES`), and its `StyleSheet` wholesale into a new `src/components/feedback-modal.tsx`, exported as `FeedbackModal`. `onboarding-modal.tsx` now imports it from `./feedback-modal` instead of declaring it locally — zero behavior change, pure move. Also trimmed `onboarding-modal.tsx`'s `react-native` import line down to what it still uses (`KeyboardAvoidingView`, `Platform`, `TextInput` were only used by the extracted component; `Modal` stayed since `OnboardingModal` itself renders one).
+
+**Verification:** `npx tsc --noEmit` — zero new errors (same pre-existing jest-globals-in-test-files and `settings.tsx` `expo-file-system` baseline). `npx eslint` on both files — same 9 pre-existing problems (6 errors, 3 warnings) as a `git stash`-diffed baseline, confirmed at the same relative lines (`WelcomeVisual`'s `useRef` access, `EmotionsVisual`'s `require()`, `setPage` in an effect) — nothing new. Verified live per [[verify_via_expo_web_playwright]]: ran `expo start --web` + a scratch Playwright script, walked the first-launch language step, tapped "Report an issue" from the onboarding slide, confirmed the sheet still opens with the Bug/Suggestion/Other type selector and description field, typed a test description, and confirmed "Send feedback" becomes enabled — screenshotted mid-flow.
+
+**Net:** `onboarding-modal.tsx` 706 → 562 lines; new `feedback-modal.tsx` is 157 lines, self-contained.
+
+**Outcome:** Committed as `efebdf1` ("refactor: extract FeedbackModal out of onboarding-modal.tsx"). Not yet pushed to `origin/main`.
+
+**Still open from the architecture review:** the still-placeholder RevenueCat keys in `src/config/iap.ts` (product decision, not mechanical). Also still tracked: `ko`/`hi` missing translated `overdose`-category crisis phrases.
