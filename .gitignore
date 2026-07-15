@@ -49,3 +49,11 @@ example
 
 # Local Netlify folder
 .netlify
+
+# Claude Code skill-marketplace installs (regenerable local tooling, not app code)
+/.agents/
+/.claude/skills/
+skills-lock.json
+
+# Content reference source (10MB+ binary; content already ported into src/)
+/Feelings.pdf
