@@ -409,3 +409,24 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 **Outcome:** Committed as `9b7f054` ("fix: point the 3 __tests__ files at real src/ code instead of reimplementing it"). Not yet pushed to `origin/main` — awaiting explicit push instruction.
 
 **Still open from the architecture review:** the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.
+
+---
+
+## 2026-07-15 (yet later) — Consolidated the 3 divergent `LANGUAGES` arrays
+
+Asked the user which remaining architecture-review candidate to tackle next; they picked the `LANGUAGES` finding. `src/constants/languages.ts` already held a canonical `LanguageOption[]` (`{ locale, flag, nativeName }`), consumed correctly by `language-pill.tsx`, but two more call sites had drifted into their own hand-copied arrays for the same 4 locales:
+
+- `settings.tsx` had its own `{ code, label, flag }`-shaped array (field named `code` instead of `locale`).
+- `onboarding-modal.tsx` had **two** language lists: it already imported the canonical array as `LANGUAGE_OPTIONS` for the first-launch language-picker cards, *and* separately hand-declared a second, differently-shaped local `LANGUAGES` (`{ locale, flag, label }`) for the persistent per-slide language-toggle row — that second one used deliberately abbreviated labels (`EN`, `한`, `ES`, `हि`) rather than full native names, so it wasn't pure duplication, just a shape that didn't fit the canonical type.
+
+**Fix:** added a `shortLabel` field to `LanguageOption` in `src/constants/languages.ts` (`EN`/`한`/`ES`/`हि`, one per locale) so the abbreviated-label use case is representable in the canonical array instead of needing a separate list. Then:
+- `settings.tsx` — deleted its local array, imports `LANGUAGES` from `@/constants/languages`, uses `lang.locale`/`lang.nativeName` instead of `lang.code`/`lang.label`. Also dropped its now-unused `Locale` type import.
+- `onboarding-modal.tsx` — deleted its local array, dropped the `LANGUAGE_OPTIONS` alias (both use sites now just import `LANGUAGES` directly), and the toggle row reads `lang.shortLabel` instead of `lang.label`.
+
+Net: one array definition instead of three, `grep -rn "LANGUAGES\s*[:=]"` across `src/` now matches only `constants/languages.ts`.
+
+**Verification:** `npx tsc --noEmit` and `npx eslint` on all four touched/consuming files — output identical to a `git stash`-diffed baseline (same pre-existing `__tests__/*.test.ts` jest-globals errors and `settings.tsx` `expo-file-system` typing mismatch; zero new errors or warnings). Also verified live in a browser per [[verify_via_expo_web_playwright]]: ran `expo start --web`, drove it with a scratch Playwright script — confirmed the first-launch language-picker cards still show full native names (English/한국어/Español/हिन्दी), the onboarding per-slide toggle row still shows the abbreviated labels (EN/한/ES/हि), and the Settings screen's language section shows full native names with correct checkmark/selection state and successfully switches the whole app's locale (screenshotted mid-flow in English and after switching to Korean).
+
+**Outcome:** Committed as `9a18ee5` ("refactor: consolidate the 3 divergent LANGUAGES arrays into one source of truth") and pushed to `origin/main` (`96e0a2a..9a18ee5`).
+
+**Still open from the architecture review:** the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.
