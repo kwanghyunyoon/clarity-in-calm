@@ -13,6 +13,7 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 const STORAGE_KEY = 'wellness_settings_v1';
+export const SETTINGS_STORAGE_KEY = STORAGE_KEY;
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);

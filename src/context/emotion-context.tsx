@@ -13,6 +13,7 @@ interface EmotionContextType {
 const EmotionContext = createContext<EmotionContextType | null>(null);
 
 const STORAGE_KEY = 'wellness_emotions_v1';
+export const EMOTION_STORAGE_KEY = STORAGE_KEY;
 
 function toLocalDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;

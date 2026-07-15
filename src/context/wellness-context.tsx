@@ -28,6 +28,13 @@ const STORAGE_KEY_ENTRIES_LEGACY = 'wellness_entries_v1';
 const STORAGE_KEY_SESSIONS = 'wellness_sessions_v1';
 const STORAGE_KEY_TAGS     = 'wellness_custom_tags_v1';
 
+export const WELLNESS_STORAGE_KEYS = [
+  STORAGE_KEY_ENTRIES,
+  STORAGE_KEY_ENTRIES_LEGACY,
+  STORAGE_KEY_SESSIONS,
+  STORAGE_KEY_TAGS,
+];
+
 function toLocalDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }

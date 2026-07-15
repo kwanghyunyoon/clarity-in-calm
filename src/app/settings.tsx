@@ -19,8 +19,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { IAP_CONFIG } from '@/config/iap';
+import { EMOTION_STORAGE_KEY } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
-import { useSettings } from '@/context/settings-context';
+import { SETTINGS_STORAGE_KEY, useSettings } from '@/context/settings-context';
+import { WELLNESS_STORAGE_KEYS } from '@/context/wellness-context';
 import { secureDelete, secureRead } from '@/lib/secure-storage';
 import {
   cancelDailyReminder,
@@ -39,13 +41,7 @@ const LANGUAGES: { code: Locale; label: string; flag: string }[] = [
   { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
 ];
 
-const DATA_KEYS = [
-  'wellness_entries_v1',
-  'wellness_entries_v2',
-  'wellness_emotions_v1',
-  'wellness_settings_v1',
-  'wellness_custom_tags_v1',
-];
+const DATA_KEYS = [...WELLNESS_STORAGE_KEYS, EMOTION_STORAGE_KEY, SETTINGS_STORAGE_KEY];
 
 function SectionHeader({ label }: { label: string }) {
   const { colors } = useTheme();

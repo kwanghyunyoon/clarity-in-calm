@@ -313,3 +313,29 @@ app.config.js           — expo-notifications plugin added
 - Only console noise observed: harmless `react-native-web` PanResponder shim warnings (`Unknown event handler property... onResponderGrant` etc.), unrelated to this work.
 
 **Status:** Fully implemented and visually verified via the web build. Not yet git-committed — working tree has these changes plus the untracked feelings-library work from the prior session still sitting uncommitted. Not yet tested on native Android/iOS (web-only verification so far — react-native-svg and react-native-web render slightly differently from native in some edge cases, worth a native sanity check before shipping).
+
+---
+
+## 2026-07-15 (later) — Architecture review (`/improve-codebase-architecture`), no code changes
+
+Ran the architecture-review skill twice this session (first at default effort, then redone at the user's request after they set `/effort` to `high`). No `CONTEXT.md` or `docs/adr/` exist in this repo yet. Both runs were pure analysis — **nothing was implemented or committed**; two self-contained HTML reports were written to the OS tmp dir (not the repo) and opened for the user:
+- `/tmp/architecture-review-1784109335.html` (pass 1)
+- `/tmp/architecture-review-1784109777.html` (pass 2, deeper — supersedes pass 1)
+
+**Confirmed findings (pass 1, held up in pass 2):**
+1. `toLocalDateStr` duplicated 6x (not 5) — `journal.tsx:41`, `insights.tsx:21`, `progress.tsx:46`, `emotion-context.tsx:17`, `wellness-context.tsx:31`, plus `wellness-context.tsx`'s `computeStreak:34` re-derives day boundaries independently again.
+2. Four persistence contexts (wellness/emotion/settings/language) each hand-roll load→isLoaded→save boilerplate; `language-context.tsx:37-50` is worse than first thought — it bypasses `secure-storage.ts` entirely and talks to raw `AsyncStorage` with its own key.
+3. `journal.tsx:235-244` — `handleCrisisConfirm`/`handleCrisisSave` are byte-identical.
+4. `use-translation.ts:13-16` is a 6-line pass-through over the 1349-line `translations.ts`; `crisisKeywords` duplicated per-locale at lines 250/714/1001/1286 with no parity check.
+5. All three `__tests__/*.test.ts` files (Breathing/EncryptedJournal/MoodTracker) have **zero imports from `src/`** (confirmed via grep) — they reimplement logic inline and don't actually test shipped code.
+6. `src/lib/secure-storage.ts` (+`.web.ts`) called out as the positive counterexample — a genuinely deep module (3-fn interface hiding AES-GCM, key mgmt, v1→v2 migration) to use as the template for #2.
+
+**New findings, pass 2 only (higher effort found these on a wider sweep):**
+- **Live data-integrity bug, not just style debt:** `settings.tsx:42-47` hand-maintains `DATA_KEYS` for "Delete All Data" (line 288) / "Export Data" (line 300) — it's missing `wellness-context.tsx:28`'s `wellness_sessions_v1` key. Breathing-session history currently survives account deletion and is silently omitted from data exports. **This should probably be fixed on its own regardless of whether the bigger refactor happens** — it's a small, low-risk, high-value fix (each context should own/export its storage key(s); settings.tsx should import the list, not hand-copy it).
+- Three divergent `LANGUAGES` arrays for the same 4 locales: canonical `constants/languages.ts:10-14`, plus `onboarding-modal.tsx` has **two of its own** (imports the canonical one as `LANGUAGE_OPTIONS` at line 13/385, *and* hand-declares a second differently-shaped local `LANGUAGES` at line 26, used at 516/527), plus a third shape in `settings.tsx:35-39`.
+- `onboarding-modal.tsx` (712 lines) also contains a fully unrelated `FeedbackModal` (lines 32-150) with its own Discord-webhook POST (`FEEDBACK_WORKER`) and issue-type state machine — no connection to onboarding.
+- `src/config/iap.ts`'s RevenueCat keys are still placeholder stubs (`appl_PLACEHOLDER_REPLACE_ME` etc., as originally documented above under "Outcome") and `settings.tsx:194-238` fully wires the purchase/restore flow against them — flagged as a product decision (finish RevenueCat config or gate the flow), not a mechanical refactor.
+
+**Top recommendation given to user:** fix the `settings.tsx` storage-key leak first (real bug, cheap fix), ideally as part of the `usePersistedState`/`dateKey` consolidation so `settings.tsx` gets one place to ask "what keys exist" instead of a hand-copied list.
+
+**Not yet decided:** user had not picked a candidate to implement as of end of session — next session should ask which of the above to build, starting with the storage-key bug if no preference is stated.
