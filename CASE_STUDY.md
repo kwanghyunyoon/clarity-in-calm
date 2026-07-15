@@ -406,7 +406,7 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 
 **Verification:** `npx jest` — all 3 suites, 18 tests pass. `npx tsc --noEmit` — clean on every touched/new file (had to fix a lib.dom.d.ts `Uint8Array<ArrayBufferLike>` vs `Uint8Array<ArrayBuffer>` generic mismatch in the new `expo-crypto` mock — same class of issue `secure-storage.ts` already works around with `as ArrayBuffer` casts); remaining `tsc` output is the pre-existing `settings.tsx` `expo-file-system` typing mismatch only (confirmed via `git stash` diff — the jest-globals-in-test-files errors are gone now that `@types/jest` question is moot for these files' *logic*, but no `@types/jest` package was installed so the `describe`/`test`/`expect` global-name errors are unchanged, pre-existing, and out of scope for this fix). `npx eslint` on all touched/new files — zero warnings or errors. Not run against a live app session — pure logic/test-infra change, no UI surface.
 
-**Outcome:** Committed as `9b7f054` ("fix: point the 3 __tests__ files at real src/ code instead of reimplementing it"). Not yet pushed to `origin/main` — awaiting explicit push instruction.
+**Outcome:** Committed as `9b7f054` ("fix: point the 3 __tests__ files at real src/ code instead of reimplementing it"). Pushed to `origin/main` in a later session's batch push (see the 2026-07-15 "(last)" entry below).
 
 **Still open from the architecture review:** the 3 divergent `LANGUAGES` arrays, the shallow `useTranslation()` wrapper + duplicated `crisisKeywords`, the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`.
 
@@ -445,7 +445,7 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 
 **Verification:** `npx tsc --noEmit` — zero new errors (fixed 3 implicit-`any` errors in the new test file from an untyped `test.each` callback; remaining output is the same pre-existing jest-globals-in-test-files and `settings.tsx` `expo-file-system` baseline noise). `npx eslint` on all touched files — same 3 pre-existing unused-import warnings in `journal.tsx` (confirmed via `git diff` these lines weren't touched), zero new warnings. `npx jest` — 4 suites, 23 tests, all pass. Also verified live per [[verify_via_expo_web_playwright]] since this touches an actual safety-critical runtime path, not just types: ran `expo start --web` + a scratch Playwright script that logged into the app, selected a mood, typed "I have been thinking about an overdose lately" (a phrase that only exists in English's `crisisKeywords.overdose` category), saved, and confirmed the crisis modal appeared; then typed a neutral phrase ("Had a pretty good day today, went for a walk") and confirmed the modal did *not* appear. Both passed, confirming the categorized restructure didn't break detection.
 
-**Outcome:** Committed as `cd88236` ("fix: categorize crisisKeywords per locale so parity is compiler-enforced"). Not yet pushed to `origin/main` — awaiting explicit push instruction. User decided to leave the `ko`/`hi` missing-overdose-phrase gap as a tracked issue rather than have phrases drafted — needs a native speaker or clinician, not a guess.
+**Outcome:** Committed as `cd88236` ("fix: categorize crisisKeywords per locale so parity is compiler-enforced"). Pushed to `origin/main` in a later session's batch push (see the 2026-07-15 "(last)" entry below). User decided to leave the `ko`/`hi` missing-overdose-phrase gap as a tracked issue rather than have phrases drafted — needs a native speaker or clinician, not a guess.
 
 **Still open from the architecture review:** the unrelated `FeedbackModal` embedded in `onboarding-modal.tsx`, and the still-placeholder RevenueCat keys in `src/config/iap.ts`. Also newly surfaced: `ko`/`hi` missing translated `overdose`-category crisis phrases (see above).
 
@@ -461,6 +461,30 @@ Asked the user which remaining architecture-review candidate to tackle next; the
 
 **Net:** `onboarding-modal.tsx` 706 → 562 lines; new `feedback-modal.tsx` is 157 lines, self-contained.
 
-**Outcome:** Committed as `efebdf1` ("refactor: extract FeedbackModal out of onboarding-modal.tsx"). Not yet pushed to `origin/main`.
+**Outcome:** Committed as `efebdf1` ("refactor: extract FeedbackModal out of onboarding-modal.tsx"). Pushed to `origin/main` (`3ab146f..3bd9e1a`) at explicit user request.
 
 **Still open from the architecture review:** the still-placeholder RevenueCat keys in `src/config/iap.ts` (product decision, not mechanical). Also still tracked: `ko`/`hi` missing translated `overdose`-category crisis phrases.
+
+---
+
+## 2026-07-15 (last, wrap) — Session close: pushed, no further code changes
+
+Pushed `origin/main` from `3ab146f` to `3bd9e1a`, carrying everything committed since the last push: the dead-test-files fix (`9b7f054`), the `LANGUAGES` consolidation (`9a18ee5`, `aa75db3`), the `crisisKeywords` parity fix (`cd88236`, `3ab146f`), and this session's `FeedbackModal` extraction (`efebdf1`, `3bd9e1a`). `origin/main` and local `main` are now in sync. No new code changes this entry — pure push + doc cleanup (backfilled "not yet pushed" notes above that had gone stale once this push landed).
+
+**Architecture-review status: 6 of 7 original findings fixed, committed, and pushed.** Only remaining candidate: RevenueCat placeholder keys in `src/config/iap.ts` (product decision — needs real keys/entitlement IDs from the user, not a mechanical fix). Separately tracked, not part of the original 7: `ko`/`hi` missing translated `overdose`-category crisis phrases (needs a native speaker or clinician-reviewed source).
+
+**Separately, still uncommitted in the working tree** (untouched all session): `.agents/`, `.claude/skills/`, `Feelings.pdf`, `eslint.config.js`, `gradlelog.md`, `skills-lock.json` — predate this session, see prior entries/MEMORY.md.
+
+---
+
+## 2026-07-15 (final) — Guarded IAP unlock/restore against the still-placeholder RevenueCat keys
+
+Picked up the last open architecture-review candidate: the placeholder RevenueCat keys in `src/config/iap.ts`. Asked the user whether they had a real RevenueCat project set up yet — they didn't, so filling in real keys/entitlement IDs wasn't on the table this session. Asked a follow-up on what should happen in the meantime: leave the existing try/catch behavior as-is, or add a guard so a tap on "Unlock" doesn't surface a raw SDK error. User picked the guard.
+
+**Fix:** added `IAP_IS_CONFIGURED` to `src/config/iap.ts` (true once both `REVENUECAT_API_KEY_IOS`/`_ANDROID` no longer contain the literal `'PLACEHOLDER'` string). `settings.tsx`'s `handleUnlock` and `handleRestore` both check it first and return early with a `'Coming soon'` alert, before ever calling `initRC()`/hitting the RevenueCat SDK.
+
+**Verification:** `npx tsc --noEmit` and `npx eslint` — same pre-existing baseline (60 errors, all jest-globals-in-test-files and the `settings.tsx` `expo-file-system` typing mismatch; zero new). Verified live per [[verify_via_expo_web_playwright]], including a negative control: `git stash`ed the fix, ran `expo start --web` + a scratch Playwright script that pre-seeded `localStorage` (`@cic_locale`, `@cic:hasSeenOnboarding`) to skip straight past the first-launch language picker and onboarding tour, then clicked "Unlock for $4.99" — confirmed the console showed the raw RevenueCat error (`"Invalid API key. Use your Web Billing API key."`). Popped the stash, reran the identical script — confirmed zero console output, the button never entered its "Processing…" loading state, and the guard returned before `initRC()` was reached. (Note: `Alert.alert` is a no-op on `react-native-web`, so the "Coming soon" copy itself isn't visually verifiable in this harness — the absence of the SDK error and loading state is the observable proxy that the guard fired.)
+
+**Outcome:** Committed as `1a8d081` ("fix: guard IAP unlock/restore against placeholder RevenueCat keys") and pushed to `origin/main` (`3bd9e1a..1a8d081`) at explicit user request.
+
+**Architecture-review status: all 7 original findings now addressed** (6 fixed outright, this 7th mitigated with a guard pending the user's real RevenueCat credentials). Still separately tracked, not part of the original 7: `ko`/`hi` missing translated `overdose`-category crisis phrases (needs a native speaker or clinician-reviewed source).
