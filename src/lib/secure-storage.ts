@@ -1,6 +1,6 @@
 /**
  * Secure storage — native (iOS / Android)
- * AES-256-GCM via platform crypto.subtle (Hermes built-in, RN 0.71+).
+ * AES-256-GCM via expo-crypto (Hermes has no Web Crypto / crypto.subtle global).
  * Key stored as base64 in expo-secure-store (Keychain / Keystore).
  *
  * Security model:
@@ -10,7 +10,8 @@
  *  • Cipher:          AES-256-GCM with a fresh 12-byte IV per write.
  *                     GCM is authenticated: any ciphertext tampering is detected and
  *                     rejected at decrypt time (throws, caught → returns null).
- *  • Platform primitive: crypto.subtle (Hermes). No third-party crypto library for v2 data.
+ *  • Platform primitive: expo-crypto's native AESEncryptionKey / aesEncryptAsync /
+ *                     aesDecryptAsync (Android Keystore / iOS CryptoKit under the hood).
  *
  * Migration:
  *  v1 entries used AES-256-CTR via aes-js (unauthenticated). On the first read of a
@@ -20,6 +21,7 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AESEncryptionKey, AESSealedData, aesDecryptAsync, aesEncryptAsync, getRandomBytes } from 'expo-crypto';
 import * as SecureStore from 'expo-secure-store';
 import * as aesjs from 'aes-js'; // migration only — safe to remove after v1 entries are gone
 
@@ -43,29 +45,21 @@ function fromBase64(b64: string): Uint8Array {
 
 // ─── Key management ───────────────────────────────────────────────────────────
 
-let cachedKey: CryptoKey | null = null;
+let cachedKey: AESEncryptionKey | null = null;
 
-async function getOrCreateKey(): Promise<CryptoKey> {
+async function getOrCreateKey(): Promise<AESEncryptionKey> {
   if (cachedKey) return cachedKey;
 
   const stored = await SecureStore.getItemAsync(KEY_STORE_ID, SECURE_OPTS);
   if (stored) {
-    const raw = fromBase64(stored);
-    cachedKey = await crypto.subtle.importKey(
-      'raw', raw.buffer as ArrayBuffer,
-      { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'],
-    );
+    cachedKey = await AESEncryptionKey.import(fromBase64(stored));
     return cachedKey;
   }
 
   // First run: generate, persist, import
-  const raw = new Uint8Array(32);
-  crypto.getRandomValues(raw);
+  const raw = getRandomBytes(32);
   await SecureStore.setItemAsync(KEY_STORE_ID, toBase64(raw.buffer as ArrayBuffer), SECURE_OPTS);
-  cachedKey = await crypto.subtle.importKey(
-    'raw', raw.buffer as ArrayBuffer,
-    { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'],
-  );
+  cachedKey = await AESEncryptionKey.import(raw);
   return cachedKey;
 }
 
@@ -85,35 +79,28 @@ async function decryptV1(stored: string): Promise<string> {
   return aesjs.utils.utf8.fromBytes(aesCtr.decrypt(ct));
 }
 
-// ─── v2 encryption (AES-256-GCM via crypto.subtle) ───────────────────────────
+// ─── v2 encryption (AES-256-GCM via expo-crypto) ─────────────────────────────
+// ct holds the combined iv + ciphertext + auth tag (AESSealedData.combined()).
 
-interface EnvelopeV2 { v: 2; iv: string; ct: string; }
+interface EnvelopeV2 { v: 2; ct: string; }
 
 async function encryptV2(plaintext: string): Promise<string> {
-  const key  = await getOrCreateKey();
-  const iv   = new Uint8Array(12);
-  crypto.getRandomValues(iv);
-  const data = new TextEncoder().encode(plaintext);
-  const ct   = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv: iv.buffer as ArrayBuffer },
-    key,
-    data.buffer as ArrayBuffer,
-  );
+  const key    = await getOrCreateKey();
+  const sealed = await aesEncryptAsync(new TextEncoder().encode(plaintext), key);
+  const combined = await sealed.combined('bytes') as Uint8Array;
   return JSON.stringify({
     v: 2,
-    iv: toBase64(iv.buffer as ArrayBuffer),
-    ct: toBase64(ct),
+    ct: toBase64(combined.buffer as ArrayBuffer),
   } satisfies EnvelopeV2);
 }
 
 async function decryptV2(stored: string): Promise<string> {
-  const key = await getOrCreateKey();
-  const env = JSON.parse(stored) as EnvelopeV2;
-  const iv  = fromBase64(env.iv).buffer as ArrayBuffer;
-  const ct  = fromBase64(env.ct).buffer as ArrayBuffer;
+  const key    = await getOrCreateKey();
+  const env    = JSON.parse(stored) as EnvelopeV2;
+  const sealed = AESSealedData.fromCombined(fromBase64(env.ct));
   // GCM authentication failure throws — caught by the caller, returns null
-  const pt  = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
-  return new TextDecoder().decode(pt);
+  const pt = await aesDecryptAsync(sealed, key, { output: 'bytes' });
+  return new TextDecoder().decode(pt as Uint8Array);
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
