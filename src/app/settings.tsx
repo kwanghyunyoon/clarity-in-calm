@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing } from '@/constants/theme';
-import { IAP_CONFIG } from '@/config/iap';
+import { IAP_CONFIG, IAP_IS_CONFIGURED } from '@/config/iap';
 import { EMOTION_STORAGE_KEY } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
 import { SETTINGS_STORAGE_KEY, useSettings } from '@/context/settings-context';
@@ -189,6 +189,10 @@ export default function SettingsScreen() {
 
   async function handleUnlock() {
     if (iapLoading) return;
+    if (!IAP_IS_CONFIGURED) {
+      Alert.alert('Coming soon', 'Purchases aren’t available yet. Check back later!');
+      return;
+    }
     setIapLoading(true);
     try {
       await initRC();
@@ -220,6 +224,10 @@ export default function SettingsScreen() {
 
   async function handleRestore() {
     if (iapLoading) return;
+    if (!IAP_IS_CONFIGURED) {
+      Alert.alert('Coming soon', 'Purchases aren’t available yet. Check back later!');
+      return;
+    }
     setIapLoading(true);
     try {
       await initRC();

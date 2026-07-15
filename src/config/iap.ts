@@ -27,3 +27,8 @@ export const IAP_CONFIG = {
   /** Display price — keep in sync with your store listing */
   DISPLAY_PRICE: '$4.99',
 } as const;
+
+/** True once the placeholder RevenueCat keys above have been replaced with real ones. */
+export const IAP_IS_CONFIGURED =
+  !IAP_CONFIG.REVENUECAT_API_KEY_IOS.includes('PLACEHOLDER') &&
+  !IAP_CONFIG.REVENUECAT_API_KEY_ANDROID.includes('PLACEHOLDER');
