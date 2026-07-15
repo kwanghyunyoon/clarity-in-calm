@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import ErrorBoundary from '@/components/error-boundary';
+import { LanguagePill } from '@/components/language-pill';
 import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
 import { EmotionProvider } from '@/context/emotion-context';
@@ -66,6 +67,7 @@ export default function TabLayout() {
                 <EmotionProvider>
                   <PrivacyShield />
                   <AnimatedSplashOverlay />
+                  <LanguagePill />
                   <OnboardingModal />
                   <Tabs
                     screenOptions={{
@@ -137,6 +139,7 @@ export default function TabLayout() {
                     <Tabs.Screen name="breathe"  options={{ href: null }} />
                     <Tabs.Screen name="ground"   options={{ href: null }} />
                     <Tabs.Screen name="progress" options={{ href: null }} />
+                    <Tabs.Screen name="feelings-library" options={{ href: null }} />
                   </Tabs>
                 </EmotionProvider>
               </WellnessProvider>

@@ -8,7 +8,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useRef, useState } from 'react';
 import { Animated, KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Animated2, { FadeIn } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 
+import { LANGUAGES as LANGUAGE_OPTIONS } from '@/constants/languages';
 import { Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useLocale } from '@/context/language-context';
@@ -16,7 +18,8 @@ import { type Locale } from '@/i18n/translations';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
-const ONBOARDING_KEY  = '@cic:hasSeenOnboarding';
+const ONBOARDING_KEY    = '@cic:hasSeenOnboarding';
+const LANGUAGE_STEP_KEY = '@cic:hasChosenLanguage';
 const FEEDBACK_WORKER = 'https://app-feedback.kwangyoon.workers.dev';
 const ISSUE_TYPES     = ['Bug', 'Suggestion', 'Other'];
 
@@ -306,6 +309,44 @@ function InsightsVisual({ colors }: { colors: ThemeColors }) {
   );
 }
 
+// Slide 5 — Settings: gear + toggle rows
+function SettingsVisual({ colors }: { colors: ThemeColors }) {
+  return (
+    <View style={s.settingsWrap}>
+      <Text style={s.settingsGear}>⚙️</Text>
+      <View style={s.settingsRows}>
+        {['🔔 Reminders', '🌐 Language', '🎨 Theme'].map((label) => (
+          <View key={label} style={[s.settingsRow, { backgroundColor: colors.backgroundElement }]}>
+            <Text style={[s.settingsRowText, { color: colors.text }]}>{label}</Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// Slide 6 — Privacy shield: big green shield icon
+function ShieldVisual() {
+  return (
+    <View style={s.shieldWrap}>
+      <Svg width={72} height={80} viewBox="0 0 24 26">
+        <Path
+          d="M12 1 L22 5 V12 C22 18.5 17.8 23.3 12 25 C6.2 23.3 2 18.5 2 12 V5 Z"
+          fill="#34A853"
+        />
+        <Path
+          d="M7.5 12.8 L10.5 15.8 L16.8 9.2"
+          stroke="#ffffff"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </Svg>
+    </View>
+  );
+}
+
 // ─── Slide visual router ──────────────────────────────────────────────────────
 function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
   switch (page) {
@@ -314,8 +355,65 @@ function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
     case 2: return <JournalVisual colors={colors} />;
     case 3: return <EmotionsVisual colors={colors} />;
     case 4: return <InsightsVisual colors={colors} />;
+    case 5: return <SettingsVisual colors={colors} />;
+    case 6: return <ShieldVisual />;
     default: return null;
   }
+}
+
+// ─── First-launch language step ────────────────────────────────────────────────
+function LanguageStepView({
+  colors,
+  t,
+  selected,
+  onSelect,
+  onContinue,
+}: {
+  colors: ThemeColors;
+  t: ReturnType<typeof useTranslation>;
+  selected: Locale | null;
+  onSelect: (l: Locale) => void;
+  onContinue: () => void;
+}) {
+  return (
+    <View style={s.langStepRoot}>
+      <Text style={s.langStepEmoji}>🌐</Text>
+      <Text style={[s.title, { color: colors.text }]}>{t.onboarding.languageStepTitle}</Text>
+      <Text style={[s.body, { color: colors.textSecondary }]}>{t.onboarding.languageStepBody}</Text>
+
+      <View style={s.langCards}>
+        {LANGUAGE_OPTIONS.map((opt) => {
+          const active = selected === opt.locale;
+          return (
+            <TouchableOpacity
+              key={opt.locale}
+              onPress={() => onSelect(opt.locale)}
+              activeOpacity={0.8}
+              style={[
+                s.langCard,
+                { backgroundColor: colors.backgroundElement, borderColor: active ? colors.primary : 'transparent' },
+              ]}
+            >
+              <Text style={s.langCardFlag}>{opt.flag}</Text>
+              <Text style={[s.langCardLabel, { color: colors.text }]}>{opt.nativeName}</Text>
+              {active && <Text style={[s.langCardCheck, { color: colors.primary }]}>✓</Text>}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+
+      <Text style={[s.pillTip, { color: colors.textSecondary }]}>{t.onboarding.pillTip}</Text>
+
+      <TouchableOpacity
+        style={[s.btn, { backgroundColor: colors.primary }, !selected && s.btnDisabled]}
+        onPress={onContinue}
+        disabled={!selected}
+        activeOpacity={0.85}
+      >
+        <Text style={s.btnText}>{t.onboarding.continueLabel}</Text>
+      </TouchableOpacity>
+    </View>
+  );
 }
 
 // ─── Main modal ───────────────────────────────────────────────────────────────
@@ -325,15 +423,29 @@ export function OnboardingModal() {
   const { locale, setLocale } = useLocale();
   const { isHelpVisible, hideHelp } = useHelp();
 
-  const [firstLaunch,     setFirstLaunch]     = useState(false);
-  const [page,            setPage]            = useState(0);
-  const [feedbackVisible, setFeedbackVisible] = useState(false);
+  const [firstLaunch,      setFirstLaunch]      = useState(false);
+  const [showLanguageStep, setShowLanguageStep] = useState(false);
+  const [langSelection,    setLangSelection]    = useState<Locale | null>(null);
+  const [page,             setPage]             = useState(0);
+  const [feedbackVisible,  setFeedbackVisible]  = useState(false);
 
   useEffect(() => {
     let mounted = true;
-    AsyncStorage.getItem(ONBOARDING_KEY)
-      .then((val) => { if (mounted && val !== 'true') setFirstLaunch(true); })
-      .catch(() => { if (mounted) setFirstLaunch(true); });
+    (async () => {
+      try {
+        const [seenOnboarding, chosenLanguage] = await Promise.all([
+          AsyncStorage.getItem(ONBOARDING_KEY),
+          AsyncStorage.getItem(LANGUAGE_STEP_KEY),
+        ]);
+        if (!mounted) return;
+        if (seenOnboarding !== 'true') {
+          setFirstLaunch(true);
+          if (chosenLanguage !== 'true') setShowLanguageStep(true);
+        }
+      } catch {
+        if (mounted) setFirstLaunch(true);
+      }
+    })();
     return () => { mounted = false; };
   }, []);
 
@@ -341,9 +453,10 @@ export function OnboardingModal() {
     if (isHelpVisible) setPage(0);
   }, [isHelpVisible]);
 
-  const visible = firstLaunch || isHelpVisible;
-  const slides  = t.onboarding.slides as readonly { emoji: string; title: string; body: string }[];
-  const isLast  = page === slides.length - 1;
+  const visible    = firstLaunch || isHelpVisible;
+  const slides     = t.onboarding.slides as readonly { emoji: string; title: string; body: string }[];
+  const isLast     = page === slides.length - 1;
+  const checklist  = t.onboarding.shieldChecklist as readonly string[];
 
   const handleNext = async () => {
     if (isLast) {
@@ -358,9 +471,18 @@ export function OnboardingModal() {
 
   const handleClose = async () => {
     await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
+    await AsyncStorage.setItem(LANGUAGE_STEP_KEY, 'true');
     setFirstLaunch(false);
+    setShowLanguageStep(false);
     hideHelp();
     setPage(0);
+  };
+
+  const handleLanguageContinue = async () => {
+    if (!langSelection) return;
+    setLocale(langSelection);
+    await AsyncStorage.setItem(LANGUAGE_STEP_KEY, 'true');
+    setShowLanguageStep(false);
   };
 
   const slide = slides[page];
@@ -379,79 +501,101 @@ export function OnboardingModal() {
           <Text style={[s.closeTxt, { color: colors.textSecondary }]}>✕</Text>
         </TouchableOpacity>
 
-        {/* ── Language toggle ── */}
-        <View style={s.langRow}>
-          {LANGUAGES.map((lang, i) => {
-            const active = locale === lang.locale;
-            return (
+        {showLanguageStep ? (
+          <LanguageStepView
+            colors={colors}
+            t={t}
+            selected={langSelection}
+            onSelect={setLangSelection}
+            onContinue={handleLanguageContinue}
+          />
+        ) : (
+          <>
+            {/* ── Language toggle ── */}
+            <View style={s.langRow}>
+              {LANGUAGES.map((lang, i) => {
+                const active = locale === lang.locale;
+                return (
+                  <TouchableOpacity
+                    key={lang.locale}
+                    onPress={() => setLocale(lang.locale)}
+                    activeOpacity={0.75}
+                    style={[
+                      s.langBtn,
+                      { backgroundColor: active ? colors.primary : colors.backgroundElement },
+                      i === 0 && s.langBtnFirst,
+                      i === LANGUAGES.length - 1 && s.langBtnLast,
+                    ]}
+                  >
+                    <Text style={s.langFlag}>{lang.flag}</Text>
+                    <Text style={[s.langLabel, { color: active ? '#fff' : colors.textSecondary }]}>
+                      {lang.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {/* ── Visual component for this slide ── */}
+            <Animated2.View key={`visual-${page}`} entering={FadeIn.duration(300)} style={s.visualWrap}>
+              <SlideVisual page={page} colors={colors} />
+            </Animated2.View>
+
+            {/* ── Text content ── */}
+            <Animated2.View key={`text-${page}`} entering={FadeIn.duration(280)} style={s.slide}>
+              <Text style={[s.title, { color: colors.text }]}>{slide.title}</Text>
+              <Text style={[s.body,  { color: colors.textSecondary }]}>{slide.body}</Text>
+              {isLast && (
+                <View style={s.checklist}>
+                  {checklist.map((item, i) => (
+                    <View key={i} style={s.checklistRow}>
+                      <Text style={s.checklistCheck}>✅</Text>
+                      <Text style={[s.checklistText, { color: colors.text }]}>{item}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+            </Animated2.View>
+
+            {/* ── Bottom ── */}
+            <View style={s.bottom}>
+              <View style={s.dots}>
+                {slides.map((_, i) => (
+                  <View
+                    key={i}
+                    style={[
+                      s.dot,
+                      {
+                        backgroundColor: i === page ? colors.primary : colors.backgroundSelected,
+                        width: i === page ? 20 : 8,
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
+
+              <Text style={[s.privacy, { color: colors.textSecondary }]}>
+                {t.onboarding.privacy}
+              </Text>
+
               <TouchableOpacity
-                key={lang.locale}
-                onPress={() => setLocale(lang.locale)}
-                activeOpacity={0.75}
-                style={[
-                  s.langBtn,
-                  { backgroundColor: active ? colors.primary : colors.backgroundElement },
-                  i === 0 && s.langBtnFirst,
-                  i === LANGUAGES.length - 1 && s.langBtnLast,
-                ]}
+                style={[s.btn, { backgroundColor: colors.primary }]}
+                onPress={handleNext}
+                activeOpacity={0.85}
               >
-                <Text style={s.langFlag}>{lang.flag}</Text>
-                <Text style={[s.langLabel, { color: active ? '#fff' : colors.textSecondary }]}>
-                  {lang.label}
+                <Text style={s.btnText}>
+                  {isLast ? t.onboarding.getStarted : t.onboarding.next}
                 </Text>
               </TouchableOpacity>
-            );
-          })}
-        </View>
 
-        {/* ── Visual component for this slide ── */}
-        <Animated2.View key={`visual-${page}`} entering={FadeIn.duration(300)} style={s.visualWrap}>
-          <SlideVisual page={page} colors={colors} />
-        </Animated2.View>
-
-        {/* ── Text content ── */}
-        <Animated2.View key={`text-${page}`} entering={FadeIn.duration(280)} style={s.slide}>
-          <Text style={[s.title, { color: colors.text }]}>{slide.title}</Text>
-          <Text style={[s.body,  { color: colors.textSecondary }]}>{slide.body}</Text>
-        </Animated2.View>
-
-        {/* ── Bottom ── */}
-        <View style={s.bottom}>
-          <View style={s.dots}>
-            {slides.map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  s.dot,
-                  {
-                    backgroundColor: i === page ? colors.primary : colors.backgroundSelected,
-                    width: i === page ? 20 : 8,
-                  },
-                ]}
-              />
-            ))}
-          </View>
-
-          <Text style={[s.privacy, { color: colors.textSecondary }]}>
-            {t.onboarding.privacy}
-          </Text>
-
-          <TouchableOpacity
-            style={[s.btn, { backgroundColor: colors.primary }]}
-            onPress={handleNext}
-            activeOpacity={0.85}
-          >
-            <Text style={s.btnText}>
-              {isLast ? t.onboarding.getStarted : t.onboarding.next}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setFeedbackVisible(true)} activeOpacity={0.7} style={s.reportBtn}>
-            <Text style={[s.reportTxt, { color: colors.textSecondary }]}>
-              {t.onboarding.reportIssue}
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity onPress={() => setFeedbackVisible(true)} activeOpacity={0.7} style={s.reportBtn}>
+                <Text style={[s.reportTxt, { color: colors.textSecondary }]}>
+                  {t.onboarding.reportIssue}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
 
       </View>
 
@@ -477,6 +621,21 @@ const s = StyleSheet.create({
   langBtnLast:  { borderTopRightRadius: 50, borderBottomRightRadius: 50 },
   langFlag:     { fontSize: 14 },
   langLabel:    { fontSize: 12, fontWeight: '700' },
+
+  // First-launch language step
+  langStepRoot:   { flex: 1, alignItems: 'center', justifyContent: 'center',
+                    gap: Spacing.two, paddingHorizontal: Spacing.two },
+  langStepEmoji:  { fontSize: 56, marginBottom: Spacing.one },
+  langCards:      { width: '100%', gap: Spacing.two, marginTop: Spacing.two },
+  langCard:       { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
+                    borderRadius: 14, borderWidth: 2,
+                    paddingHorizontal: Spacing.three, paddingVertical: Spacing.two + 4 },
+  langCardFlag:   { fontSize: 22 },
+  langCardLabel:  { fontSize: 16, fontWeight: '700', flex: 1 },
+  langCardCheck:  { fontSize: 18, fontWeight: '700' },
+  pillTip:        { fontSize: 13, lineHeight: 19, textAlign: 'center',
+                    marginTop: Spacing.one, maxWidth: 300 },
+  btnDisabled:    { opacity: 0.4 },
 
   // Visual area
   visualWrap:   { alignItems: 'center', justifyContent: 'center', height: 160, marginTop: Spacing.three },
@@ -515,6 +674,19 @@ const s = StyleSheet.create({
   bar:           { width: 20, borderRadius: 5 },
   barLabel:      { fontSize: 10, fontWeight: '600' },
 
+  // Settings
+  settingsWrap:     { alignItems: 'center', gap: Spacing.two },
+  settingsGear:     { fontSize: 40 },
+  settingsRows:     { gap: Spacing.one + 2 },
+  settingsRow:      { borderRadius: 12, paddingHorizontal: Spacing.three,
+                      paddingVertical: Spacing.one + 4, width: 180 },
+  settingsRowText:  { fontSize: 14, fontWeight: '600' },
+
+  // Privacy shield
+  shieldWrap:   { width: 120, height: 120, borderRadius: 60,
+                  backgroundColor: 'rgba(52,168,83,0.15)',
+                  alignItems: 'center', justifyContent: 'center' },
+
   // Slide text
   slide:        { flex: 1, justifyContent: 'center', alignItems: 'center', gap: Spacing.two,
                   paddingHorizontal: Spacing.two },
@@ -522,6 +694,10 @@ const s = StyleSheet.create({
                   letterSpacing: -0.5, lineHeight: 36 },
   body:         { fontSize: 15, lineHeight: 23, textAlign: 'center', fontWeight: '500',
                   maxWidth: 300 },
+  checklist:      { gap: Spacing.one + 4, alignSelf: 'stretch', marginTop: Spacing.one },
+  checklistRow:   { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.one + 2 },
+  checklistCheck: { fontSize: 15 },
+  checklistText:  { fontSize: 14, lineHeight: 20, fontWeight: '500', flex: 1 },
 
   bottom:       { gap: Spacing.two + 2, alignItems: 'center' },
   dots:         { flexDirection: 'row', gap: 6, alignItems: 'center' },

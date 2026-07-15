@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.two + 4,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  headerTitle: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5 },
+  headerTitle: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5, marginLeft: Spacing.six },
   scroll: { flex: 1 },
   content: {
     paddingHorizontal: Spacing.four,

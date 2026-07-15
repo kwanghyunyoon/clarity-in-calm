@@ -19,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { IAP_CONFIG } from '@/config/iap';
+import { useHelp } from '@/context/help-context';
 import { useSettings } from '@/context/settings-context';
 import { secureDelete, secureRead } from '@/lib/secure-storage';
 import {
@@ -175,6 +176,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const { settings, setNotificationSettings, setIAPStatus, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
+  const { showHelp } = useHelp();
 
   const [iapLoading, setIapLoading] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -472,6 +474,7 @@ export default function SettingsScreen() {
         {/* ── About ── */}
         <SectionHeader label={ts.about} />
         <SettingsGroup>
+          <SettingsRow label={t.onboarding.replayOnboarding} onPress={showHelp} />
           <SettingsRow label={ts.privacy} onPress={openPrivacy} />
           <SettingsRow label={ts.version} value="1.0.0" />
         </SettingsGroup>

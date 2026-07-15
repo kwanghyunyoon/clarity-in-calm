@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -9,10 +9,18 @@ import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 import { EMOTIONS, PlutchikEmotion } from '@/constants/emotions';
 import { useTheme } from '@/hooks/use-theme';
 
-const SIZE = 280;
+// Wheel scales with screen width so wedges/labels have room to breathe on all devices.
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SIZE = Math.min(SCREEN_WIDTH - 24, 440);
 const CENTER = SIZE / 2;
+const SCALE = SIZE / 280;
 // Ring radii: ring 1 = inner/intense, ring 2 = primary, ring 3 = mild/outer
-const RING_RADII = { inner: 40, ring1: 75, ring2: 118, ring3: 138 };
+const RING_RADII = {
+  inner: 40 * SCALE,
+  ring1: 75 * SCALE,
+  ring2: 118 * SCALE,
+  ring3: 138 * SCALE,
+};
 const NUM_SECTORS = 8;
 const SECTOR_ANGLE = (2 * Math.PI) / NUM_SECTORS; // 45° each
 

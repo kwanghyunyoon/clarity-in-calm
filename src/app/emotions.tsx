@@ -110,7 +110,7 @@ export default function EmotionsScreen() {
     >
       {/* ── Header ── */}
       <View style={[styles.header, { paddingTop: insets.top + Spacing.two, borderBottomColor: colors.border, backgroundColor: colors.background }]}>
-        <View>
+        <View style={{ marginLeft: Spacing.six }}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>{te.title}</Text>
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{te.subtitle}</Text>
         </View>

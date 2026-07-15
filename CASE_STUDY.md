@@ -268,3 +268,48 @@ app.config.js           — expo-notifications plugin added
 - All Netlify deploy previews green throughout
 - Zero breaking changes to existing encrypted data — all new fields are optional on existing entries
 - RevenueCat credentials are placeholder stubs; swapping 4 values in `src/config/iap.ts` is all that's needed to go live
+
+---
+
+## 2026-07-14 — Local Android build fix + Feelings Library feature
+
+**Thread 1: Local Android debug build**
+- Root cause of `./gradlew assembleDebug` failure: `expo-in-app-purchases` (legacy Expo Modules API) is incompatible with SDK 56's `expo-modules-core` — the app had already migrated to RevenueCat's `react-native-purchases`, so the old package was dead weight.
+- Fix: removed `expo-in-app-purchases` from `package.json`, `npm install`, `npx expo prebuild --platform android --clean`, reapplied the low-RAM `gradle.properties` fix (`org.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m` — wiped by `--clean` prebuild, must reapply every time). See `[[local_android_build_setup]]` memory for full detail.
+- Follow-up session: root cause fix confirmed correct — `expo-in-app-purchases` was already removed from `package.json`/`node_modules` and `gradle.properties` jvmargs fix was in place. A background rebuild I (Claude) kicked off (`assembleDebug`, PID 19954) turned out to be redundant with the user's own build already running in their own terminal (PID 17335, started 20:29) — killed the redundant one on request. **The user's own terminal build subsequently completed successfully** (user confirmed "its done" — exact APK path not re-verified by Claude this session, but the build that had been stuck at the old `expo-in-app-purchases` compile error is now fixed and completes). Next session should just confirm `android/app/build/outputs/apk/debug/app-debug.apk` exists and install/launch on the emulator if not already done.
+
+**Thread 2: Feelings Library feature**
+- Implemented per plan at `/home/jayhaxxx88/.claude/plans/shiny-crunching-yeti.md`:
+  - `src/constants/feelings-library.ts` (new) — 8 emotions (anger, anxiousness, burnout, fear, sadness, insecurity, loneliness, overwhelm), each with original Notice/Hear/Feel/Ease/Explore content, written fresh without reading `Feelings.pdf` during drafting (per user's explicit no-copy requirement).
+  - `src/app/feelings-library.tsx` (new) — grid of expand-in-place cards, same pattern as `emotions.tsx`.
+  - `src/app/_layout.tsx` — registered `feelings-library` as a hidden route (`href: null`), same as `breathe`/`ground`/`progress`.
+  - `src/app/index.tsx` — added a `ToolCard` entry point to the tools grid, plus a `PLUTCHIK_TO_FEELINGS_CATEGORY` partial mapping (only anger/fear/sadness family wheel ids map honestly) driving an affirmation card that shows the mapped emotion's `ease` line when the most recent logged emotion matches, falling back to the existing `QUOTES` rotation otherwise.
+  - `src/i18n/translations.ts` — added `feelingsLibraryScreen` chrome-string namespace across en/ko/es/hi (body content stays English-only for v1, as flagged in the plan).
+- Verified: `npx tsc --noEmit` — zero errors from any new/edited file (pre-existing unrelated errors only, in jest test files and `settings.tsx`).
+- **Verified this session:** manually diffed all 8 drafted entries against every emotion chapter (Anger, Anxiousness, Burnout, Fear, Sadness, Insecurity, Loneliness, Overwhelm) in `Feelings.pdf` — no phrasing overlap. Calm's PDF uses a Notice/Hear/Feel/Ease/Explore body-map-and-affirmation format; the app's content is original and differently worded/structured throughout. This verification step from the plan is complete.
+- **Still not done:** manual golden-path walkthrough in a running app (`npx expo start`, Metro was up at `localhost:8081` this session) — Today → Feelings Library → expand cards → log an anger/fear/sadness emotion → confirm affirmation card swaps → log an unmapped emotion (e.g. joy) → confirm fallback to `QUOTES`. Blocked this session because the emulator (`emulator-5554`) was occupied by the user's own gradle build; now that the build is done, this should be unblocked next session.
+- Uncommitted at end of session — nothing has been git-committed yet (package.json/package-lock.json changes, i18n edits, and all new feelings-library files are still just working-tree changes).
+
+**Meta: created a `wrap` skill this session** (discovered one already existed at `~/.agents/skills/wrap/SKILL.md` from a prior session — kept as-is rather than replacing).
+
+---
+
+## 2026-07-15 — Bigger emotion wheel, first-launch language screen, onboarding expansion, floating language pill
+
+**Thread 1: Emotion wheel resize**
+- Resolved the open [[emotion_wheel_ui_issue]] bug (small tap targets, overlapping labels). User's first framing was a big thumb-spinnable cropped wheel, but after clarifying questions the actual ask was simpler: keep tap-to-select, just make the wheel bigger and fully visible.
+- `src/components/emotions/PlutchikWheel.tsx` — `SIZE` changed from a fixed `280` to `Math.min(Dimensions.get('window').width - 24, 440)`, with a `SCALE` factor applied to all ring radii and font sizes so everything grows proportionally.
+
+**Thread 2: Onboarding expansion + first-launch language screen + floating pill**
+- Expanded the existing 5-slide onboarding tour (`src/components/onboarding-modal.tsx`) to 7 slides: added a Settings-tab explainer slide and a "Built to Protect You" slide with a big green shield icon (custom `react-native-svg` path — the 🛡️ emoji renders blue/silver by default, not green, so a plain-emoji approach was rejected after visual verification) plus a privacy checklist (encryption, no uploads, no ads/trackers, export/delete anytime).
+- Added a first-launch-only language-selection screen as a new step inside the same onboarding modal: 4 language cards labeled in their own script (English, 한국어, Español, हिन्दी — see new `src/constants/languages.ts`), tap-to-preview (calls `setLocale` live), Continue button disabled until a pick is made. Gated by its own AsyncStorage key `@cic:hasChosenLanguage`, independent from the existing `@cic:hasSeenOnboarding` tour flag — this lets "View onboarding again" (new row added to Settings → About, calls `useHelp().showHelp()`) replay the tour without repeating the language step.
+- Added `src/components/language-pill.tsx` (new) — a floating top-left pill shown on every tab screen except Settings (which already has its own language section), tap opens a dropdown of all 4 languages by native name, tapping one switches the whole app's locale in place with no navigation. Mounted globally in `src/app/_layout.tsx`.
+- All new UI strings added across all 4 locales (en/ko/es/hi) in `src/i18n/translations.ts`.
+
+**Verification**
+- `npx tsc --noEmit` checked incrementally after each file/chunk (per user's explicit ask mid-session to pace work and verify as it goes, not batch-and-check-at-the-end — see [[feedback_pace_and_verify]]) — zero new errors introduced anywhere.
+- No project skill exists for running this app and `chromium-cli` wasn't available in this environment, so verification used `npx expo start --web` + a scratch Playwright script (see [[verify_via_expo_web_playwright]] for the recipe). Walked the full flow in a real headless-Chromium session at 390×844: language screen → 7-slide tour (screenshotted the new Settings and Shield slides) → Today screen → Emotions wheel (confirmed bigger, clearer labels) → language pill dropdown → live switch to Korean → Settings screen (confirmed pill correctly hidden, confirmed "View onboarding again" row present and working, confirmed replay skips the language step).
+- **Bug found and fixed during verification:** the floating pill's absolute top-left position collided with and visually cut off each tab screen's header title (e.g. "Good morning" became "d morning"). Fixed by adding a `Spacing.six` (64px) left margin to the header title in `src/app/index.tsx`, `src/app/journal.tsx`, `src/app/emotions.tsx`, and `src/app/insights.tsx`. Confirmed fixed via a second screenshot pass.
+- Only console noise observed: harmless `react-native-web` PanResponder shim warnings (`Unknown event handler property... onResponderGrant` etc.), unrelated to this work.
+
+**Status:** Fully implemented and visually verified via the web build. Not yet git-committed — working tree has these changes plus the untracked feelings-library work from the prior session still sitting uncommitted. Not yet tested on native Android/iOS (web-only verification so far — react-native-svg and react-native-web render slightly differently from native in some edge cases, worth a native sanity check before shipping).

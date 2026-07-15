@@ -77,11 +77,32 @@ export const en = {
         title: 'Discover Your Patterns',
         body: 'The Insights tab surfaces mood trends, top emotions, and your streak — giving you a clearer picture of your inner world.',
       },
+      {
+        emoji: '⚙️',
+        title: 'Make It Yours',
+        body: 'The Settings tab lets you set reminders, switch language, adjust the theme, and manage your data — all in one place.',
+      },
+      {
+        emoji: '🛡️',
+        title: 'Built to Protect You',
+        body: 'Here is exactly how we keep your entries safe.',
+      },
     ],
     next:       'Next',
     getStarted: "Let's go",
     privacy:    '🔒 Your data never leaves your device',
     reportIssue: 'Report an issue',
+    shieldChecklist: [
+      'Entries are encrypted on your device',
+      'Nothing is ever uploaded to a server',
+      'No ads, no trackers, no analytics on your journal content',
+      'You can export or delete everything, anytime',
+    ],
+    replayOnboarding: 'View onboarding again',
+    languageStepTitle: 'Choose your language',
+    languageStepBody: 'Pick the language you’d like to use.',
+    pillTip: '💡 Tip: You can switch languages anytime using the pill in the top-left corner.',
+    continueLabel: 'Continue',
   },
 
   // ── Home ──────────────────────────────────────────────────────────────────
@@ -289,6 +310,21 @@ export const en = {
       confirm: 'Delete',
       cancel: 'Cancel',
     },
+  },
+
+  // ── Feelings Library ─────────────────────────────────────────────────────
+  feelingsLibraryScreen: {
+    title: 'Feelings Library',
+    subtitle: 'Notice it, hear it, ease it',
+    cardTitle: 'Feelings Library',
+    cardSub: 'Explore 8 common feelings',
+    back: 'Back',
+    noticeLabel: 'Notice',
+    hearLabel: 'Hear',
+    feelLabel: 'Feel',
+    easeLabel: 'Ease',
+    exploreLabel: 'Explore',
+    affirmationLabel: 'Based on how you\'re feeling',
   },
 
   // ── Insights ──────────────────────────────────────────────────────────────
@@ -509,11 +545,32 @@ export const ko: Translations = {
         title: '패턴 발견하기',
         body: '인사이트 탭에서 기분 추세, 주요 감정, 연속 기록을 확인해 나의 내면 세계를 더 명확히 살펴보세요.',
       },
+      {
+        emoji: '⚙️',
+        title: '나에게 맞게 설정하기',
+        body: '설정 탭에서 알림, 언어, 테마를 조정하고 데이터를 관리할 수 있어요 — 모두 한곳에서.',
+      },
+      {
+        emoji: '🛡️',
+        title: '당신을 지키는 방식',
+        body: '기록이 어떻게 안전하게 보호되는지 알려드릴게요.',
+      },
     ],
     next:       '다음',
     getStarted: '시작하기',
     privacy:    '🔒 데이터는 절대 이 기기를 벗어나지 않아요',
     reportIssue: '문제 신고하기',
+    shieldChecklist: [
+      '기록은 기기에서 암호화돼요',
+      '어떤 서버에도 업로드되지 않아요',
+      '일기 내용에는 광고, 추적기, 분석 도구가 전혀 없어요',
+      '언제든지 모든 데이터를 내보내거나 삭제할 수 있어요',
+    ],
+    replayOnboarding: '온보딩 다시 보기',
+    languageStepTitle: '언어를 선택하세요',
+    languageStepBody: '사용하고 싶은 언어를 선택해주세요.',
+    pillTip: '💡 팁: 화면 왼쪽 상단의 알약 모양 버튼으로 언제든지 언어를 바꿀 수 있어요.',
+    continueLabel: '계속하기',
   },
 
   home: {
@@ -674,6 +731,7 @@ export const ko: Translations = {
   },
 
   today: { title: '오늘', checkIn: '지금 기분이 어떠세요?', logEmotion: '감정 기록', streakDays: '일 연속', streakStart: '오늘 감정을 기록해 스트릭을 시작하세요', tools: '빠른 도구', breatheTitle: '박스 호흡', breatheSub: '4-4-4-4 · 신경계 안정', groundTitle: '5-4-3-2-1 그라운딩', groundSub: '현재 순간에 집중하기', todayEmotions: '오늘의 감정', noEmotionsYet: '오늘 아직 기록된 감정이 없어요', quote: '오늘의 명언', journalEntries: '일기\n기록', emotionsLogged: '감정\n기록' },
+  feelingsLibraryScreen: { title: '감정 라이브러리', subtitle: '알아차리고, 듣고, 편안하게', cardTitle: '감정 라이브러리', cardSub: '8가지 감정 탐색하기', back: '뒤로', noticeLabel: '알아차리기', hearLabel: '듣기', feelLabel: '느끼기', easeLabel: '편안하게', exploreLabel: '탐구하기', affirmationLabel: '지금 느끼는 감정에 맞춰' },
   emotionsScreen: { title: '감정', subtitle: '지금 어떤 감정인가요?', selectEmotion: '바퀴에서 감정을 탭하세요', intensity: '강도', intensityLow: '약함', intensityHigh: '강함', contextTags: '지금 무슨 상황인가요?', bodyCheckIn: '어디서 느껴지나요?', copingActions: '어떻게 했나요?', note: '노트 추가 (선택사항)', notePlaceholder: '이 감정에 대한 생각…', saveBtn: '감정 기록하기', savedBtn: '✓ 저장됨!', pastTitle: '최근 감정', emptyTitle: '감정 기록이 여기 나타납니다', emptyBody: '위의 바퀴를 탭해 첫 감정을 기록하세요', quickLog: '빠른 기록', fullLog: '전체 기록', selectedEmotion: '선택됨', deleteConfirm: { title: '감정 기록 삭제?', body: '이 항목이 영구적으로 삭제됩니다.', confirm: '삭제', cancel: '취소' } },
   insightsScreen: { title: '분석', subtitle: '시간에 따른 패턴', monthlyReport: '이번 달', totalEntries: '일기 기록', totalEmotions: '감정 기록', avgIntensity: '평균 강도', topEmotion: '가장 많이 느낀 감정', topTrigger: '주요 트리거', streakRecord: '최고 스트릭', timeOfDay: '시간대', morning: '아침', afternoon: '오후', evening: '저녁', night: '밤', triggers: '감정 트리거', noTriggers: '감정 기록에 상황 태그를 추가하면 트리거가 보여요', moodCalendar: '기분 달력', weeklyReview: '주간 회고', weeklyReviewPrompt: '일요일이에요 — 이번 주를 되돌아볼 시간이에요', weeklyReviewBtn: '회고 시작', exportTitle: '데이터 내보내기', exportBtn: 'PDF로 내보내기', exportSuccess: '저장됨!', empty: { title: '인사이트가 여기 만들어집니다', body: '감정과 일기를 몇 개 기록하면 패턴이 보여요.' }, last7: '최근 7일', chartLegend: '각 점은 그날의 평균 기분', moodBreakdown: '기분 분석', streakMotiv: { week: '대단해요! 일주일! 🌟', days: '일 연속!', sub: '진정한 자기 관리 습관이에요.' }, insights: { title: '인사이트', topMood: '가장 많이 기록한 기분', trend: { label: '기분 추세', up: '↑ 지난 주보다 나아지고 있어요', down: '↓ 지난 주보다 낮아졌어요', flat: '→ 지난 주와 비슷해요', none: '추세를 보려면 더 기록해보세요' }, bestDay: '기분이 가장 좋은 요일', noPattern: '매일 기록하면 패턴이 보여요' } },
   settingsScreen: { title: '설정', clarityUnlock: 'Clarity 잠금 해제', unlocked: '✓ 잠금 해제됨', unlockTitle: 'Clarity 전체 기능 열기', unlockPrice: '$4.99 · 일회 결제, 구독 없음', unlockFeatures: ['전체 감정 바퀴', '무제한 기록 및 분석', 'PDF 보고서 내보내기', '미래의 나에게 편지', '고급 패턴 인사이트', '맞춤 일기 템플릿'], unlockBtn: '$4.99로 잠금 해제', restoreBtn: '구매 복원', notifications: '매일 알림', notificationsOff: '끄기', notificationsOn: '켜기', reminderTime: '알림 시간', reminderDays: '요일', appearance: '외관', themeSystem: '시스템', themeLight: '밝은', themeDark: '어두운', language: '언어', data: '내 데이터', exportData: '전체 데이터 내보내기 (JSON)', deleteData: '전체 데이터 삭제', deleteConfirm: { title: '전체 데이터를 삭제할까요?', body: '모든 일기, 감정 기록, 설정이 영구적으로 삭제됩니다. 취소할 수 없어요.', confirm: '모두 삭제', cancel: '취소' }, privacy: '개인정보 처리방침', version: '버전', daysShort: ['일', '월', '화', '수', '목', '금', '토'], about: '앱 정보', aboutBody: 'Clarity in Calm은 오프라인 우선 웰니스 앱입니다. 모든 데이터는 기기에 암호화되어 저장됩니다.' },
@@ -774,11 +832,32 @@ export const es: Translations = {
         title: 'Descubre tus patrones',
         body: 'La pestaña Perspectivas muestra tendencias de humor, emociones principales y tu racha — una imagen más clara de tu mundo interior.',
       },
+      {
+        emoji: '⚙️',
+        title: 'Hazlo tuyo',
+        body: 'La pestaña Ajustes te permite configurar recordatorios, cambiar el idioma, ajustar el tema y gestionar tus datos — todo en un solo lugar.',
+      },
+      {
+        emoji: '🛡️',
+        title: 'Diseñado para protegerte',
+        body: 'Así es exactamente como mantenemos seguras tus entradas.',
+      },
     ],
     next:       'Siguiente',
     getStarted: '¡Vamos!',
     privacy:    '🔒 Tus datos nunca abandonan tu dispositivo',
     reportIssue: 'Reportar un problema',
+    shieldChecklist: [
+      'Las entradas se cifran en tu dispositivo',
+      'Nunca se suben a ningún servidor',
+      'Sin anuncios, rastreadores ni análisis sobre el contenido de tu diario',
+      'Puedes exportar o eliminar todo, en cualquier momento',
+    ],
+    replayOnboarding: 'Ver la introducción de nuevo',
+    languageStepTitle: 'Elige tu idioma',
+    languageStepBody: 'Selecciona el idioma que te gustaría usar.',
+    pillTip: '💡 Consejo: puedes cambiar de idioma en cualquier momento con la píldora en la esquina superior izquierda.',
+    continueLabel: 'Continuar',
   },
 
   home: {
@@ -937,6 +1016,7 @@ export const es: Translations = {
   },
 
   today: { title: 'Hoy', checkIn: '¿Cómo te sientes ahora?', logEmotion: 'Registrar emoción', streakDays: 'días seguidos', streakStart: 'Registra una emoción hoy para comenzar tu racha', tools: 'Herramientas rápidas', breatheTitle: 'Respiración de caja', breatheSub: '4-4-4-4 · Calma tu sistema nervioso', groundTitle: 'Enraizamiento 5-4-3-2-1', groundSub: 'Ancla al momento presente', todayEmotions: 'Emociones de hoy', noEmotionsYet: 'No has registrado emociones hoy', quote: 'Reflexión diaria', journalEntries: 'entradas\nde diario', emotionsLogged: 'emociones\nregistradas' },
+  feelingsLibraryScreen: { title: 'Biblioteca de Emociones', subtitle: 'Nótalo, escúchalo, calma', cardTitle: 'Biblioteca de Emociones', cardSub: 'Explora 8 emociones comunes', back: 'Atrás', noticeLabel: 'Notar', hearLabel: 'Escuchar', feelLabel: 'Sentir', easeLabel: 'Calmar', exploreLabel: 'Explorar', affirmationLabel: 'Según cómo te sientes' },
   emotionsScreen: { title: 'Emociones', subtitle: '¿Qué sientes ahora?', selectEmotion: 'Toca una emoción en la rueda', intensity: 'Intensidad', intensityLow: 'leve', intensityHigh: 'intensa', contextTags: '¿Qué está pasando?', bodyCheckIn: '¿Dónde lo sientes?', copingActions: '¿Qué hiciste?', note: 'Añadir nota (opcional)', notePlaceholder: 'Pensamientos sobre este sentimiento…', saveBtn: 'Registrar emoción', savedBtn: '✓ ¡Registrado!', pastTitle: 'Emociones recientes', emptyTitle: 'Tus registros aparecerán aquí', emptyBody: 'Toca la rueda para registrar tu primera emoción', quickLog: 'Registro rápido', fullLog: 'Registro completo', selectedEmotion: 'Seleccionado', deleteConfirm: { title: '¿Eliminar registro?', body: 'Este registro se eliminará de forma permanente.', confirm: 'Eliminar', cancel: 'Cancelar' } },
   insightsScreen: { title: 'Análisis', subtitle: 'Tus patrones en el tiempo', monthlyReport: 'Este mes', totalEntries: 'entradas de diario', totalEmotions: 'emociones registradas', avgIntensity: 'intensidad promedio', topEmotion: 'Más sentida', topTrigger: 'Principal desencadenante', streakRecord: 'Mejor racha', timeOfDay: 'Momento del día', morning: 'Mañana', afternoon: 'Tarde', evening: 'Noche', night: 'Madrugada', triggers: 'Desencadenantes', noTriggers: 'Registra emociones con etiquetas para ver desencadenantes', moodCalendar: 'Calendario de ánimo', weeklyReview: 'Revisión semanal', weeklyReviewPrompt: 'Es domingo — hora de reflexionar sobre tu semana', weeklyReviewBtn: 'Comenzar revisión', exportTitle: 'Exportar datos', exportBtn: 'Exportar como PDF', exportSuccess: '¡Guardado!', empty: { title: 'Tus insights se construirán aquí', body: 'Registra algunas emociones y entradas para ver patrones.' }, last7: 'Últimos 7 días', chartLegend: 'Cada punto muestra tu ánimo promedio ese día', moodBreakdown: 'Distribución de ánimo', streakMotiv: { week: '¡Increíble! ¡Una semana! 🌟', days: 'días seguidos', sub: 'Estás creando un hábito de autocuidado.' }, insights: { title: 'Perspectivas', topMood: 'Ánimo más registrado', trend: { label: 'Tendencia', up: '↑ Mejorando vs semana anterior', down: '↓ Bajando vs semana anterior', flat: '→ Estable vs semana anterior', none: 'Registra más para ver tendencias' }, bestDay: 'Tu mejor día', noPattern: 'Sigue registrando para descubrir patrones' } },
   settingsScreen: { title: 'Ajustes', clarityUnlock: 'Clarity Completo', unlocked: '✓ Desbloqueado', unlockTitle: 'Desbloquea todo Clarity', unlockPrice: '$4.99 · Pago único, sin suscripción', unlockFeatures: ['Rueda de emociones completa', 'Historial y análisis ilimitados', 'Exportar reportes en PDF', 'Cartas a tu yo futuro', 'Insights avanzados de patrones', 'Plantillas de diario personalizadas'], unlockBtn: 'Desbloquear por $4.99', restoreBtn: 'Restaurar compra', notifications: 'Recordatorio diario', notificationsOff: 'Apagado', notificationsOn: 'Encendido', reminderTime: 'Hora del recordatorio', reminderDays: 'Días', appearance: 'Apariencia', themeSystem: 'Sistema', themeLight: 'Claro', themeDark: 'Oscuro', language: 'Idioma', data: 'Tus datos', exportData: 'Exportar todos los datos (JSON)', deleteData: 'Eliminar todos los datos', deleteConfirm: { title: '¿Eliminar todos los datos?', body: 'Esto borrará permanentemente todas las entradas, emociones y ajustes.', confirm: 'Eliminar todo', cancel: 'Cancelar' }, privacy: 'Política de privacidad', version: 'Versión', daysShort: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'], about: 'Acerca de', aboutBody: 'Clarity in Calm es una app de bienestar privada y sin conexión. Todos los datos se cifran en tu dispositivo.' },
@@ -1037,11 +1117,32 @@ export const hi: Translations = {
         title: 'अपने पैटर्न खोजें',
         body: 'इनसाइट्स टैब मूड रुझान, शीर्ष भावनाएँ और स्ट्रीक दिखाता है — आपकी आंतरिक दुनिया की स्पष्ट तस्वीर।',
       },
+      {
+        emoji: '⚙️',
+        title: 'इसे अपने अनुसार बनाएं',
+        body: 'सेटिंग्स टैब में आप रिमाइंडर सेट कर सकते हैं, भाषा बदल सकते हैं, थीम समायोजित कर सकते हैं, और अपना डेटा प्रबंधित कर सकते हैं — सब एक ही जगह।',
+      },
+      {
+        emoji: '🛡️',
+        title: 'आपकी सुरक्षा के लिए बनाया गया',
+        body: 'यहाँ बताया गया है कि हम आपकी प्रविष्टियों को कैसे सुरक्षित रखते हैं।',
+      },
     ],
     next:       'आगे',
     getStarted: 'चलते हैं',
     privacy:    '🔒 आपका डेटा कभी भी इस डिवाइस से बाहर नहीं जाता',
     reportIssue: 'समस्या रिपोर्ट करें',
+    shieldChecklist: [
+      'प्रविष्टियाँ आपके डिवाइस पर एन्क्रिप्ट की जाती हैं',
+      'कुछ भी कभी किसी सर्वर पर अपलोड नहीं होता',
+      'आपकी डायरी सामग्री पर कोई विज्ञापन, ट्रैकर या एनालिटिक्स नहीं',
+      'आप कभी भी सब कुछ निर्यात या हटा सकते हैं',
+    ],
+    replayOnboarding: 'फिर से ऑनबोर्डिंग देखें',
+    languageStepTitle: 'अपनी भाषा चुनें',
+    languageStepBody: 'वह भाषा चुनें जिसका आप उपयोग करना चाहते हैं।',
+    pillTip: '💡 सुझाव: आप स्क्रीन के ऊपरी-बाएँ कोने में मौजूद पिल बटन से कभी भी भाषा बदल सकते हैं।',
+    continueLabel: 'जारी रखें',
   },
 
   home: {
@@ -1199,6 +1300,7 @@ export const hi: Translations = {
   },
 
   today: { title: 'आज', checkIn: 'अभी कैसा महसूस कर रहे हैं?', logEmotion: 'भावना दर्ज करें', streakDays: 'दिन लगातार', streakStart: 'स्ट्रीक शुरू करने के लिए आज भावना दर्ज करें', tools: 'त्वरित उपकरण', breatheTitle: 'बॉक्स ब्रीदिंग', breatheSub: '4-4-4-4 · तंत्रिका तंत्र को शांत करें', groundTitle: '5-4-3-2-1 ग्राउंडिंग', groundSub: 'वर्तमान क्षण से जुड़ें', todayEmotions: 'आज की भावनाएँ', noEmotionsYet: 'आज अभी कोई भावना दर्ज नहीं हुई', quote: 'दैनिक विचार', journalEntries: 'डायरी\nप्रविष्टियाँ', emotionsLogged: 'भावनाएँ\nदर्ज' },
+  feelingsLibraryScreen: { title: 'भावना पुस्तकालय', subtitle: 'महसूस करें, सुनें, सहज बनें', cardTitle: 'भावना पुस्तकालय', cardSub: '8 सामान्य भावनाएँ जानें', back: 'वापस', noticeLabel: 'महसूस करें', hearLabel: 'सुनें', feelLabel: 'अनुभव', easeLabel: 'सहज बनें', exploreLabel: 'जानें', affirmationLabel: 'आपकी भावना के अनुसार' },
   emotionsScreen: { title: 'भावनाएँ', subtitle: 'अभी क्या महसूस हो रहा है?', selectEmotion: 'पहिए पर भावना टैप करें', intensity: 'तीव्रता', intensityLow: 'हल्का', intensityHigh: 'तीव्र', contextTags: 'अभी क्या हो रहा है?', bodyCheckIn: 'कहाँ महसूस हो रहा है?', copingActions: 'आपने क्या किया?', note: 'नोट जोड़ें (वैकल्पिक)', notePlaceholder: 'इस भावना के बारे में विचार…', saveBtn: 'भावना दर्ज करें', savedBtn: '✓ दर्ज हो गया!', pastTitle: 'हाल की भावनाएँ', emptyTitle: 'आपकी भावनाएँ यहाँ दिखेंगी', emptyBody: 'पहली भावना दर्ज करने के लिए पहिए पर टैप करें', quickLog: 'त्वरित लॉग', fullLog: 'पूर्ण लॉग', selectedEmotion: 'चुना गया', deleteConfirm: { title: 'भावना लॉग हटाएँ?', body: 'यह प्रविष्टि स्थायी रूप से हट जाएगी।', confirm: 'हटाएँ', cancel: 'रद्द करें' } },
   insightsScreen: { title: 'विश्लेषण', subtitle: 'समय के साथ आपके पैटर्न', monthlyReport: 'इस महीने', totalEntries: 'डायरी प्रविष्टियाँ', totalEmotions: 'भावनाएँ दर्ज', avgIntensity: 'औसत तीव्रता', topEmotion: 'सबसे अधिक महसूस की गई', topTrigger: 'मुख्य ट्रिगर', streakRecord: 'सर्वश्रेष्ठ स्ट्रीक', timeOfDay: 'दिन का समय', morning: 'सुबह', afternoon: 'दोपहर', evening: 'शाम', night: 'रात', triggers: 'भावनात्मक ट्रिगर', noTriggers: 'संदर्भ टैग के साथ भावनाएँ दर्ज करें', moodCalendar: 'मूड कैलेंडर', weeklyReview: 'साप्ताहिक समीक्षा', weeklyReviewPrompt: 'रविवार है — इस सप्ताह पर विचार करने का समय', weeklyReviewBtn: 'समीक्षा शुरू करें', exportTitle: 'डेटा निर्यात', exportBtn: 'PDF के रूप में निर्यात', exportSuccess: 'सहेजा गया!', empty: { title: 'यहाँ आपकी अंतर्दृष्टि बनेगी', body: 'भावनाएँ और प्रविष्टियाँ दर्ज करें।' }, last7: 'पिछले 7 दिन', chartLegend: 'प्रत्येक बिंदु उस दिन का औसत मूड', moodBreakdown: 'मूड विश्लेषण', streakMotiv: { week: 'अद्भुत! पूरा सप्ताह! 🌟', days: 'दिन लगातार!', sub: 'आप आत्म-देखभाल की आदत बना रहे हैं।' }, insights: { title: 'अंतर्दृष्टि', topMood: 'सबसे अधिक दर्ज किया गया मूड', trend: { label: 'मूड प्रवृत्ति', up: '↑ पिछले सप्ताह से बेहतर', down: '↓ पिछले सप्ताह से कम', flat: '→ पिछले सप्ताह जैसा', none: 'अधिक प्रविष्टियाँ करें' }, bestDay: 'सबसे अच्छा दिन', noPattern: 'पैटर्न देखने के लिए रोज़ लिखें' } },
   settingsScreen: { title: 'सेटिंग', clarityUnlock: 'Clarity अनलॉक', unlocked: '✓ अनलॉक हो गया', unlockTitle: 'पूरा Clarity खोलें', unlockPrice: '$4.99 · एकमुश्त भुगतान', unlockFeatures: ['पूर्ण भावना पहिया', 'असीमित इतिहास', 'PDF रिपोर्ट', 'भविष्य के मुझे पत्र', 'उन्नत पैटर्न', 'कस्टम टेम्पलेट'], unlockBtn: '$4.99 में अनलॉक करें', restoreBtn: 'खरीद पुनर्स्थापित करें', notifications: 'दैनिक अनुस्मारक', notificationsOff: 'बंद', notificationsOn: 'चालू', reminderTime: 'अनुस्मारक समय', reminderDays: 'दिन', appearance: 'रूप-रंग', themeSystem: 'सिस्टम', themeLight: 'हल्का', themeDark: 'गहरा', language: 'भाषा', data: 'आपका डेटा', exportData: 'सारा डेटा निर्यात करें (JSON)', deleteData: 'सारा डेटा हटाएँ', deleteConfirm: { title: 'सारा डेटा हटाएँ?', body: 'सभी डायरी, भावनाएँ और सेटिंग स्थायी रूप से हट जाएंगी।', confirm: 'सब हटाएँ', cancel: 'रद्द करें' }, privacy: 'गोपनीयता नीति', version: 'संस्करण', daysShort: ['र', 'सो', 'मं', 'बु', 'गु', 'शु', 'श'], about: 'ऐप के बारे में', aboutBody: 'Clarity in Calm एक निजी ऑफलाइन वेलनेस ऐप है।' },

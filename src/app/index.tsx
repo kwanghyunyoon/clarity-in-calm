@@ -17,6 +17,7 @@ import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { QUOTES } from '@/constants/quotes';
 import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
 import { EMOTIONS_BY_ID } from '@/constants/emotions';
+import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
 import { useEmotions } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
 import { useWellness } from '@/context/wellness-context';
@@ -35,6 +36,15 @@ function getDailyQuote() {
   return QUOTES[day % QUOTES.length];
 }
 
+// Deliberately partial: only wheel ids with an honest, non-forced match to a
+// Feelings Library category are included. Everything else (joy, trust, disgust,
+// anticipation, dyads, etc.) falls back to the generic QUOTES rotation.
+const PLUTCHIK_TO_FEELINGS_CATEGORY: Partial<Record<string, FeelingsLibraryEntry['id']>> = {
+  rage: 'anger', anger: 'anger', annoyance: 'anger',
+  terror: 'fear', fear: 'fear', apprehension: 'fear',
+  grief: 'sadness', sadness: 'sadness', pensiveness: 'sadness',
+};
+
 export default function TodayScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
@@ -45,6 +55,12 @@ export default function TodayScreen() {
 
   const quote = useMemo(getDailyQuote, []);
   const greeting = getGreeting(t);
+
+  const affirmation = useMemo(() => {
+    const mostRecentEmotionId = emotionLogs[0]?.emotionId;
+    const libraryId = mostRecentEmotionId ? PLUTCHIK_TO_FEELINGS_CATEGORY[mostRecentEmotionId] : undefined;
+    return libraryId ? FEELINGS_LIBRARY_BY_ID[libraryId] : undefined;
+  }, [emotionLogs]);
 
   // Bottom padding = tab bar height (approx 80) + safe area bottom
   const bottomPad = 88 + insets.bottom;
@@ -164,25 +180,51 @@ export default function TodayScreen() {
               accentColor={EmotionColors.trust}
               onPress={() => router.push('/ground')}
             />
+            <ToolCard
+              emoji="📖"
+              title={t.feelingsLibraryScreen.cardTitle}
+              subtitle={t.feelingsLibraryScreen.cardSub}
+              accentColor={EmotionColors.disgust}
+              onPress={() => router.push('/feelings-library')}
+            />
           </View>
         </Animated.View>
 
-        {/* ── Daily quote ── */}
+        {/* ── Daily quote / affirmation ── */}
         <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.section}>
-          <View style={[styles.quoteCard, {
-            backgroundColor: colors.surface,
-            borderColor: colors.border,
-          }]}>
-            <Text style={[styles.quoteLabel, { color: colors.textSecondary }]}>
-              {t.today.quote}
-            </Text>
-            <Text style={[styles.quoteText, { color: colors.text }]}>
-              "{quote.text}"
-            </Text>
-            <Text style={[styles.quoteAuthor, { color: colors.textSecondary }]}>
-              — {quote.author}
-            </Text>
-          </View>
+          {affirmation ? (
+            <AnimatedPressable
+              onPress={() => router.push('/feelings-library')}
+              style={[styles.quoteCard, {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              }]}
+              accessibilityRole="button"
+              accessibilityLabel={affirmation.ease}
+            >
+              <Text style={[styles.quoteLabel, { color: colors.textSecondary }]}>
+                {t.feelingsLibraryScreen.affirmationLabel}
+              </Text>
+              <Text style={[styles.quoteText, { color: colors.text, fontStyle: 'normal' }]}>
+                {affirmation.emoji} {affirmation.ease}
+              </Text>
+            </AnimatedPressable>
+          ) : (
+            <View style={[styles.quoteCard, {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            }]}>
+              <Text style={[styles.quoteLabel, { color: colors.textSecondary }]}>
+                {t.today.quote}
+              </Text>
+              <Text style={[styles.quoteText, { color: colors.text }]}>
+                "{quote.text}"
+              </Text>
+              <Text style={[styles.quoteAuthor, { color: colors.textSecondary }]}>
+                — {quote.author}
+              </Text>
+            </View>
+          )}
         </Animated.View>
       </ScrollView>
     </View>
@@ -205,6 +247,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     letterSpacing: -0.5,
+    marginLeft: Spacing.six, // reserve room for the floating LanguagePill
   },
   helpBtn: {
     fontSize: 18,
@@ -277,6 +320,7 @@ const styles = StyleSheet.create({
   },
   toolsGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: Spacing.two + 4,
   },
   quoteCard: {
