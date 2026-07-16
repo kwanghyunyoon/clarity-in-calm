@@ -57,3 +57,6 @@ skills-lock.json
 
 # Content reference source (10MB+ binary; content already ported into src/)
 /Feelings.pdf
+
+# Device screenshots dropped in for review (not app code)
+/screenshots/
