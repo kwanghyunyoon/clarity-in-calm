@@ -571,8 +571,8 @@ Same-day follow-up. Reconnected to the already-running Metro instance and the pr
 
 **Verification:** Live device walkthrough of all 7 onboarding slides after the fix — slide 3 ("Journal Your Way") now renders in full; spot-checked slides 1, 4 ("Name What You Feel"), 5 ("Discover Your Patterns"), and 7 (privacy checklist) to confirm the shared style change didn't regress any other title. `npx tsc --noEmit` and `npx eslint src/components/onboarding-modal.tsx` — same pre-existing baseline only (3 known issues: `WelcomeVisual`'s `useRef` access, `setPage` in an effect, one `exhaustive-deps` warning), zero new.
 
-**Outcome:** All four fixes committed as `673784a` ("fix: repair three leftover-wheel onboarding bugs and a text-clipping bug"), at explicit user request. Not yet pushed.
+**Outcome:** All four fixes committed as `673784a` ("fix: repair three leftover-wheel onboarding bugs and a text-clipping bug"), doc-logged as `a2d6a73`, and pushed to `origin/main` (`606153c..a2d6a73`) at explicit user request. Working tree is clean (only untracked, gitignored `screenshots/` remains).
 
 **Still open:**
-- Push `673784a` to `origin/main` when the user asks.
-- Same standing ko/es/hi native-speaker review gap as before.
+- Same standing ko/es/hi native-speaker review gap as before (crisis phrases + this session's onboarding copy) — needs a native speaker or clinician-reviewed source, not mechanical work.
+- Still-placeholder RevenueCat keys in `src/config/iap.ts`, already guarded (see prior architecture-review entries) — needs the user's real RevenueCat credentials whenever that product decision happens.
