@@ -38,6 +38,10 @@ yarn-error.*
 # Google service account key (secret)
 google-service-account.json
 
+# EAS-downloaded signing credentials (keystore + passwords, secret)
+credentials.json
+/credentials/
+
 # typescript
 *.tsbuildinfo
 
