@@ -11,6 +11,8 @@
  *  4. Optionally set USER_ID_PREFIX if you want to namespace anonymous IDs.
  */
 
+import { Platform } from 'react-native';
+
 export const IAP_CONFIG = {
   /** RevenueCat iOS SDK key — find in RC dashboard → Project → API Keys */
   REVENUECAT_API_KEY_IOS: 'appl_PLACEHOLDER_REPLACE_ME',
@@ -28,7 +30,14 @@ export const IAP_CONFIG = {
   DISPLAY_PRICE: '$4.99',
 } as const;
 
-/** True once the placeholder RevenueCat keys above have been replaced with real ones. */
-export const IAP_IS_CONFIGURED =
-  !IAP_CONFIG.REVENUECAT_API_KEY_IOS.includes('PLACEHOLDER') &&
-  !IAP_CONFIG.REVENUECAT_API_KEY_ANDROID.includes('PLACEHOLDER');
+/**
+ * True once the placeholder RevenueCat key for the current platform has been
+ * replaced with a real one. Android-only for now — the iOS key stays a
+ * placeholder until an Apple Developer account/build exists, so it's excluded
+ * from this check (see CASE_STUDY.md's "RevenueCat project setup begun" entry).
+ */
+export const IAP_IS_CONFIGURED = Platform.select({
+  ios: !IAP_CONFIG.REVENUECAT_API_KEY_IOS.includes('PLACEHOLDER'),
+  android: !IAP_CONFIG.REVENUECAT_API_KEY_ANDROID.includes('PLACEHOLDER'),
+  default: false,
+});
