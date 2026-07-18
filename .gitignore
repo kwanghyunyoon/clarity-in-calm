@@ -37,6 +37,8 @@ yarn-error.*
 
 # Google service account key (secret)
 google-service-account.json
+assets/clarity.json
+assets/skillful-signer-502715-m5-02550709b69d.json
 
 # EAS-downloaded signing credentials (keystore + passwords, secret)
 credentials.json

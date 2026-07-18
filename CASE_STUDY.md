@@ -639,3 +639,24 @@ Dispatched an Explore agent to check each of the 6 perks advertised in `unlockFe
 2. Decide whether to implement real gating behind `isUnlocked` for any of the remaining perks (emotion categories/history/future-self-letters/pattern-insights/guided-templates) — right now none of them are restricted for non-payers, so the $4.99 unlock currently buys nothing functional. This was raised to the user as a next step but not yet decided.
 3. Commit this session's `translations.ts` copy trim (currently uncommitted, alongside the still-pending items 3-7 from the RevenueCat thread above: finish the Play Console in-app product, register it in RevenueCat, drop in the real Android SDK key, push commit `7a22581`).
 4. Same standing ko/es/hi native-speaker review gap as always (now also covering this session's renamed strings, which are Claude's best-effort translations, not native-reviewed).
+
+---
+
+## 2026-07-17 (continuation) — Committed paywall-copy fixes, pushed; fixed exportBtn PDF copy; found exposed GCP keys
+
+Picked up the prior session's uncommitted `translations.ts` copy trim plus the already-present `app.config.js`/`iap.ts` changes. First checked whether commit `7a22581` (credentials.json/.gitignore fix) genuinely still needed pushing — `git status` showed `main` already up to date with `origin/main`, so that "not yet pushed" note in the prior entry was stale; no action needed there.
+
+**Commit 1 (`58c9e02`):** staged and committed only the 4 intentionally-modified files (`CASE_STUDY.md`, `app.config.js`, `src/config/iap.ts`, `src/i18n/translations.ts`) — the `unlockFeatures` copy trim, the `versionCode` 3→4 bump, and the Android-only `IAP_IS_CONFIGURED` change, all already sitting in the working tree from the prior session. Pushed to `origin/main`.
+
+**Security finding (not fixed, flagged only):** before staging, checked the untracked files in `git status` and found `assets/clarity.json` and `assets/skillful-signer-502715-m5-02550709b69d.json` are two **live GCP service-account private keys** (project `skillful-signer-502715-m5`, two different key IDs) sitting in the repo, untracked *and not covered by any `.gitignore` rule* — unlike `google-service-account.json`, which already has a dedicated ignore entry. A future `git add -A`/`git add .` would stage real secrets. Left both files untouched (didn't delete, didn't gitignore) since their purpose/origin is unknown — flagged to the user, saved as memory ([[exposed_gcp_keys_in_assets]]) so future sessions don't `git add -A` in this repo without checking `assets/` first.
+
+**Commit 2 (`fe0daf3`):** fixed the `insightsScreen.exportBtn` "Export as PDF" copy across all 4 locales (en/ko/es/hi) → "Export as JSON", same rename-to-match-reality pattern as the `unlockFeatures` fix. While tracing consumers, discovered `insightsScreen.exportBtn`/`exportTitle`/`exportSuccess` have **zero consumers anywhere in `src/app` or `src/components`** — these are dead i18n keys, not currently rendered on the Insights screen at all. The real, live export button is `settingsScreen.exportData` ("Export all data (JSON)") in `settings.tsx:462-463`, which was already accurate. Renamed the dead keys rather than deleting them, in case they're wired up later. `npx tsc --noEmit` confirmed clean (same pre-existing baseline: test-file jest-globals, `settings.tsx` expo-file-system typing). Committed and pushed.
+
+**Outcome:** Working tree now has only the 3 untracked non-repo files (`assets/Untitled design.png`, `assets/clarity.json`, `assets/skillful-signer-502715-m5-02550709b69d.json`) — no modified/staged files. `origin/main` is at `fe0daf3`.
+
+**Still open (paywall thread): only the gating-vs-tip-jar product decision remains** — implement real feature gating behind `isUnlocked` for the 5 remaining perks, or leave the $4.99 unlock as a no-op "support the app" purchase. Not yet decided.
+
+**Still open (other threads, unchanged):**
+- Finish the RevenueCat rollout: create the Google Play in-app product (`clarity_unlock_499`, $4.99, Active), register it in RevenueCat attached to entitlement `clarity_unlock`, and drop the real Android SDK key into `IAP_CONFIG.REVENUECAT_API_KEY_ANDROID` in `src/config/iap.ts:19` (flips `IAP_IS_CONFIGURED` to `true`). See [[revenuecat_setup_2026_07_17]].
+- ko/hi crisis-keyword `overdose` category is empty — needs a native speaker/clinician, not a guess.
+- The exposed GCP service-account keys in `assets/` (see above) — decide whether to delete, gitignore, or relocate them; not acted on this session.
