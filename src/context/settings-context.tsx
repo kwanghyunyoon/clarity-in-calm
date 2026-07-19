@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext } from 'react';
+import { DataKeySpec } from '@/lib/data-keys';
 import { usePersistedState } from '@/lib/use-persisted-state';
 import { AppSettings, DEFAULT_SETTINGS, NotificationSettings, ThemeOverride } from '@/types';
 
@@ -12,7 +13,7 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | null>(null);
 
 const STORAGE_KEY = 'wellness_settings_v1';
-export const SETTINGS_STORAGE_KEY = STORAGE_KEY;
+export const SETTINGS_DATA_KEYS: DataKeySpec[] = [{ key: STORAGE_KEY, backend: 'secure' }];
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
   const [settings, setSettings, isLoaded] = usePersistedState<AppSettings>(STORAGE_KEY, DEFAULT_SETTINGS, {

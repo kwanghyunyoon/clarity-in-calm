@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo } from 'react';
+import { DataKeySpec } from '@/lib/data-keys';
 import { toLocalDateStr } from '@/lib/date-utils';
 import { usePersistedState } from '@/lib/use-persisted-state';
 import { EmotionLog } from '@/types';
@@ -14,7 +15,7 @@ interface EmotionContextType {
 const EmotionContext = createContext<EmotionContextType | null>(null);
 
 const STORAGE_KEY = 'wellness_emotions_v1';
-export const EMOTION_STORAGE_KEY = STORAGE_KEY;
+export const EMOTION_DATA_KEYS: DataKeySpec[] = [{ key: STORAGE_KEY, backend: 'secure' }];
 
 export function EmotionProvider({ children }: { children: React.ReactNode }) {
   const [emotionLogs, setEmotionLogs, isLoaded] = usePersistedState<EmotionLog[]>(STORAGE_KEY, []);

@@ -17,11 +17,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing } from '@/constants/theme';
-import { EMOTION_STORAGE_KEY } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
-import { SETTINGS_STORAGE_KEY, useSettings } from '@/context/settings-context';
-import { WELLNESS_STORAGE_KEYS } from '@/context/wellness-context';
-import { secureDelete, secureRead } from '@/lib/secure-storage';
+import { useSettings } from '@/context/settings-context';
+import { ALL_DATA_KEYS } from '@/lib/data-registry';
+import { deleteAllData, readAllData } from '@/lib/data-keys';
 import {
   cancelDailyReminder,
   requestNotificationPermission,
@@ -30,8 +29,6 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useLocale } from '@/context/language-context';
-
-const DATA_KEYS = [...WELLNESS_STORAGE_KEYS, EMOTION_STORAGE_KEY, SETTINGS_STORAGE_KEY];
 
 function SectionHeader({ label }: { label: string }) {
   const { colors } = useTheme();
@@ -204,7 +201,7 @@ export default function SettingsScreen() {
           text: ts.deleteConfirm.confirm,
           style: 'destructive',
           onPress: async () => {
-            await Promise.all(DATA_KEYS.map(k => secureDelete(k)));
+            await deleteAllData(ALL_DATA_KEYS);
             Alert.alert(ts.dataDeleted.title, ts.dataDeleted.body);
           },
         },
@@ -214,15 +211,10 @@ export default function SettingsScreen() {
 
   async function handleExport() {
     try {
-      const payload: Record<string, unknown> = { exportedAt: new Date().toISOString() };
-      await Promise.all(
-        DATA_KEYS.map(async (key) => {
-          const raw = await secureRead(key);
-          if (raw) {
-            try { payload[key] = JSON.parse(raw); } catch { payload[key] = raw; }
-          }
-        }),
-      );
+      const payload: Record<string, unknown> = {
+        exportedAt: new Date().toISOString(),
+        ...(await readAllData(ALL_DATA_KEYS)),
+      };
       const json = JSON.stringify(payload, null, 2);
       const filename = `clarity-export-${new Date().toISOString().slice(0, 10)}.json`;
       const uri = (FileSystem.cacheDirectory ?? FileSystem.documentDirectory ?? '') + filename;

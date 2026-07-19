@@ -8,9 +8,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import type { Locale } from '@/i18n/translations';
+import { DataKeySpec } from '@/lib/data-keys';
 
 const ONBOARDING_KEY    = '@cic:hasSeenOnboarding';
 const LANGUAGE_STEP_KEY = '@cic:hasChosenLanguage';
+
+export const ONBOARDING_DATA_KEYS: DataKeySpec[] = [
+  { key: ONBOARDING_KEY, backend: 'plain' },
+  { key: LANGUAGE_STEP_KEY, backend: 'plain' },
+];
 
 interface UseOnboardingFlowArgs {
   isHelpVisible: boolean;
