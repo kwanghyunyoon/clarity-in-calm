@@ -12,22 +12,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
-import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { toLocalDateStr } from '@/lib/date-utils';
-
-function getLast7Days() {
-  const days: string[] = [];
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    days.push(toLocalDateStr(d));
-  }
-  return days;
-}
+import {
+  computeAvgIntensity,
+  computeDayMoods,
+  computeMoodDistribution,
+  computeTimeOfDay,
+  computeTopEmotion,
+  computeTriggerCounts,
+  getLast7Days,
+} from '@/lib/insights-analytics';
 
 export default function InsightsScreen() {
   const { colors } = useTheme();
@@ -42,68 +39,27 @@ export default function InsightsScreen() {
   const last7Days = useMemo(() => getLast7Days(), []);
 
   // ── Stats
-  const avgMood = useMemo(() => {
-    if (entries.length === 0) return 0;
-    return entries.reduce((sum, e) => sum + e.mood, 0) / entries.length;
-  }, [entries]);
-
-  const avgIntensity = useMemo(() => {
-    if (emotionLogs.length === 0) return 0;
-    return emotionLogs.reduce((sum, e) => sum + e.intensity, 0) / emotionLogs.length;
-  }, [emotionLogs]);
+  const avgIntensity = useMemo(() => computeAvgIntensity(emotionLogs), [emotionLogs]);
 
   // ── Top emotion
-  const topEmotion = useMemo(() => {
-    const counts: Record<string, { count: number; label: string; color: string }> = {};
-    emotionLogs.forEach(log => {
-      const color = BASIC_EMOTIONS_BY_ID[log.emotionId]?.color ?? colors.primary;
-      if (!counts[log.emotionId]) counts[log.emotionId] = { count: 0, label: log.emotionLabel, color };
-      counts[log.emotionId].count++;
-    });
-    return Object.values(counts).sort((a, b) => b.count - a.count)[0] ?? null;
-  }, [emotionLogs, colors.primary]);
+  const topEmotion = useMemo(
+    () => computeTopEmotion(emotionLogs, colors.primary),
+    [emotionLogs, colors.primary],
+  );
 
   // ── Top context triggers
-  const triggerCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    emotionLogs.forEach(log => {
-      log.contextTags.forEach(tag => { counts[tag] = (counts[tag] ?? 0) + 1; });
-    });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 6);
-  }, [emotionLogs]);
+  const triggerCounts = useMemo(() => computeTriggerCounts(emotionLogs), [emotionLogs]);
 
   // ── Time of day distribution
-  const timeOfDay = useMemo(() => {
-    const buckets = { morning: 0, afternoon: 0, evening: 0, night: 0 };
-    emotionLogs.forEach(log => {
-      const h = new Date(log.date).getHours();
-      if (h >= 6 && h < 12) buckets.morning++;
-      else if (h >= 12 && h < 17) buckets.afternoon++;
-      else if (h >= 17 && h < 22) buckets.evening++;
-      else buckets.night++;
-    });
-    const max = Math.max(...Object.values(buckets), 1);
-    return buckets;
-  }, [emotionLogs]);
+  const timeOfDay = useMemo(() => computeTimeOfDay(emotionLogs), [emotionLogs]);
 
   const maxTime = Math.max(...Object.values(timeOfDay), 1);
 
   // ── 7-day mood
-  const dayMoods = useMemo(() => {
-    return last7Days.map(day => {
-      const dayEntries = entries.filter(e => toLocalDateStr(new Date(e.date)) === day);
-      if (dayEntries.length === 0) return null;
-      return dayEntries.reduce((sum, e) => sum + e.mood, 0) / dayEntries.length;
-    });
-  }, [entries, last7Days]);
+  const dayMoods = useMemo(() => computeDayMoods(entries, last7Days), [entries, last7Days]);
 
   // ── Mood distribution
-  const moodDist = useMemo(() => {
-    const counts = [0, 0, 0, 0, 0];
-    entries.forEach(e => { counts[e.mood - 1]++; });
-    const max = Math.max(...counts, 1);
-    return counts.map(c => ({ count: c, pct: c / max }));
-  }, [entries]);
+  const moodDist = useMemo(() => computeMoodDistribution(entries), [entries]);
 
   const moods = t.moods;
 
