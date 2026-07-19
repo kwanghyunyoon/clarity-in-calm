@@ -660,3 +660,27 @@ Picked up the prior session's uncommitted `translations.ts` copy trim plus the a
 - Finish the RevenueCat rollout: create the Google Play in-app product (`clarity_unlock_499`, $4.99, Active), register it in RevenueCat attached to entitlement `clarity_unlock`, and drop the real Android SDK key into `IAP_CONFIG.REVENUECAT_API_KEY_ANDROID` in `src/config/iap.ts:19` (flips `IAP_IS_CONFIGURED` to `true`). See [[revenuecat_setup_2026_07_17]].
 - ko/hi crisis-keyword `overdose` category is empty — needs a native speaker/clinician, not a guess.
 - The exposed GCP service-account keys in `assets/` (see above) — decide whether to delete, gitignore, or relocate them; not acted on this session.
+
+---
+
+## 2026-07-18 — Chartered a `/wayfinder` map for Play Store production readiness (no code changes)
+
+**Note on the RevenueCat thread above:** superseded same-day by commit `4a26e68` ("Remove IAP paywall + production-readiness fixes") — the app is going fully free (a separate sleep app will carry the paid unlock instead), so the RevenueCat rollout and the gating-vs-tip-jar decision are both moot. That commit also dropped the unused `android.permission.CAMERA`/photo permissions and fixed the in-app Privacy Policy link, which pointed at a 404'd URL.
+
+A separate `/wayfinder` session (run from the sibling `~/projects/new` working directory, chatting through the user's original loose idea before either of us realized `clarity-in-calm` already existed) initially spent a long stretch grilling toward a from-scratch native-Android spec. That framing was wrong on two counts — this is Expo/React Native, not native Kotlin (Gradle only exists as Expo's generated `android/` wrapper), and almost everything discussed (4-language i18n, crisis keywords, mood tracking, breathing exercise, fully-free/no-IAP) was already built here. Caught by actually reading the repo (`README.md`, `git log`, this file) instead of continuing to grill on assumptions — worth remembering for next time a session starts from the wrong directory.
+
+**Rescoped destination:** close the gap between the existing app and actual Google Play production submission (an app listing already exists in Play Console; IAP was just removed).
+
+**Chartered as GitHub Issues** (this repo has a real remote + authenticated `gh`, so used native issues rather than local-markdown): created `wayfinder:*` labels, then the map plus 6 child tickets, wired via the sub-issues API and native issue `blocked_by` dependencies.
+
+- Map: [#4](https://github.com/kwanghyunyoon/clarity-in-calm/issues/4)
+- [#5](https://github.com/kwanghyunyoon/clarity-in-calm/issues/5) YouTube channel link — placement/design (open)
+- [#6](https://github.com/kwanghyunyoon/clarity-in-calm/issues/6) ko/hi crisis-keyword `overdose` translation gap (open) — a research subagent already posted sourced candidate phrases as a comment ([Korean/Hindi proposals with citations](https://github.com/kwanghyunyoon/clarity-in-calm/issues/6#issuecomment-5014470760)); MSD Manual-sourced for both languages, but no India-specific crisis-org (iCall/Vandrevala/NIMHANS) Hindi source could be found despite trying — flagged for extra human scrutiny before merging into `translations.ts`
+- [#7](https://github.com/kwanghyunyoon/clarity-in-calm/issues/7) Spanish crisis lines currently hardcode Mexico only (Línea de la Vida, SAPTEL) + findahelpline.com fallback — open question whether that's the right permanent scope for a broader Latin-America audience
+- [#8](https://github.com/kwanghyunyoon/clarity-in-calm/issues/8) Play Console current-state audit (task — needs the user to check Play Console directly; agent has no access)
+- [#9](https://github.com/kwanghyunyoon/clarity-in-calm/issues/9) Data Safety form answers — blocked by #8
+- [#10](https://github.com/kwanghyunyoon/clarity-in-calm/issues/10) Content rating (IARC) questionnaire answers — blocked by #8
+
+Explicitly out of scope (recorded on the map): therapist/telehealth, ads/IAP, embedded/bundled YouTube video (static link only), ML-based crisis detection, and any data-migration scenario (no prior distinct app to migrate from).
+
+No app code touched this session. Next session: run `/wayfinder` against issue #4 to resolve the next frontier ticket, or answer #8 directly in Play Console to unblock #9/#10.
