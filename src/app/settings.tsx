@@ -244,6 +244,10 @@ export default function SettingsScreen() {
     WebBrowser.openBrowserAsync('https://kwanghyunyoon.github.io/clarity-in-calm-privacy/');
   }
 
+  function openYoutube() {
+    WebBrowser.openBrowserAsync('https://www.youtube.com/@ClarityinCalm');
+  }
+
   // ── Render ─────────────────────────────────────────────────────────────────
 
   return (
@@ -359,6 +363,7 @@ export default function SettingsScreen() {
         <SettingsGroup>
           <SettingsRow label={t.onboarding.replayOnboarding} onPress={showHelp} />
           <SettingsRow label={ts.privacy} onPress={openPrivacy} />
+          <SettingsRow label={ts.youtube} onPress={openYoutube} />
           <SettingsRow label={ts.version} value="1.0.0" />
         </SettingsGroup>
 
