@@ -258,6 +258,14 @@ export default function JournalScreen() {
     ...customTags,
   ];
 
+  // Built-in tags are stored/matched by their canonical English id (so existing
+  // entries and search keep working); only the displayed label is localized.
+  // Custom tags aren't in this map, so they fall through to their stored text.
+  const tagLabel = useCallback((tag: string) => {
+    const tagLabels = te.tagLabels as Record<string, string>;
+    return tagLabels[tag] ?? tag;
+  }, [te]);
+
   type EntryItem = typeof filteredEntries[number];
 
   const renderEntry = useCallback(({ item: entry, index: i }: ListRenderItemInfo<EntryItem>) => {
@@ -321,7 +329,7 @@ export default function JournalScreen() {
           <View style={styles.entryTagRow}>
             {(entry.tags ?? []).map(tag => (
               <View key={tag} style={[styles.entryTag, { backgroundColor: colors.backgroundElement }]}>
-                <Text style={[styles.entryTagText, { color: colors.textSecondary }]}>#{tag}</Text>
+                <Text style={[styles.entryTagText, { color: colors.textSecondary }]}>#{tagLabel(tag)}</Text>
               </View>
             ))}
           </View>
@@ -344,7 +352,7 @@ export default function JournalScreen() {
         </TouchableOpacity>
       </Animated.View>
     );
-  }, [colors, t.moods, tj, te, deleteEntry]);
+  }, [colors, t.moods, tj, te, deleteEntry, tagLabel]);
 
   const listHeader = (
     <>
@@ -476,7 +484,7 @@ export default function JournalScreen() {
                 accessibilityState={{ checked: isSelected }}
               >
                 <Text style={[styles.tagText, { color: isSelected ? colors.accent : colors.textSecondary }]}>
-                  #{tag}
+                  #{tagLabel(tag)}
                 </Text>
               </TouchableOpacity>
             );

@@ -90,7 +90,7 @@ export function OnboardingModal() {
             {/* ── Icon + text, centered together as one group ── */}
             <View style={s.contentCenter}>
               <Animated2.View key={`visual-${page}`} entering={FadeIn.duration(300)} style={s.visualWrap}>
-                <SlideVisual page={page} colors={colors} />
+                <SlideVisual page={page} colors={colors} t={t} />
               </Animated2.View>
 
               <Animated2.View key={`text-${page}`} entering={FadeIn.duration(280)} style={s.slide}>

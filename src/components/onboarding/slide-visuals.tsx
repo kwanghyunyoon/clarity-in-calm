@@ -10,8 +10,10 @@ import Svg, { Path } from 'react-native-svg';
 import { BASIC_EMOTIONS } from '@/constants/emotions';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useTranslation } from '@/hooks/use-translation';
 
 export type ThemeColors = ReturnType<typeof useTheme>['colors'];
+type Translation = ReturnType<typeof useTranslation>;
 
 // Slide 0 — Welcome: gently pulsing lotus
 function WelcomeVisual() {
@@ -36,42 +38,42 @@ function WelcomeVisual() {
 }
 
 // Slide 1 — Today: mini streak card + shortcut pills
-function TodayVisual({ colors }: { colors: ThemeColors }) {
+function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
   return (
     <View style={s.todayWrap}>
       <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
         <Text style={s.streakFlame}>🔥</Text>
         <Text style={[s.streakNum, { color: colors.text }]}>7</Text>
-        <Text style={[s.streakLabel, { color: colors.textSecondary }]}>day streak</Text>
+        <Text style={[s.streakLabel, { color: colors.textSecondary }]}>{t.home.progress.streak}</Text>
       </View>
       <View style={s.pillRow}>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>📖 Journal</Text>
+          <Text style={[s.pillText, { color: colors.primary }]}>📖 {t.tabs.journal}</Text>
         </View>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>🎭 Emotions</Text>
+          <Text style={[s.pillText, { color: colors.primary }]}>🎭 {t.tabs.emotions}</Text>
         </View>
       </View>
     </View>
   );
 }
 
-// Slide 2 — Journal: template cards
-const TEMPLATE_LABELS = [
-  { icon: '✏️', label: 'Free Write' },
-  { icon: '🙏', label: 'Gratitude' },
-  { icon: '🔄', label: 'Reframe' },
-];
-function JournalVisual({ colors }: { colors: ThemeColors }) {
+// Slide 2 — Journal: template cards (mirrors 3 of the real JOURNAL_TEMPLATES)
+function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
+  const templates = [
+    { icon: '✏️', label: t.journalExtended.templateFreeWrite },
+    { icon: '🙏', label: t.journalExtended.templateGratitude },
+    { icon: '🔍', label: t.journalExtended.templateCBT },
+  ];
   return (
     <View style={s.templateWrap}>
-      {TEMPLATE_LABELS.map((t, i) => (
+      {templates.map((tmpl, i) => (
         <View
           key={i}
           style={[s.templateCard, { backgroundColor: colors.backgroundElement }]}
         >
-          <Text style={s.templateIcon}>{t.icon}</Text>
-          <Text style={[s.templateLabel, { color: colors.text }]}>{t.label}</Text>
+          <Text style={s.templateIcon}>{tmpl.icon}</Text>
+          <Text style={[s.templateLabel, { color: colors.text }]}>{tmpl.label}</Text>
         </View>
       ))}
     </View>
@@ -96,8 +98,8 @@ function EmotionsVisual() {
 
 // Slide 4 — Insights: mini bar chart
 const BAR_HEIGHTS = [40, 60, 30, 80, 55, 70, 45];
-const BAR_LABELS  = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-function InsightsVisual({ colors }: { colors: ThemeColors }) {
+function InsightsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
+  const barLabels = t.settingsScreen.daysShort;
   return (
     <View style={s.chartWrap}>
       {BAR_HEIGHTS.map((h, i) => (
@@ -108,7 +110,7 @@ function InsightsVisual({ colors }: { colors: ThemeColors }) {
               { height: h, backgroundColor: colors.primary, opacity: 0.6 + i * 0.06 },
             ]}
           />
-          <Text style={[s.barLabel, { color: colors.textSecondary }]}>{BAR_LABELS[i]}</Text>
+          <Text style={[s.barLabel, { color: colors.textSecondary }]}>{barLabels[i]}</Text>
         </View>
       ))}
     </View>
@@ -116,14 +118,19 @@ function InsightsVisual({ colors }: { colors: ThemeColors }) {
 }
 
 // Slide 5 — Settings: gear + toggle rows
-function SettingsVisual({ colors }: { colors: ThemeColors }) {
+function SettingsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
+  const rows = [
+    { emoji: '🔔', label: t.settingsScreen.notifications },
+    { emoji: '🌐', label: t.settingsScreen.language },
+    { emoji: '🎨', label: t.settingsScreen.appearance },
+  ];
   return (
     <View style={s.settingsWrap}>
       <Text style={s.settingsGear}>⚙️</Text>
       <View style={s.settingsRows}>
-        {['🔔 Reminders', '🌐 Language', '🎨 Theme'].map((label) => (
-          <View key={label} style={[s.settingsRow, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[s.settingsRowText, { color: colors.text }]}>{label}</Text>
+        {rows.map((row) => (
+          <View key={row.label} style={[s.settingsRow, { backgroundColor: colors.backgroundElement }]}>
+            <Text style={[s.settingsRowText, { color: colors.text }]}>{row.emoji} {row.label}</Text>
           </View>
         ))}
       </View>
@@ -153,14 +160,14 @@ function ShieldVisual() {
   );
 }
 
-export function SlideVisual({ page, colors }: { page: number; colors: ThemeColors }) {
+export function SlideVisual({ page, colors, t }: { page: number; colors: ThemeColors; t: Translation }) {
   switch (page) {
     case 0: return <WelcomeVisual />;
-    case 1: return <TodayVisual colors={colors} />;
-    case 2: return <JournalVisual colors={colors} />;
+    case 1: return <TodayVisual colors={colors} t={t} />;
+    case 2: return <JournalVisual colors={colors} t={t} />;
     case 3: return <EmotionsVisual />;
-    case 4: return <InsightsVisual colors={colors} />;
-    case 5: return <SettingsVisual colors={colors} />;
+    case 4: return <InsightsVisual colors={colors} t={t} />;
+    case 5: return <SettingsVisual colors={colors} t={t} />;
     case 6: return <ShieldVisual />;
     default: return null;
   }

@@ -87,6 +87,7 @@ function TimePicker({
   onClose: () => void;
 }) {
   const { colors } = useTheme();
+  const tt = useTranslation().settingsScreen.timePicker;
   const [h, setH] = useState(hour);
   const [m, setM] = useState(minute);
 
@@ -97,12 +98,12 @@ function TimePicker({
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <View style={tp.overlay}>
         <View style={[tp.sheet, { backgroundColor: colors.surface }]}>
-          <Text style={[tp.title, { color: colors.text }]}>Reminder time</Text>
+          <Text style={[tp.title, { color: colors.text }]}>{tt.title}</Text>
 
           <View style={tp.row}>
             {/* Hour picker */}
             <View style={tp.col}>
-              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>Hour</Text>
+              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>{tt.hourLabel}</Text>
               <ScrollView style={tp.scroll} showsVerticalScrollIndicator={false}>
                 {HOURS.map(hh => (
                   <TouchableOpacity
@@ -122,7 +123,7 @@ function TimePicker({
 
             {/* Minute picker */}
             <View style={tp.col}>
-              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>Min</Text>
+              <Text style={[tp.colLabel, { color: colors.textSecondary }]}>{tt.minuteLabel}</Text>
               <ScrollView style={tp.scroll} showsVerticalScrollIndicator={false}>
                 {MINUTES.map(mm => (
                   <TouchableOpacity
@@ -143,10 +144,10 @@ function TimePicker({
             style={[tp.btn, { backgroundColor: colors.primary }]}
             onPress={() => onConfirm(h, m)}
           >
-            <Text style={tp.btnText}>Set reminder</Text>
+            <Text style={tp.btnText}>{tt.confirm}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={onClose} style={tp.cancel}>
-            <Text style={[tp.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+            <Text style={[tp.cancelText, { color: colors.textSecondary }]}>{tt.cancel}</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -175,10 +176,7 @@ export default function SettingsScreen() {
     if (value) {
       const granted = await requestNotificationPermission();
       if (!granted) {
-        Alert.alert(
-          'Permission required',
-          'Please enable notifications in your device settings to receive daily reminders.',
-        );
+        Alert.alert(ts.notifPermission.title, ts.notifPermission.body);
         return;
       }
       await scheduleDailyReminder(settings.notifications.hour, settings.notifications.minute);
@@ -207,7 +205,7 @@ export default function SettingsScreen() {
           style: 'destructive',
           onPress: async () => {
             await Promise.all(DATA_KEYS.map(k => secureDelete(k)));
-            Alert.alert('Done', 'All data has been deleted.');
+            Alert.alert(ts.dataDeleted.title, ts.dataDeleted.body);
           },
         },
       ],
@@ -233,10 +231,10 @@ export default function SettingsScreen() {
       if (canShare) {
         await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
       } else {
-        Alert.alert('Exported', `Saved to: ${uri}`);
+        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${uri}`);
       }
     } catch (e: any) {
-      Alert.alert('Export failed', e.message ?? 'Something went wrong.');
+      Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
     }
   }
 
