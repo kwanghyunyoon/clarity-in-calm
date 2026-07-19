@@ -1,11 +1,10 @@
 import React, { createContext, useCallback, useContext } from 'react';
 import { usePersistedState } from '@/lib/use-persisted-state';
-import { AppSettings, DEFAULT_SETTINGS, IAPStatus, NotificationSettings, ThemeOverride } from '@/types';
+import { AppSettings, DEFAULT_SETTINGS, NotificationSettings, ThemeOverride } from '@/types';
 
 interface SettingsContextType {
   settings: AppSettings;
   setNotificationSettings: (n: NotificationSettings) => void;
-  setIAPStatus: (s: IAPStatus) => void;
   setThemeOverride: (t: ThemeOverride) => void;
   isLoaded: boolean;
 }
@@ -24,16 +23,12 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings(prev => ({ ...prev, notifications: n }));
   }, [setSettings]);
 
-  const setIAPStatus = useCallback((s: IAPStatus) => {
-    setSettings(prev => ({ ...prev, iap: s }));
-  }, [setSettings]);
-
   const setThemeOverride = useCallback((t: ThemeOverride) => {
     setSettings(prev => ({ ...prev, themeOverride: t }));
   }, [setSettings]);
 
   return (
-    <SettingsContext.Provider value={{ settings, setNotificationSettings, setIAPStatus, setThemeOverride, isLoaded }}>
+    <SettingsContext.Provider value={{ settings, setNotificationSettings, setThemeOverride, isLoaded }}>
       {children}
     </SettingsContext.Provider>
   );

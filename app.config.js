@@ -11,10 +11,6 @@ export default {
       bundleIdentifier: 'com.clarityincalm.app',
       icon: './assets/images/icon.png',
       supportsTablet: true,
-      infoPlist: {
-        NSPhotoLibraryUsageDescription: 'Used for profile photos.',
-        NSCameraUsageDescription: 'Used for profile photos.',
-      },
     },
     android: {
       package: 'com.clarityincalm.app',
@@ -27,7 +23,6 @@ export default {
         monochromeImage: './assets/images/android-icon-monochrome.png',
       },
       predictiveBackGestureEnabled: false,
-      permissions: ['android.permission.CAMERA'],
     },
     newArchEnabled: true,
     web: {
