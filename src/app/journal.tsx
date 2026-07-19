@@ -23,6 +23,7 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { checkCrisis } from '@/lib/crisis-detection';
 import { toLocalDateStr } from '@/lib/date-utils';
 import type { MoodValue } from '@/types';
 
@@ -196,16 +197,9 @@ export default function JournalScreen() {
       )
     : entries;
 
-  function checkCrisis(text: string): boolean {
-    const lower = text.toLowerCase();
-    return Object.values(tj.crisisKeywords)
-      .flat()
-      .some(kw => lower.includes(kw));
-  }
-
   function handleSaveAttempt() {
     if (!mood) return;
-    if (note.trim() && checkCrisis(note)) {
+    if (note.trim() && checkCrisis(note, tj.crisisKeywords)) {
       setPendingSave({ mood, note });
       setShowCrisis(true);
     } else {
