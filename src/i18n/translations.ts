@@ -716,8 +716,7 @@ export const ko: Translations = {
       hopelessness: ['살기 싫다', '살기싫다', '살고 싶지 않다', '더 이상 살고 싶지 않다', '죽는 게 낫다'],
       givingUp: ['삶을 끝내고 싶다', '삶을 포기', '삶을 포기하고 싶다', '사라지고 싶다'],
       selfHarm: ['자해', '스스로를 해치다', '스스로 해치고 싶다'],
-      // No Korean overdose phrase translated yet — known content gap, tracked separately.
-      overdose: [],
+      overdose: ['약물 과다복용', '과다복용'],
     },
 
     deleteConfirm: {
@@ -1291,8 +1290,7 @@ export const hi: Translations = {
         'गायब हो जाना चाहता हूँ', 'गायब हो जाना चाहती हूँ',
       ],
       selfHarm: ['खुद को नुकसान', 'खुद को चोट'],
-      // No Hindi overdose phrase translated yet — known content gap, tracked separately.
-      overdose: [],
+      overdose: ['दवा की अधिक मात्रा', 'ओवरडोज़'],
     },
 
     deleteConfirm: {
