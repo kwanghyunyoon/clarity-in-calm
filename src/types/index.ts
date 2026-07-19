@@ -33,17 +33,10 @@ export type NotificationSettings = {
   days: number[]; // 0=Sun … 6=Sat
 };
 
-export type IAPStatus = {
-  unlocked: boolean;
-  purchaseToken?: string;
-  restoredAt?: string;
-};
-
 export type ThemeOverride = 'system' | 'light' | 'dark';
 
 export interface AppSettings {
   notifications: NotificationSettings;
-  iap: IAPStatus;
   themeOverride: ThemeOverride;
 }
 
@@ -54,6 +47,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
     minute: 0,
     days: [0, 1, 2, 3, 4, 5, 6],
   },
-  iap: { unlocked: false },
   themeOverride: 'system',
 };

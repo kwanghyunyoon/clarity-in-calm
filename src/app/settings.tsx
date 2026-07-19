@@ -13,13 +13,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Purchases, { LOG_LEVEL } from 'react-native-purchases';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing } from '@/constants/theme';
-import { IAP_CONFIG, IAP_IS_CONFIGURED } from '@/config/iap';
 import { EMOTION_STORAGE_KEY } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
 import { SETTINGS_STORAGE_KEY, useSettings } from '@/context/settings-context';
@@ -163,87 +160,14 @@ export default function SettingsScreen() {
   const t = useTranslation();
   const ts = t.settingsScreen;
   const insets = useSafeAreaInsets();
-  const { settings, setNotificationSettings, setIAPStatus, setThemeOverride } = useSettings();
+  const { settings, setNotificationSettings, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
   const { showHelp } = useHelp();
 
-  const [iapLoading, setIapLoading] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const notifEnabled = settings.notifications.enabled;
   const bottomPad = 88 + insets.bottom;
-  const isUnlocked = settings.iap.unlocked;
-
-  // ── IAP ────────────────────────────────────────────────────────────────────
-
-  async function initRC() {
-    Purchases.setLogLevel(LOG_LEVEL.ERROR);
-    Purchases.configure({
-      apiKey: Platform.select({
-        ios: IAP_CONFIG.REVENUECAT_API_KEY_IOS,
-        android: IAP_CONFIG.REVENUECAT_API_KEY_ANDROID,
-        default: IAP_CONFIG.REVENUECAT_API_KEY_IOS,
-      })!,
-    });
-  }
-
-  async function handleUnlock() {
-    if (iapLoading) return;
-    if (!IAP_IS_CONFIGURED) {
-      Alert.alert('Coming soon', 'Purchases aren’t available yet. Check back later!');
-      return;
-    }
-    setIapLoading(true);
-    try {
-      await initRC();
-      const offerings = await Purchases.getOfferings();
-      const pkg = offerings.current?.availablePackages.find(
-        p => p.product.identifier === IAP_CONFIG.PRODUCT_ID,
-      ) ?? offerings.current?.availablePackages[0];
-
-      if (!pkg) {
-        Alert.alert('Not available', 'Purchase not available right now. Try again later.');
-        return;
-      }
-
-      const { customerInfo } = await Purchases.purchasePackage(pkg);
-      const unlocked = customerInfo.entitlements.active[IAP_CONFIG.ENTITLEMENT_ID] !== undefined;
-      setIAPStatus({ unlocked });
-
-      if (!unlocked) {
-        Alert.alert('Purchase failed', 'Purchase could not be verified. Please contact support.');
-      }
-    } catch (e: any) {
-      if (!e.userCancelled) {
-        Alert.alert('Purchase error', e.message ?? 'Something went wrong.');
-      }
-    } finally {
-      setIapLoading(false);
-    }
-  }
-
-  async function handleRestore() {
-    if (iapLoading) return;
-    if (!IAP_IS_CONFIGURED) {
-      Alert.alert('Coming soon', 'Purchases aren’t available yet. Check back later!');
-      return;
-    }
-    setIapLoading(true);
-    try {
-      await initRC();
-      const customerInfo = await Purchases.restorePurchases();
-      const unlocked = customerInfo.entitlements.active[IAP_CONFIG.ENTITLEMENT_ID] !== undefined;
-      setIAPStatus({ unlocked });
-      Alert.alert(
-        unlocked ? 'Restored!' : 'Nothing to restore',
-        unlocked ? 'Your purchase has been restored.' : 'No previous purchase found for this account.',
-      );
-    } catch (e: any) {
-      Alert.alert('Restore failed', e.message ?? 'Something went wrong.');
-    } finally {
-      setIapLoading(false);
-    }
-  }
 
   // ── Notifications ──────────────────────────────────────────────────────────
 
@@ -338,44 +262,6 @@ export default function SettingsScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── IAP Section ── */}
-        {!isUnlocked ? (
-          <>
-            <SectionHeader label={ts.clarityUnlock} />
-            <View style={[styles.iapCard, { backgroundColor: colors.primary + '12', borderColor: colors.primary + '44' }]}>
-              <Text style={[styles.iapTitle, { color: colors.text }]}>{ts.unlockTitle}</Text>
-              <Text style={[styles.iapPrice, { color: colors.textSecondary }]}>{ts.unlockPrice}</Text>
-              <View style={styles.featureList}>
-                {ts.unlockFeatures.map(f => (
-                  <View key={f} style={styles.featureRow}>
-                    <Text style={[styles.featureCheck, { color: colors.primary }]}>✓</Text>
-                    <Text style={[styles.featureText, { color: colors.text }]}>{f}</Text>
-                  </View>
-                ))}
-              </View>
-              <AnimatedPressable
-                onPress={handleUnlock}
-                style={[styles.unlockBtn, { backgroundColor: colors.primary, opacity: iapLoading ? 0.6 : 1 }]}
-                accessibilityRole="button"
-              >
-                <Text style={styles.unlockBtnText}>
-                  {iapLoading ? 'Processing…' : ts.unlockBtn}
-                </Text>
-              </AnimatedPressable>
-              <TouchableOpacity onPress={handleRestore} style={styles.restoreBtn} disabled={iapLoading}>
-                <Text style={[styles.restoreBtnText, { color: colors.textSecondary }]}>{ts.restoreBtn}</Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        ) : (
-          <>
-            <SectionHeader label={ts.clarityUnlock} />
-            <SettingsGroup>
-              <SettingsRow label={ts.unlocked} />
-            </SettingsGroup>
-          </>
-        )}
-
         {/* ── Notifications ── */}
         <SectionHeader label={ts.notifications} />
         <SettingsGroup>
@@ -530,26 +416,6 @@ const styles = StyleSheet.create({
   rowRight: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   rowValue: { fontSize: 15 },
   chevron: { fontSize: 20, fontWeight: '300' },
-  iapCard: {
-    borderRadius: BorderRadius.xl,
-    borderWidth: 1,
-    padding: Spacing.four,
-    gap: Spacing.three,
-  },
-  iapTitle: { fontSize: 20, fontWeight: '700', letterSpacing: -0.3 },
-  iapPrice: { fontSize: 14 },
-  featureList: { gap: Spacing.two },
-  featureRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.two },
-  featureCheck: { fontSize: 14, fontWeight: '700', width: 18 },
-  featureText: { flex: 1, fontSize: 14, lineHeight: 20 },
-  unlockBtn: {
-    borderRadius: BorderRadius.xl,
-    paddingVertical: Spacing.three,
-    alignItems: 'center',
-  },
-  unlockBtnText: { color: '#fff', fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
-  restoreBtn: { alignItems: 'center', paddingVertical: Spacing.two },
-  restoreBtnText: { fontSize: 14 },
   themeToggle: { flexDirection: 'row', gap: Spacing.one, flexShrink: 0 },
   themeOption: {
     borderRadius: BorderRadius.md,
