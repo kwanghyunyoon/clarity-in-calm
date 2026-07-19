@@ -985,6 +985,24 @@ export const es: Translations = {
           action: 'tel:5552598121',
         },
         {
+          emoji:  '📞',
+          title:  'Línea 192, opción 4 (Colombia)',
+          sub:    '192, opción 4 · Gratuito, 24/7',
+          action: 'tel:192,4',
+        },
+        {
+          emoji:  '📞',
+          title:  'Línea Nacional de Salud Mental (Argentina)',
+          sub:    '0800-999-0091 · Gratuito, 24/7',
+          action: 'tel:08009990091',
+        },
+        {
+          emoji:  '📞',
+          title:  'Línea 113, opción 5 (Perú)',
+          sub:    '113, opción 5 · Gratuito, 24/7',
+          action: 'tel:113,5',
+        },
+        {
           emoji:  '🌍',
           title:  'Líneas de ayuda internacionales',
           sub:    'findahelpline.com · Recursos en todo el mundo',
