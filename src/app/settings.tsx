@@ -241,7 +241,7 @@ export default function SettingsScreen() {
   }
 
   function openPrivacy() {
-    WebBrowser.openBrowserAsync('https://kwanghyunyoon.github.io/clarity-in-calm/privacy.html');
+    WebBrowser.openBrowserAsync('https://kwanghyunyoon.github.io/clarity-in-calm-privacy/');
   }
 
   // ── Render ─────────────────────────────────────────────────────────────────
