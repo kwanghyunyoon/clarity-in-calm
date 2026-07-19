@@ -767,3 +767,31 @@ Ran the architecture-review skill. No `CONTEXT.md` or `docs/adr/` exist in this 
 5. **Let contexts register their own storage keys** (Worth exploring) — `settings.tsx:34`'s `DATA_KEYS` still hand-imports from 3 contexts to build the delete/export key list (the same shape that caused the already-fixed `wellness_sessions_v1` bug — symptom fixed 07-15, design unchanged); also doesn't cover onboarding's 2 separate `AsyncStorage` keys, a blind spot nobody's hit yet.
 
 **Not yet decided:** asked the user which candidate to explore next (per the skill's grilling-loop step); session ended before they picked one. Next session should ask again rather than assume, or pick up on crisis-detection extraction (the top recommendation) if no preference is stated.
+
+---
+
+## 2026-07-19 (later still) — Worked candidates #2, #3, #1, #4 from the architecture review; #5 still open
+
+Picked up from the prior session's open architecture-review candidates (this session started in the sibling `~/projects/new` directory again — third time this exact gotcha has hit; worth just starting in `clarity-in-calm` directly). User asked for each candidate in turn; each was committed and pushed to `main` individually as its own commit, no batching.
+
+**#2 — Extract crisis detection (`c28115d`, pushed):** moved `checkCrisis` out of `journal.tsx` (was an untested private closure gating the crisis-support modal) into `src/lib/crisis-detection.ts`, typed against `Translations['journal']['crisisKeywords']`. Added `__tests__/CrisisDetection.test.ts` (case-insensitivity, substring matching, real per-locale phrases for all 4 locales). `journal.tsx` now just calls `checkCrisis(note, tj.crisisKeywords)`.
+
+**#3 — Extract insights analytics (`b03cbfd`, pushed):** moved `insights.tsx`'s 7 inline `useMemo` statistics into `src/lib/insights-analytics.ts` (`computeAvgIntensity`, `computeTopEmotion`, `computeTriggerCounts`, `computeTimeOfDay`, `computeDayMoods`, `computeMoodDistribution`, `getLast7Days` — the last now takes an injectable date for testability). Added 12 tests. Found `avgMood` was computed but never rendered anywhere — dropped it rather than port dead code into the new module.
+
+**#1 — Split `onboarding-modal.tsx` (`f95dd7c`, pushed):** 557 lines → 196-line orchestrator plus:
+- `src/hooks/use-onboarding-flow.ts` — the first-launch gate state machine (AsyncStorage reads, page/step transitions), isolated from rendering.
+- `src/components/onboarding/language-picker.tsx` — one `LanguagePicker` component with a `compact`/`cards` variant, replacing the two separately-implemented pickers (inline pill row + card grid) that were both just mapping over `LANGUAGES` with different layouts.
+- `src/components/onboarding/language-step.tsx` — the first-launch language step, rebuilt on `LanguagePicker`.
+- `src/components/onboarding/slide-visuals.tsx` — the 7 per-slide illustrations + router.
+Caught and fixed one incidental `import/no-duplicates` lint warning from the split. Not manually smoke-tested in the running app (this session didn't touch the emulator).
+
+**#4 — Close the translation-seam leaks (`c97759b`, pushed):** all 3 call sites the review named:
+- `settings.tsx`: added `settingsScreen.timePicker`/`notifPermission`/`dataDeleted`/`exportSaved`/`exportFailed` keys (real en/ko/es/hi translations, not placeholders) and wired `TimePicker` + all 4 `Alert.alert` call sites to them.
+- `journal.tsx`: the 10 built-in tag ids (`work`, `home`, ...) still drive storage/search/`customTags` unchanged (existing entries keep working), but display now goes through a new `journalExtended.tagLabels` lookup per locale; custom tags fall through to their stored text untouched.
+- `onboarding/slide-visuals.tsx`: `TodayVisual`/`JournalVisual`/`SettingsVisual`/`InsightsVisual` now take a `t` prop and use existing keys (`home.progress.streak`, `tabs.journal`/`emotions`, `journalExtended.templateFreeWrite`/`templateGratitude`/`templateCBT`, `settingsScreen.notifications`/`language`/`appearance`/`daysShort`) instead of literal English. Along the way, found and fixed a latent content bug: the onboarding Journal-slide preview showed "Reframe" with a 🔄 icon that doesn't correspond to any real entry in `JOURNAL_TEMPLATES` — swapped for the actual "Thought Check" (CBT) template's icon/label.
+- Explicitly left out of scope: `EmotionsVisual`'s `BASIC_EMOTIONS` labels and the real Journal screen's own `JOURNAL_TEMPLATES` labels are hardcoded English too, but that's a shared catalog used well beyond onboarding — a separate, larger translation effort.
+- New-key locale parity is compiler-enforced (`ko`/`es`/`hi` are typed `: Translations`), so no new runtime parity test was added — same mechanism the existing `CrisisKeywordsParity.test.ts` comment describes, just without needing the runtime net since no `as any` escape hatch was introduced here.
+
+**Verification pattern used for all four:** `npx tsc --noEmit` (compared against a pre-change baseline each time — this repo has 3 long-standing unrelated `tsc` errors in `settings.tsx`/expo-file-system typings plus jest-globals errors in test files under plain `tsc`, unchanged throughout), `npx expo lint` (compared problem counts against a stashed baseline — repo sits at a stable 19 errors/16 warnings unrelated to this work), and `npx jest` (44 tests passing by the end). None of these four changes were manually smoke-tested in the running app this session.
+
+**Still open — candidate #5 (not started):** "Let contexts register their own storage keys" — `settings.tsx:34`'s `DATA_KEYS` still hand-imports from 3 contexts (`WELLNESS_STORAGE_KEYS`, `EMOTION_STORAGE_KEY`, `SETTINGS_STORAGE_KEY`) to build the delete/export key list, the same shape that caused the already-fixed `wellness_sessions_v1` bug (symptom fixed 07-15, design unchanged since). Also doesn't cover onboarding's 2 separate `AsyncStorage` keys (`@cic:hasSeenOnboarding`, `@cic:hasChosenLanguage`, defined in the new `src/hooks/use-onboarding-flow.ts` as of this session) — a blind spot nobody's hit yet. Next session: pick this up, or ask the user if something else takes priority.
