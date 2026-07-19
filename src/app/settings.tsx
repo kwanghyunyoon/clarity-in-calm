@@ -1,4 +1,4 @@
-import * as FileSystem from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
@@ -217,13 +217,13 @@ export default function SettingsScreen() {
       };
       const json = JSON.stringify(payload, null, 2);
       const filename = `clarity-export-${new Date().toISOString().slice(0, 10)}.json`;
-      const uri = (FileSystem.cacheDirectory ?? FileSystem.documentDirectory ?? '') + filename;
-      await FileSystem.writeAsStringAsync(uri, json, { encoding: FileSystem.EncodingType.UTF8 });
+      const file = new File(new Directory(Paths.cache), filename);
+      file.write(json);
       const canShare = await Sharing.isAvailableAsync();
       if (canShare) {
-        await Sharing.shareAsync(uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
+        await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
       } else {
-        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${uri}`);
+        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${file.uri}`);
       }
     } catch (e: any) {
       Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
