@@ -19,7 +19,9 @@ import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useSettings } from '@/context/settings-context';
+import { useWellness } from '@/context/wellness-context';
 import { ALL_DATA_KEYS } from '@/lib/data-registry';
+import { buildClarityAIExport } from '@/lib/clarityai-export';
 import { deleteAllData, readAllData } from '@/lib/data-keys';
 import {
   cancelDailyReminder,
@@ -161,6 +163,7 @@ export default function SettingsScreen() {
   const { settings, setNotificationSettings, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
   const { showHelp } = useHelp();
+  const { entries, breathingSessions } = useWellness();
 
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -222,6 +225,24 @@ export default function SettingsScreen() {
       const canShare = await Sharing.isAvailableAsync();
       if (canShare) {
         await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
+      } else {
+        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${file.uri}`);
+      }
+    } catch (e: any) {
+      Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
+    }
+  }
+
+  async function handleShareClarityAI() {
+    try {
+      const payload = buildClarityAIExport(entries, breathingSessions);
+      const json = JSON.stringify(payload, null, 2);
+      const filename = `clarity-clarityai-${new Date().toISOString().slice(0, 10)}.json`;
+      const file = new File(new Directory(Paths.cache), filename);
+      file.write(json);
+      const canShare = await Sharing.isAvailableAsync();
+      if (canShare) {
+        await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Share data with ClarityAI' });
       } else {
         Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${file.uri}`);
       }
@@ -341,6 +362,10 @@ export default function SettingsScreen() {
           <SettingsRow
             label={ts.exportData}
             onPress={handleExport}
+          />
+          <SettingsRow
+            label={ts.shareClarityAI}
+            onPress={handleShareClarityAI}
           />
           <SettingsRow
             label={ts.deleteData}
