@@ -27,6 +27,15 @@ import { checkCrisis } from '@/lib/crisis-detection';
 import { toLocalDateStr } from '@/lib/date-utils';
 import type { MoodValue } from '@/types';
 
+const TEMPLATE_LABEL_KEYS = {
+  free: 'templateFreeWrite',
+  gratitude: 'templateGratitude',
+  reflection: 'templateReflection',
+  cbt: 'templateCBT',
+  'weekly-review': 'templateWeeklyReview',
+  'future-self': 'templateFutureSelf',
+} as const;
+
 async function openUrl(rawUrl: string) {
   let url = rawUrl;
   if (Platform.OS === 'android' && url.startsWith('sms:') && url.includes('?')) {
@@ -166,6 +175,14 @@ export default function JournalScreen() {
   const tj = t.journal;
   const te = t.journalExtended;
   const insets = useSafeAreaInsets();
+
+  const templateLabel = useCallback((id: string) => {
+    const key = TEMPLATE_LABEL_KEYS[id as keyof typeof TEMPLATE_LABEL_KEYS];
+    return key ? te[key] : id;
+  }, [te]);
+  const templatePrompts = useCallback((tmpl: typeof JOURNAL_TEMPLATES[number]) => {
+    return te.templatePrompts?.[tmpl.id as keyof typeof te.templatePrompts] ?? tmpl.prompts;
+  }, [te]);
   const { entries, addEntry, deleteEntry, customTags, addCustomTag } = useWellness();
 
   const [mood, setMood] = useState<MoodValue | null>(null);
@@ -187,7 +204,7 @@ export default function JournalScreen() {
   const promptIdx = Math.floor(Date.now() / 86400000) % tj.prompts.length;
   const placeholder = selectedTemplate.id === 'free'
     ? tj.prompts[promptIdx]
-    : selectedTemplate.prompts.join('\n\n');
+    : templatePrompts(selectedTemplate).join('\n\n');
 
   // Filtered entries
   const filteredEntries = searchQuery
@@ -309,7 +326,7 @@ export default function JournalScreen() {
               <View style={[styles.templateBadge, { backgroundColor: colors.backgroundElement }]}>
                 <Text style={[styles.templateBadgeText, { color: colors.textSecondary }]}>
                   {JOURNAL_TEMPLATES.find(t => t.id === entry.templateId)?.emoji ?? '📝'}{' '}
-                  {entry.templateId}
+                  {templateLabel(entry.templateId)}
                 </Text>
               </View>
             )}
@@ -352,7 +369,7 @@ export default function JournalScreen() {
         </TouchableOpacity>
       </Animated.View>
     );
-  }, [colors, t.moods, tj, te, deleteEntry, tagLabel]);
+  }, [colors, t.moods, tj, te, deleteEntry, tagLabel, templateLabel]);
 
   const listHeader = (
     <>
@@ -367,7 +384,7 @@ export default function JournalScreen() {
                 key={tmpl.id}
                 onPress={() => {
                   setSelectedTemplate(tmpl);
-                  if (tmpl.id !== 'free') setNote(tmpl.prompts.join('\n\n'));
+                  if (tmpl.id !== 'free') setNote(templatePrompts(tmpl).join('\n\n'));
                   else setNote('');
                   if (tmpl.id !== 'future-self') setUnlockDate(null);
                 }}
@@ -383,7 +400,7 @@ export default function JournalScreen() {
               >
                 <Text style={styles.templateEmoji}>{tmpl.emoji}</Text>
                 <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
-                  {tmpl.label}
+                  {templateLabel(tmpl.id)}
                 </Text>
               </AnimatedPressable>
             );

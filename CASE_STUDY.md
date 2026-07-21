@@ -830,3 +830,38 @@ Ran the app for real for the first time this round of sessions (ChromeOS ARC++ A
 - Verified twice: once via a direct `curl` to the deployed worker (created and closed issue #17), once via an actual tap-through in the running app — Report an issue → Bug → description → Send feedback → "Thanks!" confirmation (created and closed issue #18, contents matched the typed text exactly). Both test issues closed with an explanatory comment so they don't clutter the tracker.
 
 Play Store gap effort (issue #4, tickets #5-#10) is still the one open, untouched thread.
+
+---
+
+## 2026-07-19 (later still) — 16 real screen recordings (EN + KO) for content creation
+
+Session started in the sibling `~/projects/new` directory again (same recurring gotcha). User asked to go into `clarity-in-calm` and produce screenshots/assets/recordings for content. Checked first and found the prior sessions already covered static screenshots and composited promo-video slideshows — what was still missing was actual **screen-recorded** app footage (live UI in motion), so that's what this session focused on.
+
+**Release build instead of debug:** the installed debug APK depends on Metro on port 8081, but that port was occupied by the Dreami project's dev server running in the background (a separate app on this same machine). Rather than fight the port conflict, built `./gradlew assembleRelease` fresh (3m16s, signing already fully configured from the earlier versionCode-5 session) and installed that standalone build on the moto g phone — no Metro dependency, no dev banners, closer to what a real user sees.
+
+**Real personal data found and removed before recording:** the phone had one genuine emotion log from actual app usage ("Sadness · 10/10"). Flagged this to the user before proceeding — recording a real personal low-mood entry into public-facing content wasn't something to do by default. Deleted that single entry via the in-app UI, then added clean sample content instead: 2 journal entries (a free-write and a gratitude entry) and 2-3 emotion logs, all neutral/generic text.
+
+**Captured via `adb shell screenrecord` + scripted `input tap`/`swipe`/`text` sequences**, verifying each step with an interleaved `screencap` screenshot before committing to a timed recording (UI element positions shift screen-to-screen and after scrolling, so blind coordinate taps repeatedly missed — this verify-then-act loop caught it every time). Recorded in English first, then switched the app to Korean (`Settings → Language`) and re-recorded the same flows against the same sample data, since Korean is one of the app's 4 supported locales and worth having in the content library.
+
+**Final set — 16 clips, `screenshots/recordings-2026-07-19/`, 62MB total** (EN/KO pairs unless noted): onboarding carousel (via Settings → "View onboarding again", no data loss), Today dashboard, journal entry writing (live text input), emotion logging flow, Insights charts, box breathing exercise (the animated circle, not just the static "Ready" screen — first attempt missed this and had to be redone), 5-4-3-2-1 grounding exercise, Settings scroll. One recording (a language-switch transition) came out at 0 duration from a missed tap and was discarded rather than delivered.
+
+**Found in passing, not fixed:** the Emotions screen's activity tags ("Deep breathing", "Journaling", "Walk/exercise", etc.) render in English even in the Korean pass — matches the already-documented shared-catalog translation gap from the 07-19 architecture-review session, not a new issue.
+
+**Cleanup:** all sample data wiped via the app's own Settings → "Delete all data" (confirmed working, consistent with the candidate #5 fix from earlier), language reset back to English. All 16 files delivered to the user via `SendUserFile` and left committed in the repo under `screenshots/recordings-2026-07-19/`.
+
+Play Store gap effort (issue #4, tickets #5-#10) remains the one open, untouched thread — unaffected by this session.
+
+---
+
+## 2026-07-20 — Journal template translation gap fixed (not just flagged this time)
+
+User reported the Journal templates feature (card labels + the multi-line prompt text that pre-fills the note field) renders in English regardless of app language. This is exactly the "shared-catalog translation gap" that the 07-19 architecture-review session (candidate #4) explicitly scoped out and multiple later sessions (16-recordings session, this one) kept re-flagging in passing without fixing.
+
+**Root cause:** `src/app/journal.tsx` read `label`/`prompts` straight off the `JOURNAL_TEMPLATES` constant in `src/constants/emotions.ts` (English-only, 6 templates: free/gratitude/reflection/cbt/weekly-review/future-self). Translated label keys (`templateFreeWrite`, `templateGratitude`, etc.) already existed in `src/i18n/translations.ts` for all 4 locales but were dead code — nothing read them. Prompt text (the actual journaling questions) had no translation keys at all.
+
+**Fix (uncommitted as of end of session):**
+- Added `journalExtended.templatePrompts` to all 4 locale blocks in `src/i18n/translations.ts` — real translations (not placeholders) for en/ko/es/hi, keyed by template id (`gratitude`, `reflection`, `cbt`, `'weekly-review'`, `'future-self'`).
+- `journal.tsx`: added a `TEMPLATE_LABEL_KEYS` map + `templateLabel(id)`/`templatePrompts(tmpl)` helpers. Card labels, the note-prefill on template select, the placeholder text, and the saved-entry template badge (which previously showed the raw `templateId` string like `"weekly-review"`, not even the English label) all now resolve through `te`, falling back to the English constant only if a key is somehow missing.
+- **Explicitly not touched:** `EmotionsVisual`'s activity tags (`BASIC_EMOTIONS` labels) — same underlying "shared catalog hardcoded in English" pattern, called out again in the 16-recordings session, but out of scope for this fix. Next occurrence of this pattern should probably prompt fixing that one too rather than flagging it a fourth time.
+
+**Verification:** `npx tsc --noEmit` — no new errors in `journal.tsx` or `translations.ts` (repo's pre-existing jest-globals/test-runner errors elsewhere are unchanged and unrelated). Not yet lint-checked, not yet run in Expo web/emulator, and not yet committed — the user ran `/wrap` immediately after the code change.
