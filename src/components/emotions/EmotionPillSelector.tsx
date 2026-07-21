@@ -3,6 +3,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-nativ
 import { BASIC_EMOTIONS } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useTranslation } from '@/hooks/use-translation';
 
 export interface SelectedEmotion {
   id: string;
@@ -24,10 +25,13 @@ interface Props {
 
 export function EmotionPillSelector({ selected, onSelect, otherLabel, customPlaceholder }: Props) {
   const { colors } = useTheme();
+  const t = useTranslation();
   const [customText, setCustomText] = useState('');
   const [editingCustom, setEditingCustom] = useState(false);
 
   const isCustomSelected = !!selected && !BASIC_EMOTIONS.some(e => e.id === selected.id);
+  const labelFor = (id: string, fallback: string) =>
+    t.emotionsCatalog.basicEmotions[id as keyof typeof t.emotionsCatalog.basicEmotions] ?? fallback;
 
   function submitCustom() {
     const label = customText.trim();
@@ -41,12 +45,13 @@ export function EmotionPillSelector({ selected, onSelect, otherLabel, customPlac
     <View style={styles.wrap} accessibilityLabel="Emotion selector">
       {BASIC_EMOTIONS.map(emotion => {
         const isSelected = selected?.id === emotion.id;
+        const label = labelFor(emotion.id, emotion.label);
         return (
           <TouchableOpacity
             key={emotion.id}
             onPress={() => {
               setEditingCustom(false);
-              onSelect(emotion);
+              onSelect({ ...emotion, label });
             }}
             style={[
               styles.pill,
@@ -57,10 +62,10 @@ export function EmotionPillSelector({ selected, onSelect, otherLabel, customPlac
             ]}
             accessibilityRole="button"
             accessibilityState={{ selected: isSelected }}
-            accessibilityLabel={emotion.label}
+            accessibilityLabel={label}
           >
             <Text style={[styles.pillText, { color: isSelected ? emotion.color : colors.text }]}>
-              {emotion.label}
+              {label}
             </Text>
           </TouchableOpacity>
         );

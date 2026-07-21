@@ -81,7 +81,7 @@ function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
 }
 
 // Slide 3 — Emotions: mini preview of the emotion pill selector
-function EmotionsVisual() {
+function EmotionsVisual({ t }: { t: Translation }) {
   return (
     <View style={s.pillPreviewWrap}>
       {BASIC_EMOTIONS.map((emotion) => (
@@ -89,7 +89,9 @@ function EmotionsVisual() {
           key={emotion.id}
           style={[s.pillPreview, { backgroundColor: emotion.color + '22', borderColor: emotion.color }]}
         >
-          <Text style={[s.pillPreviewText, { color: emotion.color }]}>{emotion.label}</Text>
+          <Text style={[s.pillPreviewText, { color: emotion.color }]}>
+            {t.emotionsCatalog.basicEmotions[emotion.id as keyof typeof t.emotionsCatalog.basicEmotions] ?? emotion.label}
+          </Text>
         </View>
       ))}
     </View>
@@ -165,7 +167,7 @@ export function SlideVisual({ page, colors, t }: { page: number; colors: ThemeCo
     case 0: return <WelcomeVisual />;
     case 1: return <TodayVisual colors={colors} t={t} />;
     case 2: return <JournalVisual colors={colors} t={t} />;
-    case 3: return <EmotionsVisual />;
+    case 3: return <EmotionsVisual t={t} />;
     case 4: return <InsightsVisual colors={colors} t={t} />;
     case 5: return <SettingsVisual colors={colors} t={t} />;
     case 6: return <ShieldVisual />;

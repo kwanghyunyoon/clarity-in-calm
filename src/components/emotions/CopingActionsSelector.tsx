@@ -3,6 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COPING_ACTIONS } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useTranslation } from '@/hooks/use-translation';
 
 interface Props {
   selected: string[];
@@ -11,11 +12,13 @@ interface Props {
 
 export function CopingActionsSelector({ selected, onToggle }: Props) {
   const { colors } = useTheme();
+  const t = useTranslation();
 
   return (
     <View style={styles.grid}>
       {COPING_ACTIONS.map(action => {
         const isSelected = selected.includes(action.id);
+        const label = t.emotionsCatalog.copingActions[action.id as keyof typeof t.emotionsCatalog.copingActions] ?? action.label;
         return (
           <TouchableOpacity
             key={action.id}
@@ -29,11 +32,11 @@ export function CopingActionsSelector({ selected, onToggle }: Props) {
             ]}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: isSelected }}
-            accessibilityLabel={action.label}
+            accessibilityLabel={label}
           >
             <Text style={styles.emoji}>{action.emoji}</Text>
             <Text style={[styles.label, { color: isSelected ? colors.accent : colors.textSecondary }]}>
-              {action.label}
+              {label}
             </Text>
           </TouchableOpacity>
         );

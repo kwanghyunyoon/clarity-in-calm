@@ -570,6 +570,121 @@ export const en = {
       overwhelm: "You don't have to hold everything at once. Pick the single smallest next step and let the rest wait its turn.",
     },
   },
+
+  emotionsCatalog: {
+    basicEmotions: {
+      happiness: 'Happiness',
+      sadness:   'Sadness',
+      fear:      'Fear',
+      disgust:   'Disgust',
+      anger:     'Anger',
+      contempt:  'Contempt',
+      surprise:  'Surprise',
+    },
+    copingActions: {
+      breathing:  'Deep breathing',
+      journaling: 'Journaling',
+      walk:       'Walk/exercise',
+      call:       'Called someone',
+      rest:       'Rest/sleep',
+      music:      'Music',
+      meditation: 'Meditation',
+      water:      'Drink water',
+      grounding:  '5-4-3-2-1',
+      nothing:    'Nothing yet',
+    },
+  },
+
+  feelingsLibraryContent: {
+    anger: {
+      label: 'Anger',
+      notice: 'A short fuse, a clenched jaw, snapping at things that wouldn\'t normally bother you. It often arrives fast and wants to be acted on immediately.',
+      hear: 'Anger usually says "this isn\'t fair" or "I have to fix this right now." It\'s protecting a boundary that got crossed, even if the target of your anger isn\'t the real cause.',
+      feel: 'Heat in the chest and face, tight fists or jaw, a racing pulse, an urge to move or speak sharply.',
+      explore: [
+        'What boundary feels crossed right now — and is it really this moment, or something older?',
+        'If you said the honest version of what you\'re thinking, what would it be?',
+        'What would "handled" actually look like a day from now?',
+      ],
+    },
+    anxiousness: {
+      label: 'Anxiousness',
+      notice: 'Racing thoughts that jump between worst-case scenarios, restlessness, checking things over and over, trouble settling on one task.',
+      hear: 'Anxiousness tends to say "what if" on a loop. It\'s trying to prepare you for danger by rehearsing every version of it in advance.',
+      feel: 'A fluttering or tight stomach, shallow breathing, a jittery or wired feeling in the limbs.',
+      explore: [
+        'Which part of this worry is actually within your control today?',
+        'What\'s the story your mind is telling, and what evidence actually supports it?',
+        'What has helped you get through uncertainty before?',
+      ],
+    },
+    burnout: {
+      label: 'Burnout',
+      notice: 'Flatness where drive used to be, dragging through tasks you normally handle easily, a sense that even rest doesn\'t refill you.',
+      hear: 'Burnout says "I should be able to keep going" long after the tank is empty. It mistakes exhaustion for a character flaw instead of a signal.',
+      feel: 'Heaviness in the limbs, foggy thinking, a dull ache behind the eyes, low motivation even for things you enjoy.',
+      explore: [
+        'What has quietly been non-negotiable that could actually be renegotiated?',
+        'When did you last feel like yourself, and what was different that day?',
+        'If you gave yourself permission to do less this week, what would you drop first?',
+      ],
+    },
+    fear: {
+      label: 'Fear',
+      notice: 'A sudden alertness, wanting to avoid or escape a specific situation, a mind that keeps circling back to the threat.',
+      hear: 'Fear says "this could hurt me" and narrows your focus to the danger. It\'s an old, fast system trying to keep you safe, even when the threat is more uncertain than physical.',
+      feel: 'A jolt in the chest, cold hands, a held breath, muscles ready to move.',
+      explore: [
+        'What specifically are you afraid will happen, in concrete terms?',
+        'Has this fear been right before, or does it tend to overestimate the danger?',
+        'What\'s one small step toward the thing you\'re avoiding?',
+      ],
+    },
+    sadness: {
+      label: 'Sadness',
+      notice: 'Low energy, tearfulness, wanting to withdraw or go quiet, things that used to feel light now feeling heavy.',
+      hear: 'Sadness says "something mattered and it\'s gone, or going." It\'s the natural response to loss, even loss that\'s hard to name.',
+      feel: 'A heaviness in the chest, a lump in the throat, tired eyes, a slower body.',
+      explore: [
+        'What, specifically, feels like it\'s been lost?',
+        'Who or what would help just by being nearby right now?',
+        'What would comfort — not distraction — look like today?',
+      ],
+    },
+    insecurity: {
+      label: 'Insecurity',
+      notice: 'Second-guessing your choices, comparing yourself to others, a voice that finds fault before anyone else does.',
+      hear: 'Insecurity says "you\'re not enough" or "they\'ll find out." It\'s often an old fear of not belonging, wearing the costume of self-criticism.',
+      feel: 'A sinking feeling in the stomach, shrinking posture, warmth in the face (shame\'s close cousin).',
+      explore: [
+        'Whose voice does this criticism actually sound like?',
+        'What would you say to a friend who felt exactly this way?',
+        'What\'s one piece of real evidence that contradicts the doubt?',
+      ],
+    },
+    loneliness: {
+      label: 'Loneliness',
+      notice: 'A quiet ache even around other people, a pull to isolate further, a sense of being unseen or unreachable.',
+      hear: 'Loneliness says "no one really gets it" or "I\'m on my own here." It\'s a signal that connection is missing, not proof that it\'s unavailable.',
+      feel: 'A hollow feeling in the chest, low energy, a heaviness that settles in quiet moments.',
+      explore: [
+        'Who is one person you could reach out to today, even briefly?',
+        'When did you last feel truly understood, and what made that possible?',
+        'Is this loneliness about being alone, or about feeling unseen?',
+      ],
+    },
+    overwhelm: {
+      label: 'Overwhelm',
+      notice: 'Too many things pulling at once, difficulty deciding where to start, a foggy or frozen feeling instead of clear thinking.',
+      hear: 'Overwhelm says "there\'s too much and not enough of me." It\'s not that you can\'t handle things — it\'s that too many things are asking for attention at the same time.',
+      feel: 'A tight chest, shallow breathing, a buzzing or scattered feeling in the head, restlessness or freezing.',
+      explore: [
+        'If you could only do one thing today, what would actually matter most?',
+        'What\'s something on your plate that could be delayed, dropped, or handed off?',
+        'What would it feel like to do this imperfectly instead of not at all?',
+      ],
+    },
+  },
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -887,6 +1002,121 @@ export const ko: Translations = {
       insecurity: '당신을 의심하는 그 목소리는 공정한 심판이 아니에요 — 그것은 두려움에서 비롯된 오래된 생각 습관일 뿐이에요. 그 목소리에 동의하지 않아도 괜찮아요.',
       loneliness: '외로움은 작은 진짜 연결만으로도 줄어들어요 — 문자 한 통, 전화 한 통, 사람들 곁에 잠시 앉아 있는 것만으로도요. 한 번에 다 해결할 필요는 없어요.',
       overwhelm: '모든 것을 한꺼번에 짊어질 필요는 없어요. 가장 작은 다음 한 걸음을 골라보고, 나머지는 차례를 기다리게 두세요.',
+    },
+  },
+
+  emotionsCatalog: {
+    basicEmotions: {
+      happiness: '행복',
+      sadness:   '슬픔',
+      fear:      '두려움',
+      disgust:   '혐오',
+      anger:     '분노',
+      contempt:  '경멸',
+      surprise:  '놀람',
+    },
+    copingActions: {
+      breathing:  '심호흡',
+      journaling: '일기 쓰기',
+      walk:       '산책/운동',
+      call:       '전화 통화',
+      rest:       '휴식/수면',
+      music:      '음악',
+      meditation: '명상',
+      water:      '물 마시기',
+      grounding:  '5-4-3-2-1',
+      nothing:    '아직 없음',
+    },
+  },
+
+  feelingsLibraryContent: {
+    anger: {
+      label: '분노',
+      notice: '짧은 도화선, 굳게 다문 턱, 평소라면 신경 쓰지 않았을 일에도 날카롭게 반응하게 돼요. 보통 빠르게 찾아오고 즉각 행동으로 옮기고 싶어져요.',
+      hear: '분노는 대개 "이건 불공평해" 또는 "지금 당장 바로잡아야 해"라고 말해요. 화의 대상이 진짜 원인이 아니더라도, 이는 침범당한 경계를 지키려는 신호예요.',
+      feel: '가슴과 얼굴의 열감, 꽉 쥔 주먹이나 턱, 빨라지는 맥박, 움직이거나 날카롭게 말하고 싶은 충동.',
+      explore: [
+        '지금 느껴지는 경계 침범은 정말 지금 이 순간의 일인가요, 아니면 더 오래된 무언가인가요?',
+        '지금 생각하는 것을 솔직하게 말한다면 무엇일까요?',
+        '하루 뒤에 "해결됐다"는 건 실제로 어떤 모습일까요?',
+      ],
+    },
+    anxiousness: {
+      label: '불안',
+      notice: '최악의 시나리오 사이를 오가는 질주하는 생각들, 안절부절못함, 반복해서 확인하기, 한 가지 일에 집중하기 어려움.',
+      hear: '불안은 보통 "만약에"를 반복해서 말해요. 모든 위험의 버전을 미리 연습시켜서 당신을 대비시키려는 거예요.',
+      feel: '속이 두근거리거나 답답함, 얕은 호흡, 팔다리의 불안정하거나 들뜬 느낌.',
+      explore: [
+        '이 걱정 중 오늘 당신이 실제로 통제할 수 있는 부분은 무엇인가요?',
+        '마음이 들려주는 이야기는 무엇이고, 실제로 그것을 뒷받침하는 증거는 무엇인가요?',
+        '예전에 불확실함을 이겨내는 데 도움이 됐던 것은 무엇이었나요?',
+      ],
+    },
+    burnout: {
+      label: '번아웃',
+      notice: '예전엔 있던 의욕이 사라진 무기력함, 평소엔 쉽게 하던 일도 힘겹게 끌고 가는 느낌, 쉬어도 채워지지 않는 느낌.',
+      hear: '번아웃은 "계속할 수 있어야 해"라고 오랫동안 말하지만, 이미 에너지는 바닥난 상태예요. 지쳐 있는 것을 신호가 아니라 성격 결함으로 착각하게 만들어요.',
+      feel: '팔다리의 무거움, 흐릿한 사고, 눈 뒤의 둔한 통증, 좋아하는 일에도 낮은 의욕.',
+      explore: [
+        '조용히 "당연한 일"이 되어버렸지만 사실 다시 협상할 수 있는 것은 무엇인가요?',
+        '가장 최근에 나다운 느낌이 들었던 건 언제였고, 그날 무엇이 달랐나요?',
+        '이번 주에 조금 덜 해도 괜찮다고 스스로에게 허락한다면, 무엇을 가장 먼저 내려놓을까요?',
+      ],
+    },
+    fear: {
+      label: '두려움',
+      notice: '갑작스러운 경계심, 특정 상황을 피하거나 벗어나고 싶은 마음, 계속 위협으로 되돌아가는 생각.',
+      hear: '두려움은 "이건 나를 다치게 할 수 있어"라고 말하며 초점을 위협에 좁혀요. 위협이 신체적이라기보다 불확실한 것이라 해도, 당신을 안전하게 지키려는 오래되고 빠른 시스템이에요.',
+      feel: '가슴의 찌릿함, 차가운 손, 멈춘 숨, 움직일 준비가 된 근육.',
+      explore: [
+        '구체적으로 무엇이 일어날까 봐 두려운가요?',
+        '이 두려움이 예전에 맞았던 적이 있나요, 아니면 위험을 과대평가하는 경향이 있나요?',
+        '피하고 있는 그 일을 향한 작은 한 걸음은 무엇일까요?',
+      ],
+    },
+    sadness: {
+      label: '슬픔',
+      notice: '낮은 에너지, 눈물, 물러나거나 조용해지고 싶은 마음, 예전엔 가볍게 느껴지던 것들이 무겁게 느껴짐.',
+      hear: '슬픔은 "무언가가 중요했고, 그것이 사라지고 있다"고 말해요. 이름 붙이기 어려운 상실이라도, 상실에 대한 자연스러운 반응이에요.',
+      feel: '가슴의 무거움, 목이 메는 느낌, 피곤한 눈, 느려진 몸.',
+      explore: [
+        '구체적으로 무엇을 잃어버린 것처럼 느껴지나요?',
+        '지금 그저 곁에 있어주는 것만으로 도움이 될 사람이나 무언가는 누구인가요?',
+        '오늘, 주의를 돌리는 것이 아니라 진짜 위로는 어떤 모습일까요?',
+      ],
+    },
+    insecurity: {
+      label: '불안정감',
+      notice: '자신의 선택을 계속 의심하기, 다른 사람과 비교하기, 누구보다 먼저 흠을 찾아내는 목소리.',
+      hear: '불안정감은 "넌 부족해" 또는 "들킬 거야"라고 말해요. 종종 소속되지 못할 것 같은 오래된 두려움이 자기비판의 옷을 입은 거예요.',
+      feel: '속이 가라앉는 느낌, 움츠러든 자세, 얼굴의 화끈거림 (수치심과 사촌 관계).',
+      explore: [
+        '이 비판은 실제로 누구의 목소리처럼 들리나요?',
+        '똑같이 느끼는 친구에게는 뭐라고 말해줄 건가요?',
+        '그 의심에 반박할 만한 진짜 증거 하나는 무엇인가요?',
+      ],
+    },
+    loneliness: {
+      label: '외로움',
+      notice: '사람들 곁에 있어도 느껴지는 조용한 아픔, 더 고립되고 싶은 끌림, 보이지 않거나 닿을 수 없다는 느낌.',
+      hear: '외로움은 "아무도 진짜로 이해하지 못해" 또는 "나 혼자야"라고 말해요. 이는 연결이 없다는 증거가 아니라 연결이 부족하다는 신호예요.',
+      feel: '가슴의 공허함, 낮은 에너지, 조용한 순간에 내려앉는 무거움.',
+      explore: [
+        '오늘 잠깐이라도 연락할 수 있는 한 사람은 누구인가요?',
+        '마지막으로 진심으로 이해받는다고 느낀 건 언제였고, 무엇이 그걸 가능하게 했나요?',
+        '이 외로움은 혼자라는 것에 관한 것인가요, 아니면 보이지 않는다는 느낌에 관한 것인가요?',
+      ],
+    },
+    overwhelm: {
+      label: '압도됨',
+      notice: '한꺼번에 몰려드는 많은 일들, 어디서부터 시작해야 할지 결정하기 어려움, 명확한 사고 대신 흐릿하거나 얼어붙은 느낌.',
+      hear: '압도됨은 "할 일은 너무 많고 나는 너무 적어"라고 말해요. 감당할 수 없다는 게 아니라, 너무 많은 것들이 동시에 관심을 요구하고 있다는 뜻이에요.',
+      feel: '답답한 가슴, 얕은 호흡, 머릿속의 웅웅거리거나 흩어지는 느낌, 안절부절못함 또는 얼어붙음.',
+      explore: [
+        '오늘 딱 한 가지만 할 수 있다면, 실제로 가장 중요한 건 무엇일까요?',
+        '미루거나, 그만두거나, 넘겨줄 수 있는 일은 무엇인가요?',
+        '완벽하지 않게라도 이 일을 하는 게 아예 안 하는 것보다 어떤 느낌일까요?',
+      ],
     },
   },
 };
@@ -1224,6 +1454,121 @@ export const es: Translations = {
       overwhelm: 'No tienes que sostenerlo todo a la vez. Elige el paso siguiente más pequeño y deja que el resto espere su turno.',
     },
   },
+
+  emotionsCatalog: {
+    basicEmotions: {
+      happiness: 'Felicidad',
+      sadness:   'Tristeza',
+      fear:      'Miedo',
+      disgust:   'Asco',
+      anger:     'Enojo',
+      contempt:  'Desprecio',
+      surprise:  'Sorpresa',
+    },
+    copingActions: {
+      breathing:  'Respiración profunda',
+      journaling: 'Escribir en el diario',
+      walk:       'Caminar/ejercicio',
+      call:       'Llamé a alguien',
+      rest:       'Descanso/dormir',
+      music:      'Música',
+      meditation: 'Meditación',
+      water:      'Beber agua',
+      grounding:  '5-4-3-2-1',
+      nothing:    'Nada todavía',
+    },
+  },
+
+  feelingsLibraryContent: {
+    anger: {
+      label: 'Enojo',
+      notice: 'Un fusible corto, mandíbula apretada, reaccionar bruscamente ante cosas que normalmente no te molestarían. Suele llegar rápido y quiere ser actuado de inmediato.',
+      hear: 'El enojo suele decir "esto no es justo" o "tengo que arreglar esto ahora mismo". Está protegiendo un límite que fue cruzado, aunque el objetivo de tu enojo no sea la causa real.',
+      feel: 'Calor en el pecho y la cara, puños o mandíbula apretados, pulso acelerado, un impulso de moverte o hablar con brusquedad.',
+      explore: [
+        '¿Qué límite sientes que fue cruzado ahora mismo — y es realmente este momento, o algo más antiguo?',
+        'Si dijeras la versión honesta de lo que estás pensando, ¿cuál sería?',
+        '¿Cómo se vería realmente "resuelto" dentro de un día?',
+      ],
+    },
+    anxiousness: {
+      label: 'Ansiedad',
+      notice: 'Pensamientos acelerados que saltan entre los peores escenarios, inquietud, revisar las cosas una y otra vez, dificultad para concentrarte en una sola tarea.',
+      hear: 'La ansiedad tiende a decir "y si" en bucle. Está tratando de prepararte para el peligro ensayando cada versión posible de antemano.',
+      feel: 'Un estómago revuelto o tenso, respiración superficial, una sensación nerviosa o acelerada en las extremidades.',
+      explore: [
+        '¿Qué parte de esta preocupación está realmente bajo tu control hoy?',
+        '¿Cuál es la historia que tu mente te está contando, y qué evidencia la respalda realmente?',
+        '¿Qué te ha ayudado a superar la incertidumbre antes?',
+      ],
+    },
+    burnout: {
+      label: 'Agotamiento',
+      notice: 'Una sensación de vacío donde antes había impulso, arrastrarte por tareas que normalmente manejas con facilidad, la sensación de que ni siquiera el descanso te recarga.',
+      hear: 'El agotamiento dice "debería poder seguir adelante" mucho después de que el tanque está vacío. Confunde el cansancio con un defecto de carácter en lugar de una señal.',
+      feel: 'Pesadez en las extremidades, pensamiento nublado, un dolor sordo detrás de los ojos, poca motivación incluso para cosas que disfrutas.',
+      explore: [
+        '¿Qué se ha vuelto silenciosamente innegociable pero en realidad podría renegociarse?',
+        '¿Cuándo fue la última vez que te sentiste como tú misma, y qué fue diferente ese día?',
+        'Si te dieras permiso para hacer menos esta semana, ¿qué soltarías primero?',
+      ],
+    },
+    fear: {
+      label: 'Miedo',
+      notice: 'Una alerta repentina, querer evitar o escapar de una situación específica, una mente que sigue volviendo a la amenaza.',
+      hear: 'El miedo dice "esto podría hacerme daño" y estrecha tu enfoque hacia el peligro. Es un sistema antiguo y rápido que trata de mantenerte a salvo, incluso cuando la amenaza es más incierta que física.',
+      feel: 'Un sobresalto en el pecho, manos frías, la respiración contenida, músculos listos para moverse.',
+      explore: [
+        '¿Qué específicamente temes que suceda, en términos concretos?',
+        '¿Este miedo ha acertado antes, o tiende a sobreestimar el peligro?',
+        '¿Cuál sería un pequeño paso hacia lo que estás evitando?',
+      ],
+    },
+    sadness: {
+      label: 'Tristeza',
+      notice: 'Poca energía, ganas de llorar, querer retraerte o quedarte en silencio, cosas que antes se sentían ligeras ahora se sienten pesadas.',
+      hear: 'La tristeza dice "algo importaba y se está yendo, o ya se fue". Es la respuesta natural a la pérdida, incluso una pérdida difícil de nombrar.',
+      feel: 'Pesadez en el pecho, un nudo en la garganta, ojos cansados, un cuerpo más lento.',
+      explore: [
+        '¿Qué, específicamente, sientes que se ha perdido?',
+        '¿Quién o qué te ayudaría con solo estar cerca en este momento?',
+        '¿Cómo se vería el consuelo — no la distracción — hoy?',
+      ],
+    },
+    insecurity: {
+      label: 'Inseguridad',
+      notice: 'Dudar constantemente de tus decisiones, compararte con otros, una voz que encuentra fallas antes que nadie más.',
+      hear: 'La inseguridad dice "no eres suficiente" o "se van a dar cuenta". A menudo es un viejo miedo a no pertenecer, disfrazado de autocrítica.',
+      feel: 'Una sensación de hundimiento en el estómago, postura encogida, calor en la cara (prima cercana de la vergüenza).',
+      explore: [
+        '¿A quién se parece realmente esta crítica?',
+        '¿Qué le dirías a una amiga que se sintiera exactamente así?',
+        '¿Cuál es una prueba real que contradice la duda?',
+      ],
+    },
+    loneliness: {
+      label: 'Soledad',
+      notice: 'Un dolor silencioso incluso rodeada de otras personas, un impulso de aislarte aún más, sentirte invisible o inalcanzable.',
+      hear: 'La soledad dice "nadie realmente lo entiende" o "estoy sola en esto". Es una señal de que falta conexión, no una prueba de que no está disponible.',
+      feel: 'Una sensación de vacío en el pecho, poca energía, una pesadez que se instala en los momentos de silencio.',
+      explore: [
+        '¿A quién podrías contactar hoy, aunque sea brevemente?',
+        '¿Cuándo fue la última vez que te sentiste verdaderamente comprendida, y qué lo hizo posible?',
+        '¿Esta soledad es sobre estar sola, o sobre sentirte invisible?',
+      ],
+    },
+    overwhelm: {
+      label: 'Agobio',
+      notice: 'Demasiadas cosas tirando de ti a la vez, dificultad para decidir por dónde empezar, una sensación de niebla o bloqueo en lugar de pensar con claridad.',
+      hear: 'El agobio dice "hay demasiado y no hay suficiente de mí". No es que no puedas con las cosas — es que demasiadas cosas están pidiendo atención al mismo tiempo.',
+      feel: 'Pecho apretado, respiración superficial, una sensación de zumbido o dispersión en la cabeza, inquietud o congelamiento.',
+      explore: [
+        'Si solo pudieras hacer una cosa hoy, ¿qué es lo que realmente importaría más?',
+        '¿Qué hay en tu plato que podría postergarse, dejarse o delegarse?',
+        '¿Cómo se sentiría hacer esto de forma imperfecta en lugar de no hacerlo en absoluto?',
+      ],
+    },
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1539,6 +1884,121 @@ export const hi: Translations = {
       insecurity: 'जो आवाज़ आप पर शक करती है वह कोई निष्पक्ष जज नहीं है — यह सोचने की एक डरी हुई, पुरानी आदत है। आपको इससे असहमत होने की अनुमति है।',
       loneliness: 'अकेलापन छोटे, असली संपर्क से भी कम हो जाता है — एक संदेश, एक कॉल, कहीं लोगों के बीच बैठना। इसे एक बार में हल करने की ज़रूरत नहीं है।',
       overwhelm: 'आपको सब कुछ एक साथ संभालने की ज़रूरत नहीं है। सबसे छोटा अगला कदम चुनें और बाकी को अपनी बारी का इंतज़ार करने दें।',
+    },
+  },
+
+  emotionsCatalog: {
+    basicEmotions: {
+      happiness: 'ख़ुशी',
+      sadness:   'उदासी',
+      fear:      'डर',
+      disgust:   'घृणा',
+      anger:     'गुस्सा',
+      contempt:  'तिरस्कार',
+      surprise:  'आश्चर्य',
+    },
+    copingActions: {
+      breathing:  'गहरी साँस',
+      journaling: 'जर्नलिंग',
+      walk:       'टहलना/व्यायाम',
+      call:       'किसी को फोन किया',
+      rest:       'आराम/नींद',
+      music:      'संगीत',
+      meditation: 'ध्यान',
+      water:      'पानी पिएं',
+      grounding:  '5-4-3-2-1',
+      nothing:    'अभी कुछ नहीं',
+    },
+  },
+
+  feelingsLibraryContent: {
+    anger: {
+      label: 'गुस्सा',
+      notice: 'छोटा धैर्य, भिंची हुई जबड़ा, ऐसी चीज़ों पर भड़क जाना जो सामान्यतः परेशान नहीं करतीं। यह अक्सर तेज़ी से आता है और तुरंत उस पर काम करना चाहता है।',
+      hear: 'गुस्सा आमतौर पर कहता है "यह उचित नहीं है" या "मुझे अभी इसे ठीक करना है।" यह किसी टूटी हुई सीमा की रक्षा कर रहा होता है, भले ही आपके गुस्से का निशाना असली वजह न हो।',
+      feel: 'छाती और चेहरे में गर्मी, कसी हुई मुट्ठियाँ या जबड़ा, तेज़ धड़कन, हिलने या तीखा बोलने की इच्छा।',
+      explore: [
+        'अभी किस सीमा का उल्लंघन महसूस हो रहा है — और क्या यह सच में अभी की बात है, या कुछ पुरानी?',
+        'अगर आप जो सोच रहे हैं उसका ईमानदार संस्करण कहें, तो वह क्या होगा?',
+        'एक दिन बाद "सुलझा हुआ" असल में कैसा दिखेगा?',
+      ],
+    },
+    anxiousness: {
+      label: 'चिंता',
+      notice: 'सबसे बुरी संभावनाओं के बीच कूदते तेज़ विचार, बेचैनी, बार-बार चीज़ें जांचना, किसी एक काम पर टिक न पाना।',
+      hear: 'चिंता अक्सर "क्या होगा अगर" को दोहराती रहती है। यह हर संभावित खतरे का पूर्वाभ्यास करके आपको तैयार करने की कोशिश कर रही है।',
+      feel: 'पेट में फड़फड़ाहट या कसाव, उथली साँसें, हाथ-पैरों में घबराई या बेचैन भावना।',
+      explore: [
+        'इस चिंता का कौन-सा हिस्सा वाकई आज आपके नियंत्रण में है?',
+        'आपका मन जो कहानी सुना रहा है वह क्या है, और उसे कौन-सा सबूत वाकई साबित करता है?',
+        'पहले अनिश्चितता से निकलने में आपकी क्या मदद मिली थी?',
+      ],
+    },
+    burnout: {
+      label: 'बर्नआउट',
+      notice: 'जहाँ पहले जोश था वहाँ अब सपाटपन, आसान लगने वाले कामों को भी घसीटते हुए करना, यह महसूस होना कि आराम भी भर नहीं पाता।',
+      hear: 'बर्नआउट कहता है "मुझे चलते रहना चाहिए" — टैंक खाली होने के बहुत बाद तक। यह थकान को चरित्र की कमी समझ बैठता है, जबकि यह एक संकेत है।',
+      feel: 'अंगों में भारीपन, धुंधली सोच, आँखों के पीछे हल्का दर्द, पसंदीदा चीज़ों के लिए भी कम प्रेरणा।',
+      explore: [
+        'चुपचाप क्या "अनिवार्य" बन गया है जिस पर असल में फिर से बात हो सकती है?',
+        'आखिरी बार आपको खुद जैसा कब महसूस हुआ था, और उस दिन क्या अलग था?',
+        'अगर आप इस हफ्ते खुद को कम करने की इजाज़त दें, तो सबसे पहले क्या छोड़ेंगे?',
+      ],
+    },
+    fear: {
+      label: 'डर',
+      notice: 'अचानक सतर्कता, किसी खास स्थिति से बचना या भाग जाना चाहना, ऐसा मन जो बार-बार खतरे की ओर लौटता है।',
+      hear: 'डर कहता है "यह मुझे नुकसान पहुँचा सकता है" और आपका ध्यान खतरे पर केंद्रित कर देता है। यह एक पुराना, तेज़ सिस्टम है जो आपको सुरक्षित रखने की कोशिश करता है, भले ही खतरा शारीरिक से ज़्यादा अनिश्चित हो।',
+      feel: 'छाती में झटका, ठंडे हाथ, रुकी हुई साँस, हिलने के लिए तैयार मांसपेशियाँ।',
+      explore: [
+        'ठोस शब्दों में, आपको वास्तव में किस बात का डर है कि क्या होगा?',
+        'क्या यह डर पहले सही साबित हुआ है, या यह खतरे को बढ़ा-चढ़ाकर आंकता है?',
+        'जिस चीज़ से आप बच रहे हैं, उसकी ओर एक छोटा कदम क्या हो सकता है?',
+      ],
+    },
+    sadness: {
+      label: 'उदासी',
+      notice: 'कम ऊर्जा, आँसू आना, पीछे हटना या चुप हो जाना चाहना, जो चीज़ें पहले हल्की लगती थीं वे अब भारी लगना।',
+      hear: 'उदासी कहती है "कुछ मायने रखता था और वह जा रहा है, या जा चुका है।" यह हानि की स्वाभाविक प्रतिक्रिया है, भले ही उस हानि को नाम देना मुश्किल हो।',
+      feel: 'छाती में भारीपन, गले में गांठ, थकी हुई आँखें, धीमा शरीर।',
+      explore: [
+        'ठीक-ठीक क्या खोया हुआ महसूस हो रहा है?',
+        'अभी कौन या क्या सिर्फ पास होने से मदद करेगा?',
+        'आज दिलासा — भटकाव नहीं — कैसा दिखेगा?',
+      ],
+    },
+    insecurity: {
+      label: 'असुरक्षा',
+      notice: 'अपने फैसलों पर बार-बार शक करना, खुद की दूसरों से तुलना करना, ऐसी आवाज़ जो किसी और से पहले खामी ढूंढ लेती है।',
+      hear: 'असुरक्षा कहती है "तुम काफी नहीं हो" या "उन्हें पता चल जाएगा।" यह अक्सर न जुड़ पाने के पुराने डर का ही आत्म-आलोचना का रूप होता है।',
+      feel: 'पेट में डूबने जैसा एहसास, सिकुड़ी हुई मुद्रा, चेहरे में गर्माहट (शर्म की करीबी रिश्तेदार)।',
+      explore: [
+        'यह आलोचना असल में किसकी आवाज़ जैसी लगती है?',
+        'अगर कोई दोस्त बिल्कुल ऐसा ही महसूस करे तो आप उससे क्या कहेंगे?',
+        'इस शक के खिलाफ एक असली सबूत क्या है?',
+      ],
+    },
+    loneliness: {
+      label: 'अकेलापन',
+      notice: 'दूसरों के बीच रहते हुए भी एक शांत दर्द, और अलग-थलग होने की खिंचाव, अनदेखा या अपहुँच महसूस होना।',
+      hear: 'अकेलापन कहता है "कोई वाकई इसे नहीं समझता" या "मैं यहाँ अकेला हूँ।" यह इस बात का संकेत है कि जुड़ाव की कमी है, इस बात का सबूत नहीं कि वह उपलब्ध नहीं है।',
+      feel: 'छाती में खालीपन, कम ऊर्जा, शांत पलों में बैठने वाला भारीपन।',
+      explore: [
+        'आज आप किस एक व्यक्ति से, भले ही थोड़ी देर के लिए, संपर्क कर सकते हैं?',
+        'आखिरी बार आपने सच में समझा हुआ कब महसूस किया था, और उसे किसने संभव बनाया?',
+        'क्या यह अकेलापन अकेले होने के बारे में है, या अनदेखा महसूस करने के बारे में?',
+      ],
+    },
+    overwhelm: {
+      label: 'अभिभूत होना',
+      notice: 'एक साथ बहुत सारी चीज़ों का खिंचाव, यह तय करना मुश्किल कि कहाँ से शुरू करें, स्पष्ट सोच की जगह धुंधलापन या जमा हुआ महसूस होना।',
+      hear: 'अभिभूत होना कहता है "बहुत कुछ है और मैं काफी नहीं हूँ।" यह ऐसा नहीं कि आप संभाल नहीं सकते — बल्कि बहुत सारी चीज़ें एक साथ ध्यान माँग रही हैं।',
+      feel: 'जकड़ी हुई छाती, उथली साँसें, सिर में भिनभिनाहट या बिखरा हुआ एहसास, बेचैनी या जम जाना।',
+      explore: [
+        'अगर आज आप सिर्फ एक काम कर पाएँ, तो असल में सबसे ज़्यादा मायने क्या रखेगा?',
+        'आपकी सूची में क्या ऐसा है जिसे टाला, छोड़ा या सौंपा जा सकता है?',
+        'इसे अधूरे तरीके से करना, बिल्कुल न करने से कैसा महसूस होगा?',
+      ],
     },
   },
 };

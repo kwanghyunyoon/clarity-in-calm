@@ -43,19 +43,21 @@ export default function FeelingsLibraryScreen() {
       >
         {FEELINGS_LIBRARY.map((entry, i) => {
           const expanded = expandedId === entry.id;
+          const content = t.feelingsLibraryContent[entry.id as keyof typeof t.feelingsLibraryContent] ?? entry;
+          const ease = (t.dailyContent.feelingsEase as Record<string, string>)[entry.id] ?? entry.ease;
           return (
             <Animated.View key={entry.id} entering={FadeInDown.delay(i * 40).springify()}>
               <AnimatedPressable
                 onPress={() => setExpandedId(expanded ? null : entry.id)}
                 style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}
                 accessibilityRole="button"
-                accessibilityLabel={entry.label}
+                accessibilityLabel={content.label}
               >
                 <View style={styles.cardHeader}>
                   <View style={[styles.iconBadge, { backgroundColor: entry.color + '22' }]}>
                     <Text style={styles.emoji}>{entry.emoji}</Text>
                   </View>
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>{entry.label}</Text>
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>{content.label}</Text>
                   <Text style={[styles.chevron, { color: colors.textSecondary }]}>
                     {expanded ? '▲' : '▼'}
                   </Text>
@@ -63,13 +65,13 @@ export default function FeelingsLibraryScreen() {
 
                 {expanded && (
                   <Animated.View entering={FadeInDown.springify()} style={styles.detail}>
-                    <DetailSection label={fl.noticeLabel} body={entry.notice} colors={colors} />
-                    <DetailSection label={fl.hearLabel} body={entry.hear} colors={colors} />
-                    <DetailSection label={fl.feelLabel} body={entry.feel} colors={colors} />
-                    <DetailSection label={fl.easeLabel} body={entry.ease} colors={colors} accent={entry.color} />
+                    <DetailSection label={fl.noticeLabel} body={content.notice} colors={colors} />
+                    <DetailSection label={fl.hearLabel} body={content.hear} colors={colors} />
+                    <DetailSection label={fl.feelLabel} body={content.feel} colors={colors} />
+                    <DetailSection label={fl.easeLabel} body={ease} colors={colors} accent={entry.color} />
                     <View style={styles.exploreSection}>
                       <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{fl.exploreLabel}</Text>
-                      {entry.explore.map((prompt, idx) => (
+                      {content.explore.map((prompt, idx) => (
                         <Text key={idx} style={[styles.promptText, { color: colors.text }]}>
                           · {prompt}
                         </Text>
