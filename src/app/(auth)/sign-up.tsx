@@ -8,12 +8,14 @@ import * as Linking from 'expo-linking';
 import Constants from 'expo-constants';
 import { supabase } from '../../lib/supabase';
 import { theme } from '../../lib/authTheme';
+import { useTranslation } from '../../hooks/use-translation';
 
 const PRIVACY_URL =
   (Constants.expoConfig?.extra?.privacyPolicyUrl as string | undefined) ??
   'https://kwanghyunyoon.github.io/clarity-in-calm-privacy/';
 
 export default function SignUp() {
+  const t = useTranslation().authScreen.signUp;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [consent, setConsent] = useState(false);
@@ -23,15 +25,15 @@ export default function SignUp() {
 
   const handleSignUp = async () => {
     if (!email.trim() || !password) {
-      setError('Enter an email and password');
+      setError(t.errors.missing);
       return;
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters');
+      setError(t.errors.passwordTooShort);
       return;
     }
     if (!consent) {
-      setError('Please agree to the Privacy Policy to continue');
+      setError(t.errors.consentRequired);
       return;
     }
     setError(null);
@@ -53,10 +55,10 @@ export default function SignUp() {
         router.back();
         return;
       }
-      setNotice('Check your email to confirm your account');
+      setNotice(t.confirmEmailNotice);
       setTimeout(() => router.replace('/(auth)/sign-in'), 1500);
     } catch {
-      setError('Could not create account. Please try again.');
+      setError(t.errors.generic);
     } finally {
       setSubmitting(false);
     }
@@ -68,30 +70,30 @@ export default function SignUp() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Create your account</Text>
-        <Text style={styles.subtitle}>Sign up to start using Clarity in Calm.</Text>
+        <Text style={styles.title}>{t.title}</Text>
+        <Text style={styles.subtitle}>{t.subtitle}</Text>
 
         {error && <Text style={styles.error}>{error}</Text>}
         {notice && <Text style={styles.notice}>{notice}</Text>}
 
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>{t.emailLabel}</Text>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          placeholder="email@example.com"
+          placeholder={t.emailPlaceholder}
           placeholderTextColor={theme.textPlaceholder}
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
         />
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t.passwordLabel}</Text>
         <TextInput
           style={styles.input}
           value={password}
           onChangeText={setPassword}
-          placeholder="At least 8 characters"
+          placeholder={t.passwordPlaceholder}
           placeholderTextColor={theme.textPlaceholder}
           secureTextEntry
           autoComplete="password-new"
@@ -108,9 +110,9 @@ export default function SignUp() {
             {consent && <Text style={styles.checkboxMark}>✓</Text>}
           </View>
           <Text style={styles.consentText}>
-            I agree to the{' '}
+            {t.consentPrefix}
             <Text style={styles.link} onPress={() => void Linking.openURL(PRIVACY_URL)}>
-              Privacy Policy
+              {t.consentLink}
             </Text>
           </Text>
         </TouchableOpacity>
@@ -121,12 +123,12 @@ export default function SignUp() {
           disabled={submitting}
           activeOpacity={0.85}
         >
-          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Sign Up</Text>}
+          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>{t.submit}</Text>}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')} style={styles.footer}>
           <Text style={styles.footerText}>
-            Already have an account? <Text style={styles.footerLink}>Sign in</Text>
+            {t.hasAccountPrefix}<Text style={styles.footerLink}>{t.signInLink}</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>
