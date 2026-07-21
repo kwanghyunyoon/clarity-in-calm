@@ -11,6 +11,7 @@ export default {
       bundleIdentifier: 'com.clarityincalm.app',
       icon: './assets/images/icon.png',
       supportsTablet: true,
+      usesAppleSignIn: true,
     },
     android: {
       package: 'com.clarityincalm.app',
@@ -59,6 +60,7 @@ export default {
         },
       ],
       'expo-secure-store',
+      'expo-apple-authentication',
     ],
     experiments: {
       typedRoutes: true,
