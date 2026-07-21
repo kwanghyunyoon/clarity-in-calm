@@ -539,6 +539,37 @@ export const en = {
       noPattern: 'Keep logging to discover patterns',
     },
   },
+
+  // ── Daily content (quotes + feelings-library affirmations) ────────────────
+  dailyContent: {
+    quotes: [
+      { text: "Take a breath. It's just a bad day, not a bad life.", author: 'Unknown' },
+      { text: "You don't have to control your thoughts. You just have to stop letting them control you.", author: 'Dan Millman' },
+      { text: 'Almost everything will work again if you unplug it for a few minutes — including you.', author: 'Anne Lamott' },
+      { text: 'Peace comes from within. Do not seek it without.', author: 'Buddha' },
+      { text: 'You are enough. You have always been enough.', author: 'Unknown' },
+      { text: 'Within you, there is a stillness and a sanctuary to which you can retreat at any time.', author: 'Hermann Hesse' },
+      { text: 'The present moment is the only time over which we have dominion.', author: 'Thich Nhat Hanh' },
+      { text: 'Breathe. Let go. And remind yourself that this very moment is the only one you know you have for sure.', author: 'Oprah Winfrey' },
+      { text: 'Self-care is not self-indulgence. It is self-preservation.', author: 'Audre Lorde' },
+      { text: 'In the middle of difficulty lies opportunity.', author: 'Albert Einstein' },
+      { text: 'Happiness is not something ready-made. It comes from your own actions.', author: 'Dalai Lama' },
+      { text: "Caring for yourself is not selfish — it's essential.", author: 'Unknown' },
+      { text: "You don't have to be positive all the time. It's perfectly okay to feel sad, angry, annoyed, or anxious.", author: 'Lori Deschene' },
+      { text: 'Start where you are. Use what you have. Do what you can.', author: 'Arthur Ashe' },
+      { text: 'Even the darkest night will end and the sun will rise.', author: 'Victor Hugo' },
+    ],
+    feelingsEase: {
+      anger: "You're allowed to be angry without acting on every impulse it hands you. Give it a body first — a walk, a few hard exhales — before you give it words.",
+      anxiousness: 'You don\'t have to solve every "what if" tonight. Naming one thing you can control right now is usually enough to loosen the loop.',
+      burnout: "Rest isn't something you earn after finishing everything — it's what makes finishing anything possible. One thing can wait.",
+      fear: "Naming the fear out loud, even just to yourself, takes some of its power away. Ask what's actually happening right now, in this room, versus what your mind is predicting.",
+      sadness: "Sadness doesn't need to be fixed right away — it needs room. Let yourself feel it for a few minutes without rushing to feel better.",
+      insecurity: "The voice doubting you is not a neutral judge — it's a scared, old habit of thinking. You're allowed to disagree with it.",
+      loneliness: "Loneliness shrinks with even small, real contact — a text, a call, sitting somewhere with other people around. It doesn't need to be solved all at once.",
+      overwhelm: "You don't have to hold everything at once. Pick the single smallest next step and let the rest wait its turn.",
+    },
+  },
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -826,6 +857,36 @@ export const ko: Translations = {
       },
       bestDay:   '기분이 가장 좋은 요일',
       noPattern: '매일 기록하면 패턴이 보여요',
+    },
+  },
+
+  dailyContent: {
+    quotes: [
+      { text: '숨을 쉬어보세요. 그저 힘든 하루일 뿐, 힘든 인생이 아니에요.', author: '작자 미상' },
+      { text: '생각을 통제할 필요는 없어요. 그저 생각이 나를 지배하지 못하게 하면 됩니다.', author: '댄 밀먼' },
+      { text: '거의 모든 것은 몇 분만 전원을 꺼두면 다시 제대로 작동해요 — 당신도 마찬가지예요.', author: '앤 라모트' },
+      { text: '평화는 내면에서 옵니다. 밖에서 찾으려 하지 마세요.', author: '붓다' },
+      { text: '당신은 이미 충분해요. 언제나 그래왔어요.', author: '작자 미상' },
+      { text: '당신 안에는 언제든 물러나 쉴 수 있는 고요함과 안식처가 있습니다.', author: '헤르만 헤세' },
+      { text: '지금 이 순간이야말로 우리가 다스릴 수 있는 유일한 시간입니다.', author: '틱낫한' },
+      { text: '숨을 쉬세요. 내려놓으세요. 그리고 지금 이 순간이야말로 당신이 확실히 가진 유일한 순간임을 기억하세요.', author: '오프라 윈프리' },
+      { text: '자기 돌봄은 자기 방종이 아닙니다. 그것은 자기 보존입니다.', author: '오드리 로드' },
+      { text: '어려움의 한가운데에 기회가 있습니다.', author: '알베르트 아인슈타인' },
+      { text: '행복은 이미 만들어져 있는 것이 아닙니다. 그것은 당신 자신의 행동에서 옵니다.', author: '달라이 라마' },
+      { text: '자신을 돌보는 것은 이기적인 것이 아니라 꼭 필요한 일이에요.', author: '작자 미상' },
+      { text: '항상 긍정적일 필요는 없어요. 슬프거나 화나거나 짜증 나거나 불안해도 전혀 괜찮습니다.', author: '로리 디셴' },
+      { text: '지금 있는 곳에서 시작하세요. 가진 것을 활용하세요. 할 수 있는 것을 하세요.', author: '아서 애시' },
+      { text: '아무리 어두운 밤도 끝나고, 해는 다시 떠오릅니다.', author: '빅토르 위고' },
+    ],
+    feelingsEase: {
+      anger: '화가 나도 그 충동에 매번 따를 필요는 없어요. 말로 표현하기 전에 먼저 몸을 움직여보세요 — 산책을 하거나 크게 숨을 몇 번 내쉬어 보세요.',
+      anxiousness: "오늘 밤 모든 '만약에'를 해결할 필요는 없어요. 지금 당장 통제할 수 있는 한 가지를 말해보는 것만으로도 그 굴레를 느슨하게 하기에 충분해요.",
+      burnout: '휴식은 모든 걸 끝낸 뒤에 얻는 보상이 아니라, 무언가를 끝낼 수 있게 해주는 힘이에요. 한 가지 정도는 미뤄도 괜찮아요.',
+      fear: '두려움을 소리 내어 말해보는 것만으로도 — 자신에게라도 — 그 힘이 조금은 줄어들어요. 지금 이 순간 실제로 무슨 일이 일어나고 있는지, 마음이 예측하는 것과 비교해보세요.',
+      sadness: '슬픔은 당장 고쳐야 할 문제가 아니라 머물 공간이 필요한 감정이에요. 서둘러 나아지려 하지 말고, 몇 분만이라도 그 감정을 그대로 느껴보세요.',
+      insecurity: '당신을 의심하는 그 목소리는 공정한 심판이 아니에요 — 그것은 두려움에서 비롯된 오래된 생각 습관일 뿐이에요. 그 목소리에 동의하지 않아도 괜찮아요.',
+      loneliness: '외로움은 작은 진짜 연결만으로도 줄어들어요 — 문자 한 통, 전화 한 통, 사람들 곁에 잠시 앉아 있는 것만으로도요. 한 번에 다 해결할 필요는 없어요.',
+      overwhelm: '모든 것을 한꺼번에 짊어질 필요는 없어요. 가장 작은 다음 한 걸음을 골라보고, 나머지는 차례를 기다리게 두세요.',
     },
   },
 };
@@ -1133,6 +1194,36 @@ export const es: Translations = {
       noPattern: 'Sigue registrando para descubrir patrones',
     },
   },
+
+  dailyContent: {
+    quotes: [
+      { text: 'Respira. Es solo un mal día, no una mala vida.', author: 'Anónimo' },
+      { text: 'No tienes que controlar tus pensamientos. Solo tienes que dejar de permitir que ellos te controlen a ti.', author: 'Dan Millman' },
+      { text: 'Casi todo vuelve a funcionar si lo desconectas unos minutos, incluida tú misma.', author: 'Anne Lamott' },
+      { text: 'La paz viene de adentro. No la busques afuera.', author: 'Buda' },
+      { text: 'Eres suficiente. Siempre lo has sido.', author: 'Anónimo' },
+      { text: 'Dentro de ti hay una quietud y un santuario al que puedes retirarte en cualquier momento.', author: 'Hermann Hesse' },
+      { text: 'El momento presente es el único tiempo sobre el que tenemos dominio.', author: 'Thich Nhat Hanh' },
+      { text: 'Respira. Suelta. Y recuérdate que este mismo instante es el único que sabes con certeza que tienes.', author: 'Oprah Winfrey' },
+      { text: 'El autocuidado no es autocomplacencia. Es autopreservación.', author: 'Audre Lorde' },
+      { text: 'En medio de la dificultad reside la oportunidad.', author: 'Albert Einstein' },
+      { text: 'La felicidad no es algo ya hecho. Proviene de tus propias acciones.', author: 'Dalái Lama' },
+      { text: 'Cuidarte a ti misma no es egoísmo, es esencial.', author: 'Anónimo' },
+      { text: 'No tienes que ser positiva todo el tiempo. Está perfectamente bien sentirte triste, enojada, molesta o ansiosa.', author: 'Lori Deschene' },
+      { text: 'Empieza donde estás. Usa lo que tienes. Haz lo que puedas.', author: 'Arthur Ashe' },
+      { text: 'Incluso la noche más oscura terminará y el sol saldrá.', author: 'Víctor Hugo' },
+    ],
+    feelingsEase: {
+      anger: 'Está bien sentir enojo sin actuar según cada impulso que te da. Dale primero un cuerpo — una caminata, unas cuantas exhalaciones fuertes — antes de ponerle palabras.',
+      anxiousness: "No tienes que resolver cada 'y si' esta noche. Nombrar una sola cosa que puedes controlar ahora mismo suele bastar para aflojar el bucle.",
+      burnout: 'El descanso no es algo que te ganas después de terminar todo — es lo que hace posible terminar cualquier cosa. Una cosa puede esperar.',
+      fear: 'Nombrar el miedo en voz alta, aunque sea solo para ti misma, le quita algo de poder. Pregúntate qué está pasando realmente ahora mismo, en este lugar, frente a lo que tu mente está prediciendo.',
+      sadness: 'La tristeza no necesita arreglarse de inmediato — necesita espacio. Permítete sentirla unos minutos sin apurarte a sentirte mejor.',
+      insecurity: 'La voz que duda de ti no es un juez neutral — es un viejo hábito de pensamiento asustado. Tienes permiso para no estar de acuerdo con ella.',
+      loneliness: 'La soledad disminuye con incluso un pequeño contacto real — un mensaje, una llamada, sentarte en algún lugar rodeada de gente. No necesita resolverse de una sola vez.',
+      overwhelm: 'No tienes que sostenerlo todo a la vez. Elige el paso siguiente más pequeño y deja que el resto espere su turno.',
+    },
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1418,6 +1509,36 @@ export const hi: Translations = {
       },
       bestDay:   'आपका सबसे अच्छा दिन',
       noPattern: 'पैटर्न खोजने के लिए रोज़ लिखते रहें',
+    },
+  },
+
+  dailyContent: {
+    quotes: [
+      { text: 'एक सांस लें। यह बस एक बुरा दिन है, बुरी ज़िंदगी नहीं।', author: 'अज्ञात' },
+      { text: 'आपको अपने विचारों को नियंत्रित करने की ज़रूरत नहीं है। बस उन्हें आप पर हावी होने से रोकना है।', author: 'डैन मिलमैन' },
+      { text: 'लगभग हर चीज़ कुछ मिनट के लिए बंद करने पर फिर से ठीक काम करने लगती है — आप भी।', author: 'ऐन लैमॉट' },
+      { text: 'शांति भीतर से आती है। इसे बाहर मत खोजो।', author: 'बुद्ध' },
+      { text: 'आप काफी हैं। आप हमेशा से काफी रहे हैं।', author: 'अज्ञात' },
+      { text: 'आपके भीतर एक शांति और एक शरण-स्थल है, जहाँ आप कभी भी लौट सकते हैं।', author: 'हरमन हेसे' },
+      { text: 'वर्तमान क्षण ही एकमात्र समय है जिस पर हमारा अधिकार है।', author: 'थिक न्हात हान' },
+      { text: 'साँस लें। छोड़ दें। और खुद को याद दिलाएं कि यही एक पल है जिसके बारे में आप निश्चित रूप से जानते हैं कि आपके पास है।', author: 'ओप्रा विनफ्रे' },
+      { text: 'स्वयं की देखभाल आत्म-भोग नहीं है। यह आत्म-संरक्षण है।', author: 'ऑड्रे लॉर्ड' },
+      { text: 'कठिनाई के बीच में ही अवसर छिपा होता है।', author: 'अल्बर्ट आइंस्टीन' },
+      { text: 'खुशी कोई बनी-बनाई चीज़ नहीं है। यह आपके अपने कार्यों से आती है।', author: 'दलाई लामा' },
+      { text: 'अपना ख्याल रखना स्वार्थ नहीं है — यह ज़रूरी है।', author: 'अज्ञात' },
+      { text: 'आपको हर समय सकारात्मक रहने की ज़रूरत नहीं है। उदास, गुस्सा, चिड़चिड़ा या चिंतित महसूस करना बिल्कुल ठीक है।', author: 'लॉरी डेशेन' },
+      { text: 'जहाँ हैं वहीं से शुरू करें। जो है उसका उपयोग करें। जो कर सकते हैं वह करें।', author: 'आर्थर ऐश' },
+      { text: 'सबसे अंधेरी रात भी खत्म होगी और सूरज फिर उगेगा।', author: 'विक्टर ह्यूगो' },
+    ],
+    feelingsEase: {
+      anger: 'आपको गुस्सा आने पर हर आवेग पर काम करने की ज़रूरत नहीं है। इसे शब्द देने से पहले इसे शरीर से जाहिर करें — टहलें, कुछ गहरी साँसें छोड़ें।',
+      anxiousness: "आपको आज रात हर 'क्या होगा अगर' को हल करने की ज़रूरत नहीं है। अभी आप जिस एक चीज़ को नियंत्रित कर सकते हैं उसे नाम देना आमतौर पर इस चक्र को ढीला करने के लिए काफी होता है।",
+      burnout: 'आराम कोई ऐसी चीज़ नहीं है जो आप सब कुछ खत्म करने के बाद कमाते हैं — यही वह चीज़ है जो किसी भी काम को पूरा करना संभव बनाती है। एक चीज़ इंतज़ार कर सकती है।',
+      fear: 'डर को ज़ोर से नाम देना, भले ही सिर्फ खुद से, उसकी कुछ ताकत छीन लेता है। पूछें कि अभी, इस कमरे में, वास्तव में क्या हो रहा है — बनाम आपका मन क्या अनुमान लगा रहा है।',
+      sadness: 'उदासी को तुरंत ठीक करने की ज़रूरत नहीं है — इसे जगह चाहिए। बेहतर महसूस करने की जल्दी किए बिना, खुद को कुछ मिनट इसे महसूस करने दें।',
+      insecurity: 'जो आवाज़ आप पर शक करती है वह कोई निष्पक्ष जज नहीं है — यह सोचने की एक डरी हुई, पुरानी आदत है। आपको इससे असहमत होने की अनुमति है।',
+      loneliness: 'अकेलापन छोटे, असली संपर्क से भी कम हो जाता है — एक संदेश, एक कॉल, कहीं लोगों के बीच बैठना। इसे एक बार में हल करने की ज़रूरत नहीं है।',
+      overwhelm: 'आपको सब कुछ एक साथ संभालने की ज़रूरत नहीं है। सबसे छोटा अगला कदम चुनें और बाकी को अपनी बारी का इंतज़ार करने दें।',
     },
   },
 };

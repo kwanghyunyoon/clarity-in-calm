@@ -14,7 +14,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StreakCard } from '@/components/today/StreakCard';
 import { ToolCard } from '@/components/today/ToolCard';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
-import { QUOTES } from '@/constants/quotes';
 import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
@@ -31,9 +30,10 @@ function getGreeting(t: ReturnType<typeof useTranslation>): string {
   return t.home.greeting.evening;
 }
 
-function getDailyQuote() {
+function getDailyQuote(t: ReturnType<typeof useTranslation>) {
   const day = Math.floor(Date.now() / 86400000);
-  return QUOTES[day % QUOTES.length];
+  const quotes = t.dailyContent.quotes;
+  return quotes[day % quotes.length];
 }
 
 // Deliberately partial: only emotion ids with an honest, non-forced match to a
@@ -54,7 +54,7 @@ export default function TodayScreen() {
   const { todayEmotions, emotionLogs } = useEmotions();
   const { showHelp } = useHelp();
 
-  const quote = useMemo(getDailyQuote, []);
+  const quote = useMemo(() => getDailyQuote(t), [t]);
   const greeting = getGreeting(t);
 
   const affirmation = useMemo(() => {
@@ -207,7 +207,7 @@ export default function TodayScreen() {
                 {t.feelingsLibraryScreen.affirmationLabel}
               </Text>
               <Text style={[styles.quoteText, { color: colors.text, fontStyle: 'normal' }]}>
-                {affirmation.emoji} {affirmation.ease}
+                {affirmation.emoji} {(t.dailyContent.feelingsEase as Record<string, string>)[affirmation.id] ?? affirmation.ease}
               </Text>
             </AnimatedPressable>
           ) : (
