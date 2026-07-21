@@ -7,8 +7,10 @@ import { router } from 'expo-router';
 import * as Linking from 'expo-linking';
 import { supabase } from '../../lib/supabase';
 import { theme } from '../../lib/authTheme';
+import { useTranslation } from '../../hooks/use-translation';
 
 export default function ForgotPassword() {
+  const t = useTranslation().authScreen.forgotPassword;
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -16,7 +18,7 @@ export default function ForgotPassword() {
 
   const handleSubmit = async () => {
     if (!email.trim()) {
-      setError('Enter your email');
+      setError(t.errors.missingEmail);
       return;
     }
     setError(null);
@@ -31,7 +33,7 @@ export default function ForgotPassword() {
       }
       setSent(true);
     } catch {
-      setError('Could not send reset email. Please try again.');
+      setError(t.errors.generic);
     } finally {
       setSubmitting(false);
     }
@@ -43,29 +45,29 @@ export default function ForgotPassword() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Reset your password</Text>
+        <Text style={styles.title}>{t.title}</Text>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
         {sent ? (
           <>
             <Text style={styles.subtitle}>
-              If an account exists for {email.trim()}, we&apos;ve sent a link to reset your password.
+              {t.sentBodyPrefix}{email.trim()}{t.sentBodySuffix}
             </Text>
             <TouchableOpacity style={styles.primaryBtn} onPress={() => router.replace('/(auth)/sign-in')} activeOpacity={0.85}>
-              <Text style={styles.primaryBtnText}>Back to Sign In</Text>
+              <Text style={styles.primaryBtnText}>{t.backToSignIn}</Text>
             </TouchableOpacity>
           </>
         ) : (
           <>
-            <Text style={styles.subtitle}>We&apos;ll email you a link to reset your password.</Text>
+            <Text style={styles.subtitle}>{t.subtitle}</Text>
 
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>{t.emailLabel}</Text>
             <TextInput
               style={styles.input}
               value={email}
               onChangeText={setEmail}
-              placeholder="email@example.com"
+              placeholder={t.emailPlaceholder}
               placeholderTextColor={theme.textPlaceholder}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -78,13 +80,13 @@ export default function ForgotPassword() {
               disabled={submitting}
               activeOpacity={0.85}
             >
-              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Send Reset Link</Text>}
+              {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>{t.submit}</Text>}
             </TouchableOpacity>
           </>
         )}
 
         <TouchableOpacity onPress={() => router.back()} style={styles.footer}>
-          <Text style={styles.footerText}>Cancel</Text>
+          <Text style={styles.footerText}>{t.cancel}</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>

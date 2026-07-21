@@ -8,8 +8,12 @@ import * as AppleAuthentication from 'expo-apple-authentication';
 import { supabase } from '../../lib/supabase';
 import { signInWithGoogle, signInWithApple } from '../../lib/oauth';
 import { theme } from '../../lib/authTheme';
+import { useTranslation } from '../../hooks/use-translation';
 
 export default function SignIn() {
+  const auth = useTranslation().authScreen;
+  const t = auth.signIn;
+  const tOauth = auth.oauth;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +29,7 @@ export default function SignIn() {
 
   const handleSignIn = async () => {
     if (!email.trim() || !password) {
-      setError('Enter your email and password');
+      setError(t.errors.missingCredentials);
       return;
     }
     setError(null);
@@ -37,7 +41,7 @@ export default function SignIn() {
       // dismissed by the caller (Settings) once a session exists.
       else router.back();
     } catch {
-      setError('Could not sign in. Please try again.');
+      setError(t.errors.generic);
     } finally {
       setSubmitting(false);
     }
@@ -47,11 +51,11 @@ export default function SignIn() {
     setError(null);
     setGoogleSubmitting(true);
     try {
-      const errorMessage = await signInWithGoogle();
+      const errorMessage = await signInWithGoogle(tOauth.googleGenericError);
       if (errorMessage) setError(errorMessage);
       else router.back();
     } catch {
-      setError('Could not sign in with Google. Please try again.');
+      setError(t.errors.google);
     } finally {
       setGoogleSubmitting(false);
     }
@@ -59,7 +63,10 @@ export default function SignIn() {
 
   const handleAppleSignIn = async () => {
     setError(null);
-    const errorMessage = await signInWithApple();
+    const errorMessage = await signInWithApple({
+      noToken: tOauth.appleNoToken,
+      genericError: tOauth.appleGenericError,
+    });
     if (errorMessage) setError(errorMessage);
     else router.back();
   };
@@ -70,36 +77,36 @@ export default function SignIn() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Welcome back</Text>
-        <Text style={styles.subtitle}>Sign in to Clarity in Calm.</Text>
+        <Text style={styles.title}>{t.title}</Text>
+        <Text style={styles.subtitle}>{t.subtitle}</Text>
 
         {error && <Text style={styles.error}>{error}</Text>}
 
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>{t.emailLabel}</Text>
         <TextInput
           style={styles.input}
           value={email}
           onChangeText={setEmail}
-          placeholder="email@example.com"
+          placeholder={t.emailPlaceholder}
           placeholderTextColor={theme.textPlaceholder}
           keyboardType="email-address"
           autoCapitalize="none"
           autoComplete="email"
         />
 
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t.passwordLabel}</Text>
         <TextInput
           style={styles.input}
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
+          placeholder={t.passwordPlaceholder}
           placeholderTextColor={theme.textPlaceholder}
           secureTextEntry
           autoComplete="password"
         />
 
         <TouchableOpacity onPress={() => router.push('/(auth)/forgot-password')} style={styles.forgotLink}>
-          <Text style={styles.link}>Forgot password?</Text>
+          <Text style={styles.link}>{t.forgotPassword}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -108,12 +115,12 @@ export default function SignIn() {
           disabled={submitting}
           activeOpacity={0.85}
         >
-          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>Sign In</Text>}
+          {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryBtnText}>{t.submit}</Text>}
         </TouchableOpacity>
 
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
+          <Text style={styles.dividerText}>{t.or}</Text>
           <View style={styles.dividerLine} />
         </View>
 
@@ -126,7 +133,7 @@ export default function SignIn() {
           {googleSubmitting ? (
             <ActivityIndicator color={theme.textPrimary} />
           ) : (
-            <Text style={styles.googleBtnText}>Continue with Google</Text>
+            <Text style={styles.googleBtnText}>{t.continueWithGoogle}</Text>
           )}
         </TouchableOpacity>
 
@@ -142,7 +149,7 @@ export default function SignIn() {
 
         <TouchableOpacity onPress={() => router.push('/(auth)/sign-up')} style={styles.footer}>
           <Text style={styles.footerText}>
-            Don&apos;t have an account? <Text style={styles.footerLink}>Sign up</Text>
+            {t.noAccountPrefix}<Text style={styles.footerLink}>{t.signUpLink}</Text>
           </Text>
         </TouchableOpacity>
       </ScrollView>

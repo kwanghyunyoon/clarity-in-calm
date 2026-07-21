@@ -21,13 +21,14 @@ async function createSessionFromUrl(url: string): Promise<string | null> {
 // Returns an error message on failure, or null on success/user-cancellation.
 // On success, useAuthStore's onAuthStateChange listener picks up the new
 // session and the Settings account section reflects it automatically.
-export async function signInWithGoogle(): Promise<string | null> {
+// `genericError` is the caller's translated fallback for the "couldn't start" case.
+export async function signInWithGoogle(genericError: string): Promise<string | null> {
   const redirectTo = Linking.createURL('/');
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo, skipBrowserRedirect: true },
   });
-  if (error || !data.url) return error?.message ?? 'Could not start Google sign-in';
+  if (error || !data.url) return error?.message ?? genericError;
 
   const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
   if (result.type !== 'success' || !result.url) return null;
@@ -36,8 +37,11 @@ export async function signInWithGoogle(): Promise<string | null> {
 }
 
 // Required alongside Google Sign-In by App Store Guideline 4.8. Returns an error
-// message on failure, or null on success/user-cancellation.
-export async function signInWithApple(): Promise<string | null> {
+// message on failure, or null on success/user-cancellation. `messages` are the
+// caller's translated fallbacks for the two failure cases below.
+export async function signInWithApple(
+  messages: { noToken: string; genericError: string },
+): Promise<string | null> {
   try {
     const credential = await AppleAuthentication.signInAsync({
       requestedScopes: [
@@ -45,7 +49,7 @@ export async function signInWithApple(): Promise<string | null> {
         AppleAuthentication.AppleAuthenticationScope.EMAIL,
       ],
     });
-    if (!credential.identityToken) return 'Apple sign-in did not return an identity token';
+    if (!credential.identityToken) return messages.noToken;
 
     const { error } = await supabase.auth.signInWithIdToken({
       provider: 'apple',
@@ -55,6 +59,6 @@ export async function signInWithApple(): Promise<string | null> {
   } catch (e: unknown) {
     const err = e as { code?: string };
     if (err.code === 'ERR_REQUEST_CANCELED') return null;
-    return 'Could not sign in with Apple. Please try again.';
+    return messages.genericError;
   }
 }

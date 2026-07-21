@@ -8,6 +8,7 @@ import * as Linking from 'expo-linking';
 import * as QueryParams from 'expo-auth-session/build/QueryParams';
 import { supabase } from '../lib/supabase';
 import { theme } from '../lib/authTheme';
+import { useTranslation } from '../hooks/use-translation';
 
 // Supabase's recovery email links land here as clarityincalm://reset-password#access_token=...&refresh_token=...&type=recovery
 function parseRecoveryTokens(url: string): { access_token: string; refresh_token: string } | null {
@@ -18,6 +19,7 @@ function parseRecoveryTokens(url: string): { access_token: string; refresh_token
 }
 
 export default function ResetPassword() {
+  const t = useTranslation().authScreen.resetPassword;
   const [ready, setReady] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +30,7 @@ export default function ResetPassword() {
       const tokens = url ? parseRecoveryTokens(url) : null;
       if (tokens) {
         const { error: sessionError } = await supabase.auth.setSession(tokens);
-        if (sessionError) setError('This reset link has expired. Request a new one.');
+        if (sessionError) setError(t.errors.expiredLink);
       }
       setReady(true);
     };
