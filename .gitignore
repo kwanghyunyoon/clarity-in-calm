@@ -34,6 +34,7 @@ yarn-error.*
 .env
 .env.*
 .env*.local
+!.env.example
 
 # Google service account key (secret)
 google-service-account.json

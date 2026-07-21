@@ -1,8 +1,10 @@
 import { Directory, File, Paths } from 'expo-file-system';
+import { router } from 'expo-router';
 import * as Sharing from 'expo-sharing';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Modal,
   Platform,
@@ -31,6 +33,8 @@ import {
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useLocale } from '@/context/language-context';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/useAuthStore';
 
 function SectionHeader({ label }: { label: string }) {
   const { colors } = useTheme();
@@ -68,6 +72,63 @@ function SettingsGroup({ children }: { children: React.ReactNode }) {
     <View style={[styles.group, { borderColor: colors.border }]}>
       {children}
     </View>
+  );
+}
+
+// ── Account (optional sign-in) ──────────────────────────────────────────────────
+function AccountSection() {
+  const { colors } = useTheme();
+  const ta = useTranslation().settingsScreen.account;
+  const user = useAuthStore(s => s.user);
+  const signOut = useAuthStore(s => s.signOut);
+  const [deleting, setDeleting] = useState(false);
+
+  function confirmDelete() {
+    Alert.alert(
+      ta.deleteConfirm.title,
+      ta.deleteConfirm.body,
+      [
+        { text: ta.deleteConfirm.cancel, style: 'cancel' },
+        { text: ta.deleteConfirm.confirm, style: 'destructive', onPress: () => void handleDelete() },
+      ],
+    );
+  }
+
+  async function handleDelete() {
+    setDeleting(true);
+    try {
+      const { error } = await supabase.functions.invoke('delete-account');
+      if (error) {
+        Alert.alert(ta.deleteError.title, error.message);
+        return;
+      }
+      await supabase.auth.signOut();
+    } catch {
+      Alert.alert(ta.deleteError.title, ta.deleteError.body);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  return (
+    <>
+      <SectionHeader label={ta.header} />
+      <SettingsGroup>
+        {user ? (
+          <>
+            <SettingsRow label={ta.header} value={user.email ?? undefined} />
+            <SettingsRow label={ta.signOut} onPress={() => void signOut()} />
+            <SettingsRow
+              label={ta.deleteAccount}
+              onPress={deleting ? undefined : confirmDelete}
+              accessory={deleting ? <ActivityIndicator color={colors.primary} /> : undefined}
+            />
+          </>
+        ) : (
+          <SettingsRow label={ta.signIn} onPress={() => router.push('/(auth)/sign-in')} />
+        )}
+      </SettingsGroup>
+    </>
   );
 }
 
@@ -277,6 +338,9 @@ export default function SettingsScreen() {
         contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Account ── */}
+        <AccountSection />
+
         {/* ── Notifications ── */}
         <SectionHeader label={ts.notifications} />
         <SettingsGroup>
