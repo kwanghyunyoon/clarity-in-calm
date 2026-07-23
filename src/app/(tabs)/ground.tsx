@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Spacing } from '@/constants/theme';
+import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -144,14 +144,14 @@ export default function GroundScreen() {
 
 const s = StyleSheet.create({
   root:        { flex: 1 },
-  scroll:      { paddingHorizontal: Spacing.three, paddingBottom: Spacing.six },
+  scroll:      { flexGrow: 1, justifyContent: 'center', paddingHorizontal: Spacing.three, paddingBottom: TAB_BAR_CLEARANCE },
 
-  header:      { paddingTop: Spacing.three, paddingBottom: Spacing.two, gap: Spacing.half },
-  title:       { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-  subtitle:    { fontSize: 14, fontWeight: '500' },
+  header:      { alignItems: 'center', paddingTop: Spacing.six, paddingBottom: Spacing.three, gap: Spacing.two },
+  title:       { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, textAlign: 'center' },
+  subtitle:    { fontSize: 16, fontWeight: '500', textAlign: 'center' },
 
   introCard:   { borderRadius: 16, padding: Spacing.three, marginBottom: Spacing.three },
-  introText:   { fontSize: 14, lineHeight: 21, fontWeight: '500' },
+  introText:   { fontSize: 16, lineHeight: 24, fontWeight: '500' },
 
   dotsRow:     { flexDirection: 'row', gap: 6, alignItems: 'center',
                  justifyContent: 'center', marginBottom: Spacing.three },
@@ -163,9 +163,9 @@ const s = StyleSheet.create({
                  justifyContent: 'center', gap: 2, marginBottom: Spacing.one },
   countNum:    { fontSize: 40, fontWeight: '800', lineHeight: 44 },
   countEmoji:  { fontSize: 22 },
-  senseLabel:  { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2 },
-  instruction: { fontSize: 22, fontWeight: '700', textAlign: 'center', lineHeight: 30 },
-  tip:         { fontSize: 14, lineHeight: 21, textAlign: 'center', fontWeight: '500', maxWidth: 300 },
+  senseLabel:  { fontSize: 14, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2 },
+  instruction: { fontSize: 24, fontWeight: '700', textAlign: 'center', lineHeight: 33 },
+  tip:         { fontSize: 16, lineHeight: 24, textAlign: 'center', fontWeight: '500', maxWidth: 300 },
 
   btn:         { borderRadius: 50, paddingVertical: Spacing.two + 4,
                  alignItems: 'center', marginBottom: Spacing.two },
@@ -176,7 +176,7 @@ const s = StyleSheet.create({
   btnOutlineText: { fontSize: 16, fontWeight: '600' },
 
   infoCard:    { borderRadius: 16, padding: Spacing.three },
-  infoText:    { fontSize: 13, lineHeight: 20, textAlign: 'center', fontWeight: '500' },
+  infoText:    { fontSize: 15, lineHeight: 22, textAlign: 'center', fontWeight: '500' },
 
   // Completion
   completeWrap:  { flex: 1, justifyContent: 'center', alignItems: 'center',

@@ -95,6 +95,10 @@ export const Spacing = {
   eight: 120,
 } as const;
 
+export const TAB_BAR_FLOAT_HEIGHT = 54;
+export const TAB_BAR_FLOAT_MARGIN = Spacing.two + 8;
+export const TAB_BAR_CLEARANCE = TAB_BAR_FLOAT_HEIGHT + TAB_BAR_FLOAT_MARGIN + Spacing.two;
+
 export const BorderRadius = {
   sm: 8,
   md: 12,

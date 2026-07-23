@@ -18,7 +18,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LANGUAGES } from '@/constants/languages';
-import { BorderRadius, Spacing } from '@/constants/theme';
+import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useSettings } from '@/context/settings-context';
 import { useWellness } from '@/context/wellness-context';
@@ -229,7 +229,7 @@ export default function SettingsScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
 
   const notifEnabled = settings.notifications.enabled;
-  const bottomPad = 88 + insets.bottom;
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   // ── Notifications ──────────────────────────────────────────────────────────
 

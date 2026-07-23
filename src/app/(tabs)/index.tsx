@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StreakCard } from '@/components/today/StreakCard';
 import { ToolCard } from '@/components/today/ToolCard';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
-import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
+import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
 import { useEmotions } from '@/context/emotion-context';
@@ -64,7 +64,7 @@ export default function TodayScreen() {
   }, [emotionLogs]);
 
   // Bottom padding = tab bar height (approx 80) + safe area bottom
-  const bottomPad = 88 + insets.bottom;
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>

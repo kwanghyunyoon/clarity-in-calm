@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { LanguagePill } from '@/components/language-pill';
 import { OnboardingModal } from '@/components/onboarding-modal';
-import { Colors } from '@/constants/theme';
+import { Colors, Spacing, TAB_BAR_FLOAT_HEIGHT } from '@/constants/theme';
 import { useTranslation } from '@/hooks/use-translation';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
@@ -23,8 +23,7 @@ export default function TabLayout() {
   const t = useTranslation();
   const insets = useSafeAreaInsets();
 
-  const TAB_BAR_BASE = 54;
-  const bottomPad = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 4);
+  const barBottom = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 4) + Spacing.two;
 
   return (
     <>
@@ -36,14 +35,23 @@ export default function TabLayout() {
           headerShown: false,
           tabBarHideOnKeyboard: false,
           tabBarStyle: {
+            position: 'absolute',
+            left: Spacing.three,
+            right: Spacing.three,
+            bottom: barBottom,
+            height: TAB_BAR_FLOAT_HEIGHT,
+            borderRadius: 28,
+            borderTopWidth: 0,
+            borderWidth: StyleSheet.hairlineWidth,
+            borderColor: colors.tabBarBorder,
             backgroundColor: colors.tabBar,
-            borderTopColor: colors.tabBarBorder,
-            borderTopWidth: StyleSheet.hairlineWidth,
-            height: TAB_BAR_BASE + bottomPad,
-            paddingBottom: bottomPad,
             paddingTop: 6,
-            elevation: 0,
-            shadowOpacity: 0,
+            paddingBottom: 0,
+            elevation: 4,
+            shadowColor: '#000',
+            shadowOpacity: 0.12,
+            shadowRadius: 8,
+            shadowOffset: { width: 0, height: 4 },
           },
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textSecondary,

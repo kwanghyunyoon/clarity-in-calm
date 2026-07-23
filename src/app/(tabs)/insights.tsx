@@ -11,7 +11,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
-import { BorderRadius, EmotionColors, Spacing } from '@/constants/theme';
+import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -34,7 +34,7 @@ export default function InsightsScreen() {
   const { entries, streak } = useWellness();
   const { emotionLogs } = useEmotions();
 
-  const bottomPad = 88 + insets.bottom;
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const last7Days = useMemo(() => getLast7Days(), []);
 

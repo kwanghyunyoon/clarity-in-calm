@@ -20,7 +20,7 @@ import { EmotionPillSelector, SelectedEmotion } from '@/components/emotions/Emot
 import { IntensitySlider } from '@/components/emotions/IntensitySlider';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
-import { BorderRadius, Spacing } from '@/constants/theme';
+import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -54,7 +54,7 @@ export default function EmotionsScreen() {
   const [saved, setSaved] = useState(false);
 
   const accentColor = selectedEmotion?.color ?? colors.primary;
-  const bottomPad = 88 + insets.bottom;
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   function toggleTag(tag: string) {
     setContextTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);

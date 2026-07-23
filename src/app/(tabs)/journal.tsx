@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { JOURNAL_TEMPLATES } from '@/constants/emotions';
-import { BorderRadius, Spacing } from '@/constants/theme';
+import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
@@ -198,7 +198,7 @@ export default function JournalScreen() {
   const [unlockDate, setUnlockDate] = useState<Date | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const bottomPad = 88 + insets.bottom;
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   // Daily rotating prompt (only for free write)
   const promptIdx = Math.floor(Date.now() / 86400000) % tj.prompts.length;

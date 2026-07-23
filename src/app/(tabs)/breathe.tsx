@@ -170,24 +170,26 @@ export default function BreatheScreen() {
         </Animated.View>
       </View>
 
-      {/* "Follow the circle" instruction — only before session starts */}
-      {!isRunning && (
-        <Text style={[s.followCircle, { color: colors.primary }]}>
-          {t.breathe.followCircle}
-        </Text>
-      )}
+      <View style={s.textStack}>
+        {/* "Follow the circle" instruction — only before session starts */}
+        {!isRunning && (
+          <Text style={[s.followCircle, { color: colors.primary }]}>
+            {t.breathe.followCircle}
+          </Text>
+        )}
 
-      {/* Hint */}
-      <Text style={[s.hint, { color: colors.textSecondary }]}>
-        {isRunning ? phaseHint : t.breathe.naturalBreath}
-      </Text>
-
-      {/* Rounds counter */}
-      {rounds > 0 && (
-        <Text style={[s.rounds, { color: colors.textSecondary }]}>
-          {t.breathe.round} {rounds + 1}
+        {/* Hint */}
+        <Text style={[s.hint, { color: colors.textSecondary }]}>
+          {isRunning ? phaseHint : t.breathe.naturalBreath}
         </Text>
-      )}
+
+        {/* Rounds counter */}
+        {rounds > 0 && (
+          <Text style={[s.rounds, { color: colors.textSecondary }]}>
+            {t.breathe.round} {rounds + 1}
+          </Text>
+        )}
+      </View>
 
       {/* Button */}
       <TouchableOpacity
@@ -218,10 +220,10 @@ const RING_SIZE  = DISC_SIZE + 32;
 const GLOW_SIZE  = DISC_SIZE + 72;
 
 const s = StyleSheet.create({
-  root:          { flex: 1, alignItems: 'center', paddingHorizontal: Spacing.three },
-  header:        { alignItems: 'center', paddingTop: Spacing.four, paddingBottom: Spacing.three, gap: Spacing.half },
+  root:          { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.three },
+  header:        { alignItems: 'center', paddingTop: Spacing.six, paddingBottom: Spacing.three, gap: Spacing.two },
   title:         { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
-  subtitle:      { fontSize: 14, fontWeight: '500' },
+  subtitle:      { fontSize: 16, fontWeight: '500' },
 
   circleWrap:    { width: GLOW_SIZE, height: GLOW_SIZE, alignItems: 'center', justifyContent: 'center', marginVertical: Spacing.five },
 
@@ -233,11 +235,11 @@ const s = StyleSheet.create({
   phaseText:     { fontSize: 18, fontWeight: '700', color: '#ffffff', letterSpacing: 0.5 },
   countdownText: { fontSize: 42, fontWeight: '300', color: 'rgba(255,255,255,0.85)', lineHeight: 46 },
 
-  followCircle:  { fontSize: 13, fontWeight: '600', textAlign: 'center',
-                   marginTop: -Spacing.three, marginBottom: Spacing.two,
+  textStack:     { alignItems: 'center', gap: Spacing.two, marginTop: -Spacing.two },
+  followCircle:  { fontSize: 15, fontWeight: '600', textAlign: 'center',
                    paddingHorizontal: Spacing.four },
-  hint:          { fontSize: 14, fontWeight: '500', marginTop: -Spacing.three },
-  rounds:        { fontSize: 13, fontWeight: '600', marginTop: Spacing.two },
+  hint:          { fontSize: 16, fontWeight: '500', textAlign: 'center' },
+  rounds:        { fontSize: 15, fontWeight: '600' },
 
   button:        { marginTop: Spacing.four, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two + 4,
                    borderRadius: 50, minWidth: 180, alignItems: 'center' },
@@ -245,5 +247,5 @@ const s = StyleSheet.create({
 
   infoCard:      { marginTop: Spacing.four, borderRadius: 16, padding: Spacing.three,
                    marginHorizontal: Spacing.three },
-  infoText:      { fontSize: 13, lineHeight: 20, textAlign: 'center', fontWeight: '500' },
+  infoText:      { fontSize: 15, lineHeight: 22, textAlign: 'center', fontWeight: '500' },
 });

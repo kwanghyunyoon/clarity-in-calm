@@ -912,3 +912,190 @@ User explicitly declined to run `./gradlew bundleRelease` (from the previous ses
 **Not committed.** Working tree has 6 modified files (`CASE_STUDY.md` + the 5 above) uncommitted at end of session, on top of the 2 already-local-not-pushed commits from the prior session (`067337a`, `e3661c4`).
 
 **Still open:** `PREDEFINED_CONTEXT_TAGS`/`BODY_REGIONS` translation (same pattern, deliberately out of scope this pass, see above); visual verification of this session's changes; commit + push of both this session's changes and the 2 pending commits; the `bundleRelease` run itself; Play Store gap effort (issue #4, tickets #5-#10, untouched for several sessions now).
+
+---
+
+## 2026-07-20 (later) — Shipped via EAS instead of local `bundleRelease`; versionCode is now 8, not 6
+
+Picking up from the prior entry: by the time this session started, the "not committed" 6 files had actually landed — `git log` shows `66eb0b6` ("fix: translate emotion pills, coping actions, and Feelings Library content") as HEAD, tree clean, `origin/main` up to date. So the two pending commits + this session's work were pushed between sessions (no in-session commit was needed here).
+
+**Local build attempted, then abandoned for EAS:** User asked to "build local." Walked through gradle.properties (currently release config: 4 ABIs, `-Xmx2048m` heap — the OOM-safe debug tweak from `AGENTS.md` was never applicable here since this is a release build) and confirmed release signing (`android/app/release.keystore.jks`, `MYAPP_RELEASE_*` vars in `android/gradle.properties`) is intact. User chose "Release AAB." Confirmed versionCode 6 / versionName 1.0.0 consistent across `app.config.js`, `package.json`, `android/app/build.gradle`, and that live Play Store is at versionCode 5 — so 6 would have been valid. Checked `free -h`: only 719Mi free / 2.4Gi available at the time, tight for a 4-ABI release compile. **User rejected the `./gradlew bundleRelease` tool call** (interrupted, no reason given) — did not proceed with local build.
+
+**Switched to EAS build instead.** Key discovery: `eas.json` has `"appVersionSource": "remote"` — this means `android.versionCode` in `app.config.js` is **ignored** by EAS; EAS tracks its own counter server-side and `autoIncrement: true` bumps it automatically each production build. `eas build:version:get --platform android` showed the remote counter was already at **7** (ahead of both the local config's `6` and the live Play Store `5`) — this stale-local-vs-remote-counter mismatch is almost certainly what caused "an error last time" that the user referenced.
+- Ran `eas build --platform android --profile production --non-interactive` in the background (build id `38d24cdc-471b-4a87-a0f2-566979f702a3`). Completed successfully: versionCode auto-incremented **7→8**, versionName stayed `1.0.0`.
+- AAB artifact: `https://expo.dev/artifacts/eas/ARSVuqdmtxGD-ayvZzp0UvgMWPs9wPUC9FiOajfgdkc.aab`
+- **Flagged to user, not yet an issue:** build output warned "You've reached your included build credits this billing period. New builds are blocked until your billing period resets." — next EAS build attempt (of any kind, not just production) will fail until the plan is upgraded or the period resets.
+- **Not submitted to Play Store yet.** `eas.json`'s `submit.production` config targets track `internal` via `google-service-account.json`; user has not yet asked to run `eas submit`.
+
+**Release notes drafted and trimmed per user request** (final short form, not yet used anywhere):
+> Clarity in Calm — v1.0.0 (8)
+> - Fixed several missing translations across the app (emotion pills, journal, quotes, affirmations)
+> - Improved chatbot data export
+
+**Housekeeping:** confirmed nothing needs to be committed/pushed — working tree clean, branch up to date with `origin/main`. Only loose end is the untracked `clarityincalm.aab` at repo root (stale local artifact, correctly not committed — binary build output). Also flagged (not acted on): EAS recommends removing `android.versionCode` from `app.config.js` entirely since it's a no-op under remote version source — cosmetic only, user hasn't decided.
+
+**Still open:** submit versionCode-8 AAB to Play Store internal track (`eas submit`) if desired; EAS build credits are exhausted this billing period — factor this in before assuming another build can just be kicked off; decide whether to strip the now-dead `versionCode` field from `app.config.js`; delete or keep the stale root `clarityincalm.aab`; the older Play Store gap effort (issue #4, tickets #5-#10) and `PREDEFINED_CONTEXT_TAGS`/`BODY_REGIONS` translation gap remain untouched across many sessions now.
+
+---
+
+## 2026-07-21 — Supabase auth (email/Google/Apple) implemented as optional sign-in
+
+New thread of work, unrelated to the release/i18n entries above: implemented the Expo+Supabase auth template (`~/projects/expo-supabase-auth-template/`, per its `README.md` + the `clarity-in-calm` section of `ROLLOUT.md`) into this app. Source of original code: `~/projects/invoicer`.
+
+**Decisions (user-confirmed via AskUserQuestion):**
+- Auth store in **`src/stores/`** (new dir), not `src/context/`.
+- **Optional sign-in, NOT a hard gate** — app stays fully usable offline; sign-in is a Settings entry point for future cloud sync/backup + account deletion. Diverges from ROLLOUT's `<Stack.Protected>` hard-gate by design (this is a shipped local-first app; a mandatory login wall would lock existing offline users out of their data).
+- `.env` scaffolded with **placeholders**; user will create the Supabase project and fill `EXPO_PUBLIC_SUPABASE_URL` / `_ANON_KEY` later.
+
+**Structural change:** root `src/app/_layout.tsx` was a `Tabs` layout; refactored into a root **`Stack`** (providers + `PrivacyShield` + web SW registration) hosting a **`(tabs)`** group (the old Tabs body + `AnimatedSplashOverlay`/`LanguagePill`/`OnboardingModal`) plus `(auth)` (modal presentation) and `reset-password` siblings. The 9 tab screens were `git mv`'d into `src/app/(tabs)/` (all use `@/` alias so imports didn't break; `typedRoutes` paths unchanged since groups are path-transparent).
+
+**Files added:** `src/lib/{supabase,oauth,authTheme}.ts`, `src/stores/useAuthStore.ts`, `src/app/(auth)/{_layout,sign-in,sign-up,forgot-password}.tsx`, `src/app/reset-password.tsx`, `src/app/(tabs)/_layout.tsx`, `supabase/migrations/0001_profiles.sql`, `supabase/functions/delete-account/index.ts`, `.env`/`.env.example`.
+**Edited:** `src/app/_layout.tsx` (Tabs→Stack), `src/app/(tabs)/settings.tsx` (Account section), `src/i18n/translations.ts` (added `settingsScreen.account.*` to all 4 locales en/ko/es/hi), `app.config.js` (`ios.usesAppleSignIn` + `expo-apple-authentication` plugin), `.gitignore` (`!.env.example`), `tsconfig.json` (exclude `supabase/functions/**` — Deno globals/esm.sh imports fail app tsc).
+
+**Adaptations from template:** sign-up privacy link opens the external privacy URL (`Constants.expoConfig.extra.privacyPolicyUrl`) instead of nonexistent in-app `legal/*` routes; auth screens call `router.back()` on success (no gate to auto-redirect); Settings Account section rebuilt with the screen's own `SectionHeader`/`SettingsRow` + translations instead of the template's standalone `AccountSection`/`authTheme`.
+
+**Real bug caught during verification:** `expo export --platform web` (this app is `web.output: 'static'`) crashed with `ReferenceError: window is not defined` — the native-only `LargeSecureStore` ran during Node SSR prerender (supabase-js eagerly loads its session on client construction → AsyncStorage → `window`). **Fixed** by using `LargeSecureStore` on native only (`storage: Platform.OS === 'web' ? undefined : new LargeSecureStore()`); web falls back to supabase-js's SSR-guarded default localStorage adapter.
+
+**Verification:** `npx tsc --noEmit` clean on all app source (had to run `npx expo start` briefly to regenerate stale `.expo/types/router.d.ts` — new `(auth)` routes gave TS2345 until then). Lint clean on every changed file (16 pre-existing baseline errors in untouched files unchanged). `expo export --platform web` prerenders all routes including `sign-in`/`sign-up`/`forgot-password`/`reset-password` after the SSR fix. OAuth/Apple + live session flows NOT runtime-verified — require a real dev build + Supabase creds (Expo Go/web can't run them).
+
+**Committed + pushed:** branch **`feat/supabase-auth`** (commit `c52dd1d`), **PR #23** → base `main` (https://github.com/kwanghyunyoon/clarity-in-calm/pull/23). Targeted `main` not `master`: `master` is 79 commits behind with 0 unique commits, so "PR to master" was read as a generic trunk reference. Pre-existing uncommitted `CASE_STUDY.md` + untracked `clarityincalm.aab` deliberately left out of the commit.
+
+**Still open (owner's manual steps, no CLI access from the session):** create the Supabase project → fill `.env` → run `0001_profiles.sql` → deploy `delete-account` edge fn → enable Google (client id/secret) + Apple providers → add redirect URLs `clarityincalm://` and `clarityincalm://reset-password`. Plus follow-up: full i18n of the `(auth)` + reset-password screen bodies (currently English-only; only the Settings account rows are translated). PR #23 awaits review/merge.
+
+---
+
+## 2026-07-21 (later) — Supabase dashboard-setup walkthrough prepared (no live setup performed yet)
+
+Short session, picking up the `feat/supabase-auth` thread. User chose (via AskUserQuestion) to work on the **manual Supabase dashboard setup** (option 1 of 3; the other two — i18n of `(auth)` screens, and PR #23 review/merge — were deferred). No code changed this session.
+
+**PR #23 status re-checked:** OPEN, MERGEABLE, `reviewDecision` empty (no human review yet), Netlify deploy-preview built SUCCESS on `c52dd1d`. Nothing blocking a merge from the code side. The Netlify preview is just the Expo web static export for this PR — unrelated to the GitHub-Pages privacy-policy hosting.
+
+**Repo facts confirmed for the runbook** (all read, not assumed): `.env` still holds both placeholders (`grep -c YOUR_ .env` = 2); `.env.example` has the two `EXPO_PUBLIC_SUPABASE_URL`/`_ANON_KEY` keys; app scheme is `clarityincalm` (`app.config.js:8`); `supabase` CLI **is installed** at `~/.npm-global/bin/supabase`, version **2.109.1**; `supabase/migrations/0001_profiles.sql` (profiles table + RLS "own profile" policy + `handle_new_user`/`on_auth_user_created` trigger reading `display_name`/`consented_at` from signUp metadata) and `supabase/functions/delete-account/index.ts` both present.
+
+**Six-step runbook delivered to user** (not executed — needs their dashboard + interactive `supabase login`):
+1. Create project → copy Project URL + anon key from Settings→API.
+2. Write both into `.env` (gitignored; supabase.ts throws on startup if missing). Claude offered to write the file once values are provided.
+3. Run `0001_profiles.sql` — via dashboard SQL Editor **or** CLI (`supabase login` / `link --project-ref` / `db push`).
+4. `supabase functions deploy delete-account`.
+5. Enable Email / Google (needs Google Cloud OAuth Web client id+secret) / Apple providers.
+6. Add redirect URLs `clarityincalm://**` + `clarityincalm://reset-password`.
+
+**Two accuracy corrections vs. prior memory made in the runbook:**
+- **delete-account SERVICE_ROLE key is almost certainly NOT a manual step** — Supabase auto-injects `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` as default Edge secrets. Prior notes said the user must set it; corrected to "verify after deploy, only set manually if absent." Service-role key must still never touch `.env`/the app.
+- **Redirect URL** — recommended the wildcard `clarityincalm://**` because `Linking.createURL('/')` in `oauth.ts` actually emits `clarityincalm:///`, which a bare `clarityincalm://` entry may not match; wildcard covers OAuth + reset-password paths.
+
+**Reality check stated to user:** OAuth/Apple + live sessions still can't run in Expo Go/web — need a real dev build (EAS credits exhausted this period; local Gradle OOM-risky). BUT email/password sign-up *can* be smoke-tested on web once `.env` is set. So Steps 1–3 alone yield a testable email flow.
+
+**Session ended (`/wrap for now`) before the user provided any project URL/keys** — so nothing was created, `.env` is unchanged (still placeholders), no migration/function deployed. Pick up exactly at Step 1 (or Step 2 if the project already exists and keys are in hand).
+
+---
+
+## 2026-07-21 (later still) — Supabase dashboard setup EXECUTED + email flow smoke-tested live
+
+Ran the 6-step runbook to completion with the user. Project now exists: ref **`wmomwwdfvbmpdjyoaxlo`**, URL `https://wmomwwdfvbmpdjyoaxlo.supabase.co`. No app code changed this session — this was live infra setup + verification only.
+
+**What got done:**
+1. **Project created** (user, dashboard).
+2. **`.env` written** (by Claude) — real URL + the project's **new-format publishable key** (`sb_publishable_…`, the modern client-safe equivalent of the legacy `anon`/`eyJ…` JWT; supabase-js accepts it as the 2nd arg). `grep -c YOUR_ .env` now **0**; `git check-ignore .env` confirms it's gitignored and absent from `git status`. Service-role key never requested/stored.
+3. **`0001_profiles.sql` run** via dashboard SQL Editor (Option A) — success.
+4. **`delete-account` edge fn deployed** via CLI: user ran `supabase login` (browser token) → `link --project-ref wmomwwdfvbmpdjyoaxlo` (no DB-password prompt; used session token) → `functions deploy delete-account` (script 59 kB, bundled server-side, no Docker). **Secrets verified** by Claude via `supabase secrets list`: `SUPABASE_URL`/`SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY` all auto-injected (values masked as hashes) — confirms prior memory correction (a) was right, nothing set manually. Also saw `SUPABASE_PUBLISHABLE_KEYS`/`SUPABASE_SECRET_KEYS` → project is on the new API-key format.
+5. **Email provider enabled** (user). Google/Apple deliberately deferred — untestable without a dev build (EAS credits exhausted; local Gradle OOM-risky).
+6. **Redirect URLs added** (user): `clarityincalm://**` + `clarityincalm://reset-password`.
+
+**Live smoke test (Claude, via curl to `/auth/v1/signup` — same path as `sign-up.tsx`):** `example.com` rejected (`email_address_invalid`, Supabase's built-in filter). Retried with a `+alias` on the user's own Gmail → **success**: user `59d6cf4d-aa6d-4805-8971-c3fbd5dd46d0` created, `display_name`/`consented_at` correctly passed through `options.data` into `user_metadata`. Because `handle_new_user` runs in the *same transaction* as the `auth.users` insert, the clean 200 guarantees the `profiles` row was written (a trigger error would've returned 500). **Confirms:** URL+key valid, Email provider on, metadata plumbing correct, trigger fires.
+
+**Notable:** `confirmation_sent_at` was set + no session token returned → **"Confirm email" is still ON** (safe prod default; my Step-5 suggestion to toggle it off for testing didn't take — flip Auth→Providers→Email→Confirm email off only if frictionless local testing is wanted, re-enable before release). **Cleanup owed:** one real test user (`trac3r1885+cicsmoke…@gmail.com`) now exists — delete via Auth→Users when convenient; harmless.
+
+**Status:** all setup steps testable-without-native-build are DONE and verified. Backend is live. Remaining, all deferred: Google/Apple providers (need dev build), `(auth)`+`reset-password` i18n (English-only), PR #23 review/merge (still OPEN/MERGEABLE). Untracked `clarityincalm.aab` still deliberately uncommitted.
+
+---
+
+## 2026-07-21 (final) — PR #23 merged; auth-screen i18n planned + implemented via Ultraplan (PR #24); `main` now current locally
+
+Two threads closed out this session, both continuing the Supabase-auth work.
+
+**PR #23 reviewed and merged.** Re-checked status (OPEN/MERGEABLE/no prior review), then read the security-sensitive files directly rather than trusting prior verification alone: `src/lib/supabase.ts` (`LargeSecureStore` — AES-256-CTR, fresh random key per write, key in `SecureStore`, ciphertext in `AsyncStorage`; matches Supabase's canonical RN pattern), `supabase/migrations/0001_profiles.sql` (RLS policy correctly scoped `auth.uid() = id` for all operations; `handle_new_user` trigger runs `security definer` in the same transaction as the `auth.users` insert), `supabase/functions/delete-account/index.ts` (validates the caller's JWT via an anon-scoped client *before* using the service-role client to delete — service-role key never reachable by an unauthenticated caller), `src/stores/useAuthStore.ts`, and `src/lib/oauth.ts`. All clean; `package.json` diff only added expected deps (`@supabase/supabase-js`, `zustand`, `expo-apple-authentication`, `expo-auth-session`, `react-native-url-polyfill`). Merged via `gh pr merge 23 --merge` → `main` at `15cae2c`.
+
+**i18n phase planned via Plan Mode, then handed to Ultraplan (cloud) for refinement.** Explored the 5 files with hardcoded English (`sign-in.tsx`, `sign-up.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `src/lib/oauth.ts`'s 3 literal error strings) plus the existing i18n conventions (`src/i18n/translations.ts`'s `Translations = Loosen<typeof en>` type, which forces `ko`/`es`/`hi` to structurally match `en` at compile time; the `settingsScreen.account.*` block added in the auth PR as the closest precedent; the `useTranslation()` hook at `src/hooks/use-translation.ts`). Plan written to `authScreen.{signIn,signUp,forgotPassword,resetPassword,oauth}` namespace keys, with prefix/suffix splits for two-part sentences (e.g. "Don't have an account? " + tappable "Sign up") and the interpolated email in the forgot-password confirmation, matching the existing `exportSaved.bodyPrefix`-style convention. Explicitly scoped **out**: raw Supabase SDK error messages (`error.message` from failed auth calls) — translating those needs an error-code→message mapping layer, left for a future decision. Plan saved locally at `/home/jayhaxxx88/.claude/plans/crispy-baking-waterfall.md`.
+
+User routed the plan to **Ultraplan** (`/ultraplan`, cloud Claude Code) instead of local execution — a new mode of working not used in prior sessions on this project. Ultraplan refined the plan, executed it, and opened **PR #24** ("Localize Supabase auth screens (en/ko/es/hi)", branch `claude/refine-local-plan-3vvxt9`) which the user approved and which merged automatically to `main` (commit `804a5f5`, merge commit `c1d7668`) — no local code changes or verification performed in *this* session's local environment; the cloud session did its own build/verify before opening the PR.
+
+**Local repo synced to `main`.** Local `feat/supabase-auth` checkout had a long-carried uncommitted `CASE_STUDY.md` edit (pre-existing from a prior session, predating this one) — stashed with `git stash push -u`, switched to `main`, fast-forward pulled (`66eb0b6` → `c1d7668`, bringing in both PR #23 and PR #24's 29+ file changes), then stash was popped back cleanly onto `main` (no conflicts) so this log entry could be appended. `clarityincalm.aab` and `supabase/.temp/` remain untracked/uncommitted, as before.
+
+**Status:** `main` now has the full Supabase-auth feature *and* its i18n, PR #23 and #24 both merged. Remaining: Google/Apple OAuth provider testing (still needs a real dev build — EAS credits exhausted this period, local Gradle OOM-risky per `AGENTS.md`); the intentionally-deferred raw-SDK-error-message translation; the old `feat/supabase-auth` local/remote branch is now fully merged and could be deleted (not done, not asked). `CASE_STUDY.md` itself remains uncommitted at end of session, consistent with this project's established pattern of leaving it for a deliberate commit later.
+
+---
+
+## 2026-07-21 (Google sign-in session) — Local debug build produced + installed; Google enabled in Supabase; OAuth round-trip not yet confirmed
+
+Picked up the "Google/Apple OAuth provider testing" open item from the prior session. Apple explicitly out of scope (no dev account) — `expo-apple-authentication`/`usesAppleSignIn` untouched. No app code changed this session — `src/lib/oauth.ts`'s `signInWithGoogle` was already correct (`Linking.createURL('/')` emits `clarityincalm:///`, which matches the already-allowlisted `clarityincalm://**` redirect wildcard from a prior session).
+
+**Track A (dashboard config) — done by user, guided step-by-step:**
+- Google Cloud Console: OAuth consent screen (External, app name "Clarity in Calm", test user `trac3r1885@gmail.com`) + OAuth Client ID (**Web application** type, redirect URI `https://wmomwwdfvbmpdjyoaxlo.supabase.co/auth/v1/callback`).
+- Supabase Dashboard → Authentication → Providers → Google: Client ID + Secret pasted, **enabled**. User confirmed this step complete.
+
+**Track B (local debug build) — executed:**
+1. `android/gradle.properties` hand-edited (gitignored, per `AGENTS.md`'s OOM guidance): `org.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m`, `reactNativeArchitectures=arm64-v8a`. Was previously left at release-profile settings (`-Xmx2048m`, 4 ABIs) from the last build session.
+2. `cd android && ./gradlew assembleDebug` — **succeeded**, no OOM kill, ~4m50s, produced `android/app/build/outputs/apk/debug/app-debug.apk` (85MB).
+3. **Install conflict hit and resolved with user sign-off:** device (`adb-ZT4225SW82-fwmA1o._adb-tls-connect._tcp`, Moto G "kansas") had the old **EAS release build (versionCode 8)** installed under package `com.clarityincalm.app`; this debug build is versionCode 6, so `adb install -r` (and `-r -d`) both hit `INSTALL_FAILED_VERSION_DOWNGRADE`. Asked the user via AskUserQuestion since the only fix (`adb uninstall`) wipes local app data (journal entries etc., app is local-first) — user chose **uninstall and reinstall**. Ran `adb uninstall com.clarityincalm.app` → success → reinstalled the debug APK → success. (Noted in passing: a second, unrelated stale package `com.clarityjournal.app` also exists on the device from some earlier naming — not touched.)
+4. `npx expo start` (plain, no `--dev-client`, confirmed not installed) launched in background (pid 3474, still running at session end) + `adb reverse tcp:8081 tcp:8081`. Bundle built successfully (~72s, 2025 modules), `ReactNativeJS: Running "main"` confirmed in logcat, no crash.
+
+**On-device testing so far:** Since the debug install wiped app data, the app came up on first-launch onboarding ("Choose your language") rather than straight to Settings — expected, confirmed via `adb exec-out screencap` screenshot. User then hit a **LogBox dev warning** ("The action 'GO_BACK' was not handled by any navigator") after some navigation — diagnosed via a second screenshot as a **harmless React Navigation dev-only warning** (explicitly says so in the box), unrelated to Google sign-in; likely triggered by tapping back/close with no prior screen on the stack. Instructed user to dismiss it and navigate to Settings → Account → sign-in → "Continue with Google" instead.
+
+**Session ended before the actual Google OAuth round-trip was attempted/observed.** Metro (pid 3474) and the `adb reverse` tunnel were both left running/active at end of session — likely stale by the next session (process may die when the terminal/session context ends; re-verify with `ps aux | grep "expo start"` and `adb reverse --list` before assuming they're still up).
+
+**Still open:** confirm the actual "Continue with Google" tap completes the OAuth flow and lands in a signed-in state (Settings → Account should reflect it) — this is the core untested step. If it fails, next diagnostic move is `adb logcat` filtered around the tap, and checking `signInWithGoogle`'s returned error string wherever the sign-in screen surfaces it. Also still open from before: raw-SDK-error-message translation (deliberately deferred), stale `com.clarityjournal.app` package on the test device (likely safe to ignore/uninstall separately), `android/gradle.properties` is back on debug-safe settings now (will need the release-profile values restored again if a release APK is ever built locally instead of via EAS), untracked `clarityincalm.aab` + `supabase/.temp/` still uncommitted as before.
+
+---
+
+## 2026-07-21 (continued) — Google OAuth round-trip CONFIRMED WORKING
+
+Picked up exactly where the last session left off: Metro (pid 3474/3460) and `adb reverse tcp:8081 tcp:8081` were both still alive, app still installed and foregrounded on the Moto G test device — nothing needed restarting.
+
+**Test performed:** started an `adb logcat` capture, screenshotted the running app (already on Settings → "Sign in / Create account"), tapped through to the sign-in screen, tapped "Continue with Google". This opened a Chrome Custom Tab to `accounts.google.com`'s real account chooser (listing several real Google accounts on the device — asked the user which to use rather than guessing, since these are live personal accounts). User picked `kwanghyunyoon7@gmail.com`. After account selection, the custom tab closed and the app redirected back automatically (brief splash screen, then landed on the Today home screen with the same harmless GO_BACK LogBox warning as before — cosmetic, ignored).
+
+**Verification:** navigated to Settings → confirmed the Account row now shows `kwanghyunyoon7@gmail.com` with "Sign out" / "Delete account" options in place of the old "Sign in / Create account" row — i.e. the app is genuinely in a signed-in state, not just showing a transient success toast. Cross-checked the logcat capture: clean `ActivityTaskManager` redirect chain (app → Chrome custom tab → `wmomwwdfvbmpdjyoaxlo.supabase.co` → back to app), zero errors or exceptions around the flow.
+
+**Conclusion: Google sign-in via Supabase is fully working end-to-end** — Google Cloud OAuth client config, Supabase provider config, and the app's `signInWithGoogle`/redirect-URL handling (`src/lib/oauth.ts`) are all confirmed correct together. This closes out the last remaining untested piece of the Supabase-auth feature (Apple sign-in remains explicitly out of scope, no dev account).
+
+**Cleanup owed (not done, not asked):** the test account `kwanghyunyoon7@gmail.com` is now a real signed-in user in the `wmomwwdfvbmpdjyoaxlo` Supabase project — fine to leave, or delete via Auth→Users if a clean slate is wanted later. `android/gradle.properties` remains on debug-safe settings (per `AGENTS.md`, restore release-profile values before any local release build). Untracked `clarityincalm.aab` + `supabase/.temp/` still uncommitted.
+
+---
+
+## 2026-07-22 — Canva promo video set created for closed-testing recruitment
+
+New thread, unrelated to the auth work above: built an 8-slide Canva video promo asset set for "Clarity in Calm," using the Canva MCP tools end to end.
+
+**Content sourced from the repo, not invented:** `README.md` (feature list, tagline, tech stack, contact email `clarityincalm@icloud.com`), `app.config.js` (app name, privacy policy URL, no live store listing), `src/constants/theme.ts` (brand colors — sage green `#4A8C50`, cream `#F5EDE0`, terracotta `#C17A4A`, amber `#D4870A`).
+
+**Outline (hook → problem → solution → 4 feature slides → differentiation → CTA)** built and approved via `request-outline-review` after one revision: the user asked the closing CTA slide to say the app is in **closed testing, not publicly available**, recruiting testers via email — not a fake "download now" store link. Corrected outline title: "We're looking for early testers."
+
+**Generation:** `generate-design-structured` (design_type `presentation`) produced 4 distinct candidates; all 4 saved to the account via `create-design-from-candidate` (design IDs `DAHQGiKzmHc`, `DAHQGolUBmk`, `DAHQGtS0LMU`, `DAHQGqlEGhY`) so there'd be visual variety across the video set. Two of them (`DAHQGiKzmHc`, `DAHQGolUBmk`) were additionally resized to 1080×1920 vertical via `resize-design` (new IDs `DAHQGjRNi4M`, `DAHQGl46l30`) for a mobile-format pair.
+
+**Export:** confirmed mp4 support via `get-export-formats` on all 6 design IDs first, then `export-design` with `format.type: "mp4"` — `quality: "vertical_1080p"` for the two vertical designs, `"horizontal_1080p"` for the four landscape ones. Produced 2 vertical + 4 landscape mp4s.
+
+**Delivery snag and fix:** the first round of presigned S3 download URLs, posted as markdown links, didn't open for the user at all ("doesn't open anything"). Diagnosed narrowly via `AskUserQuestion` (confirmed it was the mp4 download links specifically, not the Canva edit links). Fix: re-ran `export-design` for fresh URLs, then `curl`'d all 6 mp4s down to `/home/jayhaxxx88/.cache/claude-tmp/.../scratchpad/canva_videos/` and delivered them as local file attachments via `SendUserFile` instead of relying on the client to render remote presigned links. This worked — all 6 files delivered (`file_uuid`s confirmed in the tool result).
+
+**Status:** all 6 videos delivered as attachments. **Not yet done:** the user hasn't confirmed the attachments actually play/look right on their end (only that they were sent). Also flagged but not yet checked: auto-generated slide text can run cramped, especially on the vertical resizes cramming 8–9 slides of copy into a taller/narrower frame — "Racing thoughts. Nowhere to put them." and "Journal that's actually yours" were called out as the densest slides worth a manual look inside Canva before use. The 4 saved presentation designs and their Canva edit URLs remain in the account for manual touch-up:
+- `DAHQGiKzmHc` → https://www.canva.com/d/sOAtddzmSnkEE40
+- `DAHQGolUBmk` → https://www.canva.com/d/M_GGFzo-6DX7gXS
+- `DAHQGtS0LMU` → https://www.canva.com/d/GiOBdqlNbaJ5Fiw
+- `DAHQGqlEGhY` → https://www.canva.com/d/lhoSnxgMDdI5ZYb
+
+---
+
+## 2026-07-22 (continued) — UI polish: Box Breathing / Grounding spacing fixes + floating pill tab bar
+
+New thread, unrelated to the Canva work above. User supplied a 3-item improvement list (`list.md`, untracked); planned in plan mode (Explore → Plan agent → user-approved plan at `~/.claude/plans/my-list-of-improvements-linear-orbit.md`), then implemented directly (no separate build step needed — pure RN styling).
+
+**Root cause found for the Box Breathing overlap complaint:** `breathe.tsx`'s `followCircle` and `hint` text nodes were both using **negative** `marginTop: -Spacing.three` independently to pull themselves up toward the breathing circle — with both visible at once (pre-session state) they collided/overlapped. Not just "too tight," an actual layout bug.
+
+**Changes made:**
+1. `src/app/(tabs)/breathe.tsx` — `root` gets `justifyContent:'center'` (vertical centering); `header` padding/gap increased (`paddingTop: Spacing.four→six`, `gap: Spacing.half→two`); `followCircle`/`hint`/`rounds` moved into a new wrapping `View style={s.textStack}` (`gap: Spacing.two`) that replaces the negative-margin hack with one controlled `marginTop: -Spacing.two` on the stack itself; text sizes bumped (subtitle 14→16, followCircle 13→15, hint 14→16, rounds 13→15, infoText 13/lh20→15/lh22) — "Breathe" title (28) and "Start Breathing" buttonText (16) deliberately left untouched per user request.
+2. `src/app/(tabs)/ground.tsx` — `header` gets `alignItems:'center'` (was left-aligned) + `paddingTop: Spacing.three→six` so "Grounding"/"5-4-3-2-1" clears the globally-floating `<LanguagePill/>` (renders absolutely at `top: insets.top+4` from `_layout.tsx`, screen itself reserved no space for it before this fix); `title`/`subtitle` get `textAlign:'center'`; `scroll` contentContainerStyle gets `flexGrow:1, justifyContent:'center'` (safe with ScrollView — only centers when content < viewport, degrades to normal scroll once a step overflows); description text sizes bumped (introText 14/21→16/24, instruction 22/30→24/33, tip 14/21→16/24, infoText 13/20→15/22).
+3. `src/app/(tabs)/_layout.tsx` — bottom tab bar converted from edge-to-edge to a floating pill via pure `tabBarStyle` changes on the existing `<Tabs>` (no custom `tabBar` component needed): `position:'absolute'`, `left/right: Spacing.three`, `bottom: insets-derived`, `borderRadius: 28`, full hairline border + `colors.tabBarBorder`, drop shadow (`shadowOpacity:0.12` etc. matching `LanguagePill`'s shadow values), `elevation: 4`.
+4. **Content-clearance fix required by #3:** all 5 visible tab screens (`index.tsx`, `journal.tsx`, `emotions.tsx`, `insights.tsx`, `settings.tsx`) had independently hardcoded `const bottomPad = 88 + insets.bottom;` tuned for the old flush bar — added shared `TAB_BAR_FLOAT_HEIGHT`/`TAB_BAR_FLOAT_MARGIN`/`TAB_BAR_CLEARANCE` (~78) constants to `src/constants/theme.ts` and swapped all 5 call sites (plus `ground.tsx`'s static `scroll.paddingBottom`) to use `TAB_BAR_CLEARANCE` instead, fixing both the new floating-bar clearance and the pre-existing 5-way magic-number duplication in one pass.
+
+**Verification:** `npx tsc --noEmit` clean on every touched file (remaining errors in the output are pre-existing, unrelated missing-`@types/jest` issues in `__tests__/*.test.ts`). Machine was under heavy load from an unrelated background Gradle/Kotlin build (per `AGENTS.md`'s low-RAM warning) so `expo start --web` was slow to come up; once up, verified visually via a Playwright script (`playwright` module borrowed from the sibling `dreami` repo's `node_modules` — not installed in this repo) driving headless Chromium at an iPhone-sized viewport (390×844), screenshotting `/`, `/breathe`, `/ground`. Confirmed via `getComputedStyle` in-page (not just screenshot) that the tab bar is genuinely `position:absolute; border-radius:28px; left/right:16px; bottom:12px` with a real box-shadow — screenshots at full-page scale made the floating pill subtle against the cream background, a tight crop around the bar made it unambiguous. Not yet checked on a real Android device (elevation/shadow clipping risk and true safe-area-inset behavior were flagged in the plan as web-blind-spots worth a follow-up device check, per `AGENTS.md`'s existing local-build guidance).
+
+**Status:** all three fixes implemented and visually confirmed on web. Not committed (git status still shows the modified files, matches this project's established pattern of leaving commits for later). Untracked `clarityincalm.aab`, `supabase/.temp/`, and now `list.md` (the source improvement list) remain uncommitted from before. Real-device visual check still open.
