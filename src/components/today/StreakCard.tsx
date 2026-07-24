@@ -8,7 +8,9 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { BorderRadius, Colors, Spacing } from '@/constants/theme';
+import { Card } from '@/components/ui/Card';
+import { IconChip } from '@/components/ui/IconChip';
+import { Colors, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 interface Props {
@@ -43,11 +45,16 @@ export function StreakCard({ streak, streakLabel, streakStart, totalEntries, tot
   }));
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <Card style={styles.card}>
       <View style={styles.streakRow}>
-        <Animated.Text style={[styles.flame, flameStyle]}>
-          {streak > 0 ? '🔥' : '🌱'}
-        </Animated.Text>
+        <Animated.View style={flameStyle}>
+          <IconChip
+            name={streak > 0 ? 'flame' : 'leaf'}
+            color={colors.primary}
+            size={26}
+            chipSize={52}
+          />
+        </Animated.View>
         <View>
           {streak > 0 ? (
             <>
@@ -79,23 +86,18 @@ export function StreakCard({ streak, streakLabel, streakStart, totalEntries, tot
           <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{emotionsLabel}</Text>
         </View>
       </View>
-    </View>
+    </Card>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
     padding: Spacing.three,
   },
   streakRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
-  },
-  flame: {
-    fontSize: 36,
   },
   streakNum: {
     fontSize: 36,
