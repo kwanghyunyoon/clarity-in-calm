@@ -17,7 +17,9 @@ import {
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DatePickerModal } from '@/components/journal/DatePickerModal';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { JOURNAL_TEMPLATES } from '@/constants/emotions';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
@@ -56,118 +58,6 @@ function formatTimestamp(iso: string) {
   if (isToday) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }
-
-// ── Date picker modal ─────────────────────────────────────────────────────────
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-function DatePickerModal({
-  visible,
-  onClose,
-  onConfirm,
-}: {
-  visible: boolean;
-  onClose: () => void;
-  onConfirm: (date: Date) => void;
-}) {
-  const { colors } = useTheme();
-  const today = new Date();
-  const minYear = today.getFullYear();
-  const years = Array.from({ length: 10 }, (_, i) => minYear + i);
-
-  const [selYear,  setSelYear]  = useState(minYear);
-  const [selMonth, setSelMonth] = useState(today.getMonth());
-  const [selDay,   setSelDay]   = useState(today.getDate() + 1 > 28 ? 1 : today.getDate() + 1);
-
-  const daysInMonth = new Date(selYear, selMonth + 1, 0).getDate();
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-
-  // Keep selDay in range when month/year changes
-  const safeDay = Math.min(selDay, daysInMonth);
-
-  function handleConfirm() {
-    const d = new Date(selYear, selMonth, safeDay, 12, 0, 0);
-    if (d <= today) return; // must be future
-    onConfirm(d);
-    onClose();
-  }
-
-  return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <View style={dp.overlay}>
-        <TouchableOpacity style={dp.backdrop} activeOpacity={1} onPress={onClose} />
-        <View style={[dp.sheet, { backgroundColor: colors.surface }]}>
-          <Text style={[dp.title, { color: colors.text }]}>Set unlock date</Text>
-          <Text style={[dp.subtitle, { color: colors.textSecondary }]}>
-            Letter will be hidden until this date
-          </Text>
-          <View style={dp.pickerRow}>
-            {/* Month */}
-            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
-              {MONTHS.map((m, idx) => (
-                <TouchableOpacity key={m} onPress={() => setSelMonth(idx)} style={dp.item}>
-                  <Text style={[dp.itemText, { color: idx === selMonth ? colors.primary : colors.textSecondary },
-                    idx === selMonth && dp.itemSelected]}>
-                    {m}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            {/* Day */}
-            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
-              {days.map(d => (
-                <TouchableOpacity key={d} onPress={() => setSelDay(d)} style={dp.item}>
-                  <Text style={[dp.itemText, { color: d === safeDay ? colors.primary : colors.textSecondary },
-                    d === safeDay && dp.itemSelected]}>
-                    {String(d).padStart(2, '0')}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            {/* Year */}
-            <ScrollView style={dp.col} showsVerticalScrollIndicator={false}>
-              {years.map(y => (
-                <TouchableOpacity key={y} onPress={() => setSelYear(y)} style={dp.item}>
-                  <Text style={[dp.itemText, { color: y === selYear ? colors.primary : colors.textSecondary },
-                    y === selYear && dp.itemSelected]}>
-                    {y}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </View>
-          <TouchableOpacity
-            style={[dp.btn, { backgroundColor: colors.primary }]}
-            onPress={handleConfirm}
-          >
-            <Text style={dp.btnText}>Set date</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onClose} style={dp.cancel}>
-            <Text style={[dp.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-}
-
-const dp = StyleSheet.create({
-  overlay:    { flex: 1, justifyContent: 'flex-end' },
-  backdrop:   { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.5)' },
-  sheet:      { borderTopLeftRadius: 24, borderTopRightRadius: 24,
-                padding: Spacing.four, paddingBottom: Spacing.four + 16, gap: Spacing.two },
-  title:      { fontSize: 20, fontWeight: '800' },
-  subtitle:   { fontSize: 13, fontWeight: '500' },
-  pickerRow:  { flexDirection: 'row', gap: Spacing.two, height: 180 },
-  col:        { flex: 1 },
-  item:       { paddingVertical: Spacing.two, alignItems: 'center' },
-  itemText:   { fontSize: 16, fontWeight: '500' },
-  itemSelected: { fontWeight: '700' as const },
-  btn:        { borderRadius: 50, paddingVertical: Spacing.two + 6,
-                alignItems: 'center', marginTop: Spacing.two },
-  btnText:    { fontSize: 16, fontWeight: '700', color: '#fff' },
-  cancel:     { alignItems: 'center', paddingVertical: Spacing.two },
-  cancelText: { fontSize: 15, fontWeight: '500' },
-});
 
 export default function JournalScreen() {
   const { colors } = useTheme();
@@ -578,85 +468,77 @@ export default function JournalScreen() {
   );
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.root, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      {/* ── Header ── */}
-      <View style={[styles.header, {
-        paddingTop: insets.top + Spacing.two,
-        backgroundColor: colors.background,
-        borderBottomColor: colors.border,
-      }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{tj.title}</Text>
-      </View>
+    <Screen>
+      <KeyboardAvoidingView
+        style={styles.root}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScreenHeader>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{tj.title}</Text>
+        </ScreenHeader>
 
-      <FlatList
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-        data={filteredEntries}
-        keyExtractor={item => item.id}
-        renderItem={renderEntry}
-        ListHeaderComponent={listHeader}
-        ListEmptyComponent={listEmpty}
-        ItemSeparatorComponent={() => <View style={styles.entrySeparator} />}
-        removeClippedSubviews
-        initialNumToRender={8}
-        maxToRenderPerBatch={8}
-        windowSize={5}
-      />
+        <FlatList
+          style={styles.scroll}
+          contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          data={filteredEntries}
+          keyExtractor={item => item.id}
+          renderItem={renderEntry}
+          ListHeaderComponent={listHeader}
+          ListEmptyComponent={listEmpty}
+          ItemSeparatorComponent={() => <View style={styles.entrySeparator} />}
+          removeClippedSubviews
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={5}
+        />
 
-      {/* ── Future Self date picker ── */}
-      <DatePickerModal
-        visible={showDatePicker}
-        onClose={() => setShowDatePicker(false)}
-        onConfirm={(d) => setUnlockDate(d)}
-      />
+        {/* ── Future Self date picker ── */}
+        <DatePickerModal
+          visible={showDatePicker}
+          onClose={() => setShowDatePicker(false)}
+          onConfirm={(d) => setUnlockDate(d)}
+        />
 
-      {/* ── Crisis modal ── */}
-      <Modal visible={showCrisis} transparent animationType="fade" onRequestClose={() => { setShowCrisis(false); setPendingSave(null); }}>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.crisisTitle, { color: colors.text }]}>{tj.crisis.title}</Text>
-            <Text style={[styles.crisisBody, { color: colors.textSecondary }]}>{tj.crisis.body}</Text>
-            {tj.crisis.lines.map((line) => (
+        {/* ── Crisis modal ── */}
+        <Modal visible={showCrisis} transparent animationType="fade" onRequestClose={() => { setShowCrisis(false); setPendingSave(null); }}>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.crisisTitle, { color: colors.text }]}>{tj.crisis.title}</Text>
+              <Text style={[styles.crisisBody, { color: colors.textSecondary }]}>{tj.crisis.body}</Text>
+              {tj.crisis.lines.map((line) => (
+                <TouchableOpacity
+                  key={line.title}
+                  style={[styles.crisisLine, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}
+                  onPress={() => openUrl(line.action)}
+                >
+                  <Text style={styles.crisisEmoji}>{line.emoji}</Text>
+                  <View style={styles.crisisLineText}>
+                    <Text style={[styles.crisisLineTitle, { color: colors.text }]}>{line.title}</Text>
+                    <Text style={[styles.crisisLineSub, { color: colors.textSecondary }]}>{line.sub}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
               <TouchableOpacity
-                key={line.title}
-                style={[styles.crisisLine, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}
-                onPress={() => openUrl(line.action)}
+                style={[styles.crisisBtn, { backgroundColor: colors.primary }]}
+                onPress={handleCrisisConfirm}
               >
-                <Text style={styles.crisisEmoji}>{line.emoji}</Text>
-                <View style={styles.crisisLineText}>
-                  <Text style={[styles.crisisLineTitle, { color: colors.text }]}>{line.title}</Text>
-                  <Text style={[styles.crisisLineSub, { color: colors.textSecondary }]}>{line.sub}</Text>
-                </View>
+                <Text style={styles.crisisBtnText}>{tj.crisis.confirmBtn}</Text>
               </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={[styles.crisisBtn, { backgroundColor: colors.primary }]}
-              onPress={handleCrisisConfirm}
-            >
-              <Text style={styles.crisisBtnText}>{tj.crisis.confirmBtn}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleCrisisSave}>
-              <Text style={[styles.crisisSaveLink, { color: colors.textSecondary }]}>{tj.crisis.saveBtn}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleCrisisSave}>
+                <Text style={[styles.crisisSaveLink, { color: colors.textSecondary }]}>{tj.crisis.saveBtn}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
-    </KeyboardAvoidingView>
+        </Modal>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.two + 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
   headerTitle: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5, marginLeft: Spacing.six },
   scroll: { flex: 1 },
   content: {
