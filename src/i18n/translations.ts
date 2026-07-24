@@ -24,7 +24,6 @@ export const en = {
     home:     'Home',
     breathe:  'Breathe',
     journal:  'Journal',
-    progress: 'Progress',
     today:    'Today',
     emotions: 'Emotions',
     insights: 'Insights',
@@ -594,43 +593,6 @@ export const en = {
     },
   },
 
-  // ── Progress ──────────────────────────────────────────────────────────────
-  progress: {
-    title:    'Progress',
-    subtitle: 'Your wellness journey',
-    stats: {
-      entries:  'journal entries',
-      sessions: 'breathing sessions',
-      avgMood:  'average mood',
-    },
-    last7:        'Last 7 days',
-    chartLegend:  'Each dot shows your average mood that day',
-    streakHow:    'Log a journal entry every day to grow your streak',
-    moodBreakdown:'Mood breakdown',
-    streakMotiv: {
-      week: 'Amazing! A full week! 🌟',
-      days: 'days in a row!',
-      sub:  "You're building a real self-care habit. Keep going — every day counts.",
-    },
-    empty: {
-      title: 'Start your journey',
-      body:  'Log your first mood in the Journal tab to see your progress here.',
-    },
-    insights: {
-      title:    'Insights',
-      topMood:  'Most logged mood',
-      trend: {
-        label: 'Mood trend',
-        up:    '↑ Improving vs last week',
-        down:  '↓ Declining vs last week',
-        flat:  '→ Stable vs last week',
-        none:  'Log more entries to see your trend',
-      },
-      bestDay:   'Best day of your week',
-      noPattern: 'Keep logging to discover patterns',
-    },
-  },
-
   // ── Daily content (quotes + feelings-library affirmations) ────────────────
   dailyContent: {
     quotes: [
@@ -787,7 +749,6 @@ export const ko: Translations = {
     home:     '홈',
     breathe:  '호흡',
     journal:  '일기',
-    progress: '진행',
     today:    '오늘',
     emotions: '감정',
     insights: '분석',
@@ -1031,42 +992,6 @@ export const ko: Translations = {
   settingsScreen: { title: '설정', notifications: '매일 알림', notificationsOff: '끄기', notificationsOn: '켜기', reminderTime: '알림 시간', reminderDays: '요일', appearance: '외관', themeSystem: '시스템', themeLight: '밝은', themeDark: '어두운', language: '언어', data: '내 데이터', exportData: '전체 데이터 내보내기 (JSON)', shareClarityAI: 'ClarityAI와 데이터 공유', deleteData: '전체 데이터 삭제', deleteConfirm: { title: '전체 데이터를 삭제할까요?', body: '모든 일기, 감정 기록, 설정이 영구적으로 삭제됩니다. 취소할 수 없어요.', confirm: '모두 삭제', cancel: '취소' }, timePicker: { title: '알림 시간', hourLabel: '시', minuteLabel: '분', confirm: '알림 설정', cancel: '취소' }, notifPermission: { title: '알림 권한이 필요해요', body: '매일 알림을 받으려면 기기 설정에서 알림을 켜주세요.' }, dataDeleted: { title: '완료', body: '모든 데이터가 삭제되었습니다.' }, exportSaved: { title: '내보내기 완료', bodyPrefix: '저장 위치: ' }, exportFailed: { title: '내보내기 실패', fallbackBody: '문제가 발생했습니다.' }, privacy: '개인정보 처리방침', youtube: 'YouTube에서 보기', version: '버전', daysShort: ['일', '월', '화', '수', '목', '금', '토'], about: '앱 정보', aboutBody: 'Clarity in Calm은 오프라인 우선 웰니스 앱입니다. 모든 데이터는 기기에 암호화되어 저장됩니다.', account: { header: '계정', subtitle: '로그인하면 데이터를 동기화하고 백업할 수 있어요.', signIn: '로그인 / 계정 만들기', signOut: '로그아웃', deleteAccount: '계정 삭제', deleteConfirm: { title: '계정을 삭제할까요?', body: '계정이 영구적으로 삭제되며 취소할 수 없습니다.', confirm: '삭제', cancel: '취소' }, deleteError: { title: '계정을 삭제할 수 없습니다', body: '다시 시도해 주세요.' } } },
   authScreen: { signIn: { title: '다시 오신 것을 환영해요', subtitle: 'Clarity in Calm에 로그인하세요.', emailLabel: '이메일', emailPlaceholder: 'email@example.com', passwordLabel: '비밀번호', passwordPlaceholder: '••••••••', forgotPassword: '비밀번호를 잊으셨나요?', submit: '로그인', or: '또는', continueWithGoogle: 'Google로 계속하기', noAccountPrefix: '계정이 없으신가요? ', signUpLink: '회원가입', errors: { missingCredentials: '이메일과 비밀번호를 입력하세요', generic: '로그인할 수 없습니다. 다시 시도해 주세요.', google: 'Google 로그인에 실패했습니다. 다시 시도해 주세요.' } }, signUp: { title: '계정 만들기', subtitle: 'Clarity in Calm을 시작하려면 가입하세요.', emailLabel: '이메일', emailPlaceholder: 'email@example.com', passwordLabel: '비밀번호', passwordPlaceholder: '8자 이상 입력하세요', consentPrefix: '', consentLink: '개인정보 처리방침에 동의합니다', submit: '회원가입', hasAccountPrefix: '이미 계정이 있으신가요? ', signInLink: '로그인', confirmEmailNotice: '계정을 확인하려면 이메일을 확인하세요', errors: { missing: '이메일과 비밀번호를 입력하세요', passwordTooShort: '비밀번호는 8자 이상이어야 합니다', consentRequired: '계속하려면 개인정보 처리방침에 동의해 주세요', generic: '계정을 만들 수 없습니다. 다시 시도해 주세요.' } }, forgotPassword: { title: '비밀번호 재설정', subtitle: '비밀번호를 재설정할 수 있는 링크를 이메일로 보내드릴게요.', emailLabel: '이메일', emailPlaceholder: 'email@example.com', submit: '재설정 링크 보내기', sentBodyPrefix: '만약 ', sentBodySuffix: '에 대한 계정이 있다면, 비밀번호 재설정 링크를 보내드렸어요.', backToSignIn: '로그인으로 돌아가기', cancel: '취소', errors: { missingEmail: '이메일을 입력하세요', generic: '재설정 이메일을 보낼 수 없습니다. 다시 시도해 주세요.' } }, resetPassword: { title: '새 비밀번호 설정', passwordLabel: '새 비밀번호', passwordPlaceholder: '8자 이상 입력하세요', submit: '비밀번호 변경', errors: { expiredLink: '재설정 링크가 만료되었습니다. 새 링크를 요청하세요.', passwordTooShort: '비밀번호는 8자 이상이어야 합니다', generic: '비밀번호를 변경할 수 없습니다. 다시 시도해 주세요.' } }, oauth: { googleGenericError: 'Google 로그인을 시작할 수 없습니다', appleNoToken: 'Apple 로그인에서 인증 토큰을 받지 못했습니다', appleGenericError: 'Apple 로그인에 실패했습니다. 다시 시도해 주세요.' } },
   journalExtended: { searchPlaceholder: '기록 검색…', templates: '템플릿', tags: '태그', addTag: '+ 태그 추가', calendar: '달력', futureSelf: '미래의 나', futureSelfTitle: '미래의 나에게 쓰기', futureSelfSubtitle: '이 편지를 열 날짜를 선택하세요', futureSelfLocked: '열리는 날짜', futureSelfUnlock: '편지 열기', unlockDate: '해제 날짜', setDate: '날짜 설정', templateFreeWrite: '자유 쓰기', templateGratitude: '감사', templateReflection: '하루 회고', templateCBT: '생각 점검', templateWeeklyReview: '주간 회고', templateFutureSelf: '미래의 나', templatePrompts: { gratitude: ['1. 감사한 것은...', '2. 오늘 나를 미소 짓게 한 작은 일...', '3. 내가 고맙게 여기는 사람과 그 이유...'], reflection: ['오늘 나를 지치게 한 것은?', '오늘 나에게 힘을 준 것은?', '내일은 무엇을 다르게 해볼까?'], cbt: ['계속 떠오르는 생각:', '이 생각을 뒷받침하는 근거:', '이 생각에 반대되는 근거:', '더 균형 잡힌 시각:'], 'weekly-review': ['이번 주 나를 지치게 한 것은?', '이번 주 나에게 힘을 준 것은?', '자랑스러운 성취:', '다음 주를 위한 다짐 하나:'], 'future-self': ['미래의 나에게,', '지금 나는 이런 기분이야...', '꼭 기억했으면 하는 것:', '응원의 한마디:'] }, noResults: '검색 결과가 없어요', customTagPlaceholder: '태그 입력…', addTagConfirm: '추가', deleteEntry: '삭제', tagLabels: { work: '업무', home: '집', family: '가족', health: '건강', relationship: '관계', growth: '성장', gratitude: '감사', stress: '스트레스', joy: '기쁨', sleep: '수면' } },
-  progress: {
-    title:    '진행 상황',
-    subtitle: '나의 웰니스 여정',
-    stats: {
-      entries:  '일기 기록',
-      sessions: '호흡 세션',
-      avgMood:  '평균 기분',
-    },
-    last7:        '최근 7일',
-    chartLegend:  '각 점은 그날의 평균 기분을 나타내요',
-    streakHow:    '매일 일기를 작성하면 연속 기록이 늘어나요',
-    moodBreakdown: '기분 분석',
-    streakMotiv: {
-      week: '대단해요! 일주일 달성! 🌟',
-      days: '일 연속 달성!',
-      sub:  '진정한 자기 관리 습관을 만들고 있어요. 계속하세요 — 매일이 소중해요.',
-    },
-    empty: {
-      title: '여정을 시작하세요',
-      body:  '일기 탭에서 첫 번째 기분을 기록하면 여기서 진행 상황을 볼 수 있어요.',
-    },
-    insights: {
-      title:    '인사이트',
-      topMood:  '가장 많이 기록한 기분',
-      trend: {
-        label: '기분 추세',
-        up:    '↑ 지난 주보다 나아지고 있어요',
-        down:  '↓ 지난 주보다 낮아졌어요',
-        flat:  '→ 지난 주와 비슷해요',
-        none:  '추세를 보려면 더 기록해보세요',
-      },
-      bestDay:   '기분이 가장 좋은 요일',
-      noPattern: '매일 기록하면 패턴이 보여요',
-    },
-  },
-
   dailyContent: {
     quotes: [
       { text: '숨을 쉬어보세요. 그저 힘든 하루일 뿐, 힘든 인생이 아니에요.', author: '작자 미상' },
@@ -1222,7 +1147,6 @@ export const es: Translations = {
     home:     'Inicio',
     breathe:  'Respirar',
     journal:  'Diario',
-    progress: 'Progreso',
     today:    'Hoy',
     emotions: 'Emociones',
     insights: 'Análisis',
@@ -1482,42 +1406,6 @@ export const es: Translations = {
   settingsScreen: { title: 'Ajustes', notifications: 'Recordatorio diario', notificationsOff: 'Apagado', notificationsOn: 'Encendido', reminderTime: 'Hora del recordatorio', reminderDays: 'Días', appearance: 'Apariencia', themeSystem: 'Sistema', themeLight: 'Claro', themeDark: 'Oscuro', language: 'Idioma', data: 'Tus datos', exportData: 'Exportar todos los datos (JSON)', shareClarityAI: 'Compartir datos con ClarityAI', deleteData: 'Eliminar todos los datos', deleteConfirm: { title: '¿Eliminar todos los datos?', body: 'Esto borrará permanentemente todas las entradas, emociones y ajustes.', confirm: 'Eliminar todo', cancel: 'Cancelar' }, timePicker: { title: 'Hora del recordatorio', hourLabel: 'Hora', minuteLabel: 'Min', confirm: 'Guardar recordatorio', cancel: 'Cancelar' }, notifPermission: { title: 'Se requiere permiso', body: 'Activa las notificaciones en la configuración de tu dispositivo para recibir recordatorios diarios.' }, dataDeleted: { title: 'Listo', body: 'Todos los datos han sido eliminados.' }, exportSaved: { title: 'Exportado', bodyPrefix: 'Guardado en: ' }, exportFailed: { title: 'Error al exportar', fallbackBody: 'Algo salió mal.' }, privacy: 'Política de privacidad', youtube: 'Ver en YouTube', version: 'Versión', daysShort: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'], about: 'Acerca de', aboutBody: 'Clarity in Calm es una app de bienestar privada y sin conexión. Todos los datos se cifran en tu dispositivo.', account: { header: 'Cuenta', subtitle: 'Inicia sesión para sincronizar y respaldar tus datos.', signIn: 'Iniciar sesión / Crear cuenta', signOut: 'Cerrar sesión', deleteAccount: 'Eliminar cuenta', deleteConfirm: { title: '¿Eliminar cuenta?', body: 'Esto elimina permanentemente tu cuenta y no se puede deshacer.', confirm: 'Eliminar', cancel: 'Cancelar' }, deleteError: { title: 'No se pudo eliminar la cuenta', body: 'Inténtalo de nuevo.' } } },
   authScreen: { signIn: { title: 'Bienvenido de nuevo', subtitle: 'Inicia sesión en Clarity in Calm.', emailLabel: 'Correo electrónico', emailPlaceholder: 'email@example.com', passwordLabel: 'Contraseña', passwordPlaceholder: '••••••••', forgotPassword: '¿Olvidaste tu contraseña?', submit: 'Iniciar sesión', or: 'o', continueWithGoogle: 'Continuar con Google', noAccountPrefix: '¿No tienes una cuenta? ', signUpLink: 'Regístrate', errors: { missingCredentials: 'Ingresa tu correo y contraseña', generic: 'No se pudo iniciar sesión. Inténtalo de nuevo.', google: 'No se pudo iniciar sesión con Google. Inténtalo de nuevo.' } }, signUp: { title: 'Crea tu cuenta', subtitle: 'Regístrate para empezar a usar Clarity in Calm.', emailLabel: 'Correo electrónico', emailPlaceholder: 'email@example.com', passwordLabel: 'Contraseña', passwordPlaceholder: 'Al menos 8 caracteres', consentPrefix: 'Acepto la ', consentLink: 'Política de Privacidad', submit: 'Registrarme', hasAccountPrefix: '¿Ya tienes una cuenta? ', signInLink: 'Inicia sesión', confirmEmailNotice: 'Revisa tu correo para confirmar tu cuenta', errors: { missing: 'Ingresa un correo y una contraseña', passwordTooShort: 'La contraseña debe tener al menos 8 caracteres', consentRequired: 'Acepta la Política de Privacidad para continuar', generic: 'No se pudo crear la cuenta. Inténtalo de nuevo.' } }, forgotPassword: { title: 'Restablece tu contraseña', subtitle: 'Te enviaremos un enlace para restablecer tu contraseña.', emailLabel: 'Correo electrónico', emailPlaceholder: 'email@example.com', submit: 'Enviar enlace', sentBodyPrefix: 'Si existe una cuenta para ', sentBodySuffix: ', te hemos enviado un enlace para restablecer tu contraseña.', backToSignIn: 'Volver a iniciar sesión', cancel: 'Cancelar', errors: { missingEmail: 'Ingresa tu correo electrónico', generic: 'No se pudo enviar el correo de restablecimiento. Inténtalo de nuevo.' } }, resetPassword: { title: 'Configura una nueva contraseña', passwordLabel: 'Nueva contraseña', passwordPlaceholder: 'Al menos 8 caracteres', submit: 'Actualizar contraseña', errors: { expiredLink: 'Este enlace ha expirado. Solicita uno nuevo.', passwordTooShort: 'La contraseña debe tener al menos 8 caracteres', generic: 'No se pudo actualizar la contraseña. Inténtalo de nuevo.' } }, oauth: { googleGenericError: 'No se pudo iniciar el proceso de Google', appleNoToken: 'El inicio de sesión con Apple no devolvió un token de identidad', appleGenericError: 'No se pudo iniciar sesión con Apple. Inténtalo de nuevo.' } },
   journalExtended: { searchPlaceholder: 'Buscar entradas…', templates: 'Plantillas', tags: 'Etiquetas', addTag: '+ Agregar etiqueta', calendar: 'Calendario', futureSelf: 'Yo futuro', futureSelfTitle: 'Escribir a tu yo futuro', futureSelfSubtitle: 'Elige una fecha para abrir esta carta', futureSelfLocked: 'Se abre el', futureSelfUnlock: 'Abrir carta', unlockDate: 'Fecha de apertura', setDate: 'Establecer fecha', templateFreeWrite: 'Escritura libre', templateGratitude: 'Gratitud', templateReflection: 'Reflexión diaria', templateCBT: 'Revisión de pensamientos', templateWeeklyReview: 'Revisión semanal', templateFutureSelf: 'Yo futuro', templatePrompts: { gratitude: ['1. Estoy agradecido/a por...', '2. Algo pequeño que me hizo sonreír...', '3. Una persona que aprecio y por qué...'], reflection: ['¿Qué me agotó hoy?', '¿Qué me dio energía hoy?', '¿Qué haría diferente mañana?'], cbt: ['El pensamiento que sigo teniendo:', 'Evidencia que respalda este pensamiento:', 'Evidencia en contra de este pensamiento:', 'Una forma más equilibrada de verlo:'], 'weekly-review': ['¿Qué me agotó esta semana?', '¿Qué me dio energía esta semana?', 'Un logro del que estoy orgulloso/a:', 'Una intención para la próxima semana:'], 'future-self': ['Querido yo futuro,', 'Ahora mismo me siento...', 'Algo que espero que recuerdes:', 'Un mensaje de aliento:'] }, noResults: 'Sin resultados para tu búsqueda', customTagPlaceholder: 'etiqueta…', addTagConfirm: 'Agregar', deleteEntry: 'Eliminar', tagLabels: { work: 'trabajo', home: 'hogar', family: 'familia', health: 'salud', relationship: 'relación', growth: 'crecimiento', gratitude: 'gratitud', stress: 'estrés', joy: 'alegría', sleep: 'sueño' } },
-  progress: {
-    title:    'Progreso',
-    subtitle: 'Tu viaje de bienestar',
-    stats: {
-      entries:  'entradas de diario',
-      sessions: 'sesiones de respiración',
-      avgMood:  'estado de ánimo promedio',
-    },
-    last7:        'Últimos 7 días',
-    chartLegend:  'Cada punto muestra tu estado de ánimo promedio ese día',
-    streakHow:    'Registra una entrada en el diario cada día para aumentar tu racha',
-    moodBreakdown: 'Distribución de ánimo',
-    streakMotiv: {
-      week: '¡Increíble! ¡Una semana completa! 🌟',
-      days: 'días seguidos',
-      sub:  'Estás creando un hábito real de autocuidado. Sigue adelante — cada día cuenta.',
-    },
-    empty: {
-      title: 'Comienza tu viaje',
-      body:  'Registra tu primer estado de ánimo en la pestaña Diario para ver tu progreso aquí.',
-    },
-    insights: {
-      title:    'Perspectivas',
-      topMood:  'Estado de ánimo más registrado',
-      trend: {
-        label: 'Tendencia del ánimo',
-        up:    '↑ Mejorando vs la semana pasada',
-        down:  '↓ Bajando vs la semana pasada',
-        flat:  '→ Estable vs la semana pasada',
-        none:  'Registra más entradas para ver tu tendencia',
-      },
-      bestDay:   'Tu mejor día de la semana',
-      noPattern: 'Sigue registrando para descubrir patrones',
-    },
-  },
-
   dailyContent: {
     quotes: [
       { text: 'Respira. Es solo un mal día, no una mala vida.', author: 'Anónimo' },
@@ -1673,7 +1561,6 @@ export const hi: Translations = {
     home:     'होम',
     breathe:  'साँस',
     journal:  'डायरी',
-    progress: 'प्रगति',
     today:    'आज',
     emotions: 'भावनाएँ',
     insights: 'विश्लेषण',
@@ -1915,42 +1802,6 @@ export const hi: Translations = {
   settingsScreen: { title: 'सेटिंग', notifications: 'दैनिक अनुस्मारक', notificationsOff: 'बंद', notificationsOn: 'चालू', reminderTime: 'अनुस्मारक समय', reminderDays: 'दिन', appearance: 'रूप-रंग', themeSystem: 'सिस्टम', themeLight: 'हल्का', themeDark: 'गहरा', language: 'भाषा', data: 'आपका डेटा', exportData: 'सारा डेटा निर्यात करें (JSON)', shareClarityAI: 'ClarityAI के साथ डेटा साझा करें', deleteData: 'सारा डेटा हटाएँ', deleteConfirm: { title: 'सारा डेटा हटाएँ?', body: 'सभी डायरी, भावनाएँ और सेटिंग स्थायी रूप से हट जाएंगी।', confirm: 'सब हटाएँ', cancel: 'रद्द करें' }, timePicker: { title: 'अनुस्मारक समय', hourLabel: 'घंटा', minuteLabel: 'मिनट', confirm: 'अनुस्मारक सेट करें', cancel: 'रद्द करें' }, notifPermission: { title: 'अनुमति आवश्यक है', body: 'दैनिक अनुस्मारक पाने के लिए कृपया अपनी डिवाइस सेटिंग में सूचनाएं चालू करें।' }, dataDeleted: { title: 'हो गया', body: 'सारा डेटा हटा दिया गया है।' }, exportSaved: { title: 'निर्यात हो गया', bodyPrefix: 'यहाँ सहेजा गया: ' }, exportFailed: { title: 'निर्यात विफल', fallbackBody: 'कुछ गड़बड़ हो गई।' }, privacy: 'गोपनीयता नीति', youtube: 'YouTube पर देखें', version: 'संस्करण', daysShort: ['र', 'सो', 'मं', 'बु', 'गु', 'शु', 'श'], about: 'ऐप के बारे में', aboutBody: 'Clarity in Calm एक निजी ऑफलाइन वेलनेस ऐप है।', account: { header: 'खाता', subtitle: 'सिंक और बैकअप के लिए साइन इन करें।', signIn: 'साइन इन करें / खाता बनाएँ', signOut: 'साइन आउट', deleteAccount: 'खाता हटाएँ', deleteConfirm: { title: 'खाता हटाएँ?', body: 'इससे आपका खाता स्थायी रूप से हट जाएगा और इसे पूर्ववत नहीं किया जा सकता।', confirm: 'हटाएँ', cancel: 'रद्द करें' }, deleteError: { title: 'खाता नहीं हटाया जा सका', body: 'कृपया फिर से प्रयास करें।' } } },
   authScreen: { signIn: { title: 'वापसी पर स्वागत है', subtitle: 'Clarity in Calm में साइन इन करें।', emailLabel: 'ईमेल', emailPlaceholder: 'email@example.com', passwordLabel: 'पासवर्ड', passwordPlaceholder: '••••••••', forgotPassword: 'पासवर्ड भूल गए?', submit: 'साइन इन करें', or: 'या', continueWithGoogle: 'Google से जारी रखें', noAccountPrefix: 'खाता नहीं है? ', signUpLink: 'साइन अप करें', errors: { missingCredentials: 'अपना ईमेल और पासवर्ड डालें', generic: 'साइन इन नहीं हो सका। कृपया फिर से प्रयास करें।', google: 'Google से साइन इन नहीं हो सका। कृपया फिर से प्रयास करें।' } }, signUp: { title: 'अपना खाता बनाएँ', subtitle: 'Clarity in Calm का उपयोग शुरू करने के लिए साइन अप करें।', emailLabel: 'ईमेल', emailPlaceholder: 'email@example.com', passwordLabel: 'पासवर्ड', passwordPlaceholder: 'कम से कम 8 अक्षर', consentPrefix: '', consentLink: 'मैं गोपनीयता नीति से सहमत हूँ', submit: 'साइन अप करें', hasAccountPrefix: 'पहले से खाता है? ', signInLink: 'साइन इन करें', confirmEmailNotice: 'अपना खाता पुष्ट करने के लिए ईमेल जाँचें', errors: { missing: 'एक ईमेल और पासवर्ड डालें', passwordTooShort: 'पासवर्ड कम से कम 8 अक्षर का होना चाहिए', consentRequired: 'जारी रखने के लिए गोपनीयता नीति से सहमत हों', generic: 'खाता नहीं बनाया जा सका। कृपया फिर से प्रयास करें।' } }, forgotPassword: { title: 'अपना पासवर्ड रीसेट करें', subtitle: 'हम आपको पासवर्ड रीसेट करने के लिए एक लिंक ईमेल करेंगे।', emailLabel: 'ईमेल', emailPlaceholder: 'email@example.com', submit: 'रीसेट लिंक भेजें', sentBodyPrefix: 'अगर ', sentBodySuffix: ' के लिए कोई खाता मौजूद है, तो हमने पासवर्ड रीसेट करने के लिए एक लिंक भेज दिया है।', backToSignIn: 'साइन इन पर वापस जाएँ', cancel: 'रद्द करें', errors: { missingEmail: 'अपना ईमेल डालें', generic: 'रीसेट ईमेल नहीं भेजा जा सका। कृपया फिर से प्रयास करें।' } }, resetPassword: { title: 'नया पासवर्ड सेट करें', passwordLabel: 'नया पासवर्ड', passwordPlaceholder: 'कम से कम 8 अक्षर', submit: 'पासवर्ड अपडेट करें', errors: { expiredLink: 'यह रीसेट लिंक समाप्त हो गया है। नया लिंक माँगें।', passwordTooShort: 'पासवर्ड कम से कम 8 अक्षर का होना चाहिए', generic: 'पासवर्ड अपडेट नहीं हो सका। कृपया फिर से प्रयास करें।' } }, oauth: { googleGenericError: 'Google साइन-इन शुरू नहीं हो सका', appleNoToken: 'Apple साइन-इन से पहचान टोकन नहीं मिला', appleGenericError: 'Apple से साइन इन नहीं हो सका। कृपया फिर से प्रयास करें।' } },
   journalExtended: { searchPlaceholder: 'प्रविष्टियाँ खोजें…', templates: 'टेम्पलेट', tags: 'टैग', addTag: '+ टैग जोड़ें', calendar: 'कैलेंडर', futureSelf: 'भविष्य का मैं', futureSelfTitle: 'भविष्य के मुझे लिखें', futureSelfSubtitle: 'इस पत्र को खोलने की तारीख चुनें', futureSelfLocked: 'खुलेगा', futureSelfUnlock: 'पत्र खोलें', unlockDate: 'खुलने की तारीख', setDate: 'तारीख सेट करें', templateFreeWrite: 'स्वतंत्र लेखन', templateGratitude: 'कृतज्ञता', templateReflection: 'दैनिक समीक्षा', templateCBT: 'विचार जाँच', templateWeeklyReview: 'साप्ताहिक समीक्षा', templateFutureSelf: 'भविष्य का मैं', templatePrompts: { gratitude: ['1. मैं इसके लिए आभारी हूँ...', '2. कोई छोटी सी बात जिसने मुझे मुस्कुराया...', '3. वह व्यक्ति जिसकी मैं सराहना करता/करती हूँ और क्यों...'], reflection: ['आज मुझे किस चीज़ ने थकाया?', 'आज मुझे किस चीज़ ने ऊर्जा दी?', 'कल मैं क्या अलग करूँगा/करूँगी?'], cbt: ['वह विचार जो बार-बार आता है:', 'इस विचार का समर्थन करने वाले प्रमाण:', 'इस विचार के खिलाफ प्रमाण:', 'इसे देखने का एक अधिक संतुलित तरीका:'], 'weekly-review': ['इस हफ्ते मुझे किस चीज़ ने थकाया?', 'इस हफ्ते मुझे किस चीज़ ने ऊर्जा दी?', 'एक उपलब्धि जिस पर मुझे गर्व है:', 'अगले हफ्ते के लिए एक इरादा:'], 'future-self': ['प्रिय भविष्य के मुझे,', 'अभी मैं महसूस कर रहा/रही हूँ...', 'कुछ जो मैं चाहता/चाहती हूँ तुम याद रखो:', 'एक प्रोत्साहन भरा संदेश:'] }, noResults: 'कोई परिणाम नहीं', customTagPlaceholder: 'टैग…', addTagConfirm: 'जोड़ें', deleteEntry: 'हटाएँ', tagLabels: { work: 'काम', home: 'घर', family: 'परिवार', health: 'स्वास्थ्य', relationship: 'रिश्ता', growth: 'विकास', gratitude: 'आभार', stress: 'तनाव', joy: 'खुशी', sleep: 'नींद' } },
-  progress: {
-    title:    'प्रगति',
-    subtitle: 'आपकी वेलनेस यात्रा',
-    stats: {
-      entries:  'डायरी प्रविष्टियाँ',
-      sessions: 'साँस सत्र',
-      avgMood:  'औसत मूड',
-    },
-    last7:        'पिछले 7 दिन',
-    chartLegend:  'हर बिंदु उस दिन का औसत मूड दर्शाता है',
-    streakHow:    'स्ट्रीक बढ़ाने के लिए हर दिन डायरी में प्रविष्टि करें',
-    moodBreakdown: 'मूड विश्लेषण',
-    streakMotiv: {
-      week: 'अद्भुत! पूरा एक सप्ताह! 🌟',
-      days: 'दिन लगातार!',
-      sub:  'आप वास्तविक आत्म-देखभाल की आदत बना रहे हैं। जारी रखें — हर दिन मायने रखता है।',
-    },
-    empty: {
-      title: 'अपनी यात्रा शुरू करें',
-      body:  'अपना पहला मूड डायरी टैब में दर्ज करें और यहाँ अपनी प्रगति देखें।',
-    },
-    insights: {
-      title:    'अंतर्दृष्टि',
-      topMood:  'सबसे अधिक दर्ज किया गया मूड',
-      trend: {
-        label: 'मूड प्रवृत्ति',
-        up:    '↑ पिछले सप्ताह से बेहतर',
-        down:  '↓ पिछले सप्ताह से कम',
-        flat:  '→ पिछले सप्ताह जैसा',
-        none:  'प्रवृत्ति देखने के लिए अधिक प्रविष्टियाँ करें',
-      },
-      bestDay:   'आपका सबसे अच्छा दिन',
-      noPattern: 'पैटर्न खोजने के लिए रोज़ लिखते रहें',
-    },
-  },
-
   dailyContent: {
     quotes: [
       { text: 'एक सांस लें। यह बस एक बुरा दिन है, बुरी ज़िंदगी नहीं।', author: 'अज्ञात' },

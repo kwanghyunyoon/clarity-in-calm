@@ -108,7 +108,6 @@ export default function TabLayout() {
         {/* ── Hidden utility routes (still navigable) ── */}
         <Tabs.Screen name="breathe"  options={{ href: null }} />
         <Tabs.Screen name="ground"   options={{ href: null }} />
-        <Tabs.Screen name="progress" options={{ href: null }} />
         <Tabs.Screen name="feelings-library" options={{ href: null }} />
       </Tabs>
     </>
