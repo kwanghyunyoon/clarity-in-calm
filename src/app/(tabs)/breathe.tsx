@@ -9,8 +9,8 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
@@ -142,12 +142,11 @@ export default function BreatheScreen() {
   };
 
   return (
-    <SafeAreaView edges={['top']} style={[s.root, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={s.header}>
+    <Screen style={s.root}>
+      <ScreenHeader variant="immersive">
         <Text style={[s.title,    { color: colors.text }]}>{t.breathe.title}</Text>
         <Text style={[s.subtitle, { color: colors.textSecondary }]}>{t.breathe.subtitle}</Text>
-      </View>
+      </ScreenHeader>
 
       {/* Circle */}
       <View style={s.circleWrap}>
@@ -211,7 +210,7 @@ export default function BreatheScreen() {
           {t.breathe.infoText}
         </Text>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
@@ -220,8 +219,7 @@ const RING_SIZE  = DISC_SIZE + 32;
 const GLOW_SIZE  = DISC_SIZE + 72;
 
 const s = StyleSheet.create({
-  root:          { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: Spacing.three },
-  header:        { alignItems: 'center', paddingTop: Spacing.six, paddingBottom: Spacing.three, gap: Spacing.two },
+  root:          { alignItems: 'center', justifyContent: 'center' },
   title:         { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
   subtitle:      { fontSize: 16, fontWeight: '500' },
 

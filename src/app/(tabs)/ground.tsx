@@ -7,8 +7,9 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
@@ -17,6 +18,8 @@ export default function GroundScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
   const g = t.ground;
+  const insets = useSafeAreaInsets();
+  const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const steps = g.steps as readonly {
     count: number; emoji: string; sense: string; instruction: string; tip: string;
@@ -44,7 +47,7 @@ export default function GroundScreen() {
   // ── Completion screen ──────────────────────────────────────────────────────
   if (completed) {
     return (
-      <SafeAreaView edges={['top', 'bottom']} style={[s.root, { backgroundColor: colors.background }]}>
+      <Screen style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View style={s.completeWrap}>
           <Text style={s.completeEmoji}>{g.complete.emoji}</Text>
           <Text style={[s.completeTitle, { color: colors.text }]}>{g.complete.title}</Text>
@@ -66,24 +69,23 @@ export default function GroundScreen() {
             <Text style={[s.btnOutlineText, { color: colors.textSecondary }]}>{g.complete.back}</Text>
           </TouchableOpacity>
         </View>
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   // ── Step screen ────────────────────────────────────────────────────────────
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={[s.root, { backgroundColor: colors.background }]}>
+    <Screen>
+      <ScreenHeader variant="immersive">
+        <Text style={[s.title,    { color: colors.text }]}>{g.title}</Text>
+        <Text style={[s.subtitle, { color: colors.textSecondary }]}>{g.subtitle}</Text>
+      </ScreenHeader>
+
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={s.scroll}
+        contentContainerStyle={[s.scroll, { paddingBottom: bottomPad }]}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
-        <View style={s.header}>
-          <Text style={[s.title,    { color: colors.text }]}>{g.title}</Text>
-          <Text style={[s.subtitle, { color: colors.textSecondary }]}>{g.subtitle}</Text>
-        </View>
-
         {/* Intro — only on step 0 */}
         {stepIndex === 0 && (
           <View style={[s.introCard, { backgroundColor: colors.backgroundElement }]}>
@@ -138,15 +140,13 @@ export default function GroundScreen() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const s = StyleSheet.create({
-  root:        { flex: 1 },
-  scroll:      { flexGrow: 1, justifyContent: 'center', paddingHorizontal: Spacing.three, paddingBottom: TAB_BAR_CLEARANCE },
+  scroll:      { flexGrow: 1, justifyContent: 'center', paddingHorizontal: Spacing.three },
 
-  header:      { alignItems: 'center', paddingTop: Spacing.six, paddingBottom: Spacing.three, gap: Spacing.two },
   title:       { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, textAlign: 'center' },
   subtitle:    { fontSize: 16, fontWeight: '500', textAlign: 'center' },
 
