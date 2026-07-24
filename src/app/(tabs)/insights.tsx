@@ -11,6 +11,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
@@ -65,27 +66,26 @@ export default function InsightsScreen() {
 
   if (entries.length === 0 && emotionLogs.length === 0) {
     return (
-      <View style={[styles.root, { backgroundColor: colors.background }]}>
-        <View style={[styles.header, { paddingTop: insets.top + Spacing.two, borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+      <Screen>
+        <ScreenHeader style={styles.headerGap}>
           <Text style={[styles.headerTitle, { color: colors.text }]}>{ti.title}</Text>
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{ti.subtitle}</Text>
-        </View>
+        </ScreenHeader>
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>✨</Text>
           <Text style={[styles.emptyTitle, { color: colors.text }]}>{ti.empty.title}</Text>
           <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>{ti.empty.body}</Text>
         </View>
-      </View>
+      </Screen>
     );
   }
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {/* ── Header ── */}
-      <View style={[styles.header, { paddingTop: insets.top + Spacing.two, borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+    <Screen>
+      <ScreenHeader style={styles.headerGap}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>{ti.title}</Text>
         <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{ti.subtitle}</Text>
-      </View>
+      </ScreenHeader>
 
       <ScrollView
         style={styles.scroll}
@@ -225,18 +225,12 @@ export default function InsightsScreen() {
           </Animated.View>
         )}
       </ScrollView>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  header: {
-    paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.two + 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: 2,
-  },
+  headerGap: { gap: 2 },
   headerTitle: { fontSize: 24, fontWeight: '700', letterSpacing: -0.5, marginLeft: Spacing.six },
   headerSub: { fontSize: 14, marginLeft: Spacing.six },
   scroll: { flex: 1 },

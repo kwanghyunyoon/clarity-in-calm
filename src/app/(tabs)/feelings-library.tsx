@@ -5,6 +5,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { FEELINGS_LIBRARY } from '@/constants/feelings-library';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -20,8 +21,8 @@ export default function FeelingsLibraryScreen() {
   const bottomPad = 88 + insets.bottom;
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + Spacing.two, borderBottomColor: colors.border, backgroundColor: colors.background }]}>
+    <Screen>
+      <ScreenHeader style={styles.headerGap}>
         <TouchableOpacity
           onPress={() => router.back()}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -34,7 +35,7 @@ export default function FeelingsLibraryScreen() {
           <Text style={[styles.headerTitle, { color: colors.text }]}>{fl.title}</Text>
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{fl.subtitle}</Text>
         </View>
-      </View>
+      </ScreenHeader>
 
       <ScrollView
         style={styles.scroll}
@@ -84,7 +85,7 @@ export default function FeelingsLibraryScreen() {
           );
         })}
       </ScrollView>
-    </View>
+    </Screen>
   );
 }
 
@@ -100,13 +101,7 @@ function DetailSection({
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  header: {
-    paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.two + 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    gap: Spacing.one,
-  },
+  headerGap: { gap: Spacing.one },
   backBtn: {
     fontSize: 20,
     fontWeight: '600',

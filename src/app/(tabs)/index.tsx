@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StreakCard } from '@/components/today/StreakCard';
 import { ToolCard } from '@/components/today/ToolCard';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
+import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
@@ -67,18 +68,8 @@ export default function TodayScreen() {
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {/* ── Header — sits below system status bar ── */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + Spacing.two,
-            backgroundColor: colors.background,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
+    <Screen>
+      <ScreenHeader style={styles.header}>
         <Text style={[styles.greeting, { color: colors.text }]}>{greeting}</Text>
         <TouchableOpacity
           onPress={showHelp}
@@ -88,7 +79,7 @@ export default function TodayScreen() {
         >
           <Text style={[styles.helpBtn, { color: colors.textSecondary }]}>?</Text>
         </TouchableOpacity>
-      </View>
+      </ScreenHeader>
 
       <ScrollView
         style={styles.scroll}
@@ -228,21 +219,15 @@ export default function TodayScreen() {
           )}
         </Animated.View>
       </ScrollView>
-    </View>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.four,
-    paddingBottom: Spacing.two + 4,
-    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   greeting: {
     fontSize: 22,
