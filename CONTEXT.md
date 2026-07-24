@@ -24,3 +24,11 @@ sub-decisions, each resolved separately rather than as one verdict:
 Source: trio visual audit, issue #26 (closed 2026-07-24), comments from all three apps.
 All five sub-decisions resolved via `/grilling` on issue #28 — see
 [ADR-0001](docs/adr/0001-trio-shared-visual-identity.md).
+
+### Trio app connections
+
+Distinct from "shared visual identity" above — this covers whether the three apps share any
+backend/account system or data, versus just looking related. Resolved via `/grilling` on issue
+#29: the trio stays three fully independent apps/backends (no SSO, no cross-app data access),
+connected only by lightweight cross-promotion (store-listing links), no deep-linking. See
+[ADR-0002](docs/adr/0002-trio-app-connections.md).
