@@ -19,6 +19,8 @@ export const Colors = {
     overlay: 'rgba(26,46,28,0.4)',
     tabBar: '#FAF3EA',
     tabBarBorder: '#C8E3C9',
+    // Elevation tokens
+    glow: 'rgba(74,140,80,0.35)',
   },
   dark: {
     text: '#E8E0D4',
@@ -38,6 +40,8 @@ export const Colors = {
     overlay: 'rgba(0,0,0,0.6)',
     tabBar: '#0D1117',
     tabBarBorder: '#21262D',
+    // Elevation tokens
+    glow: 'rgba(240,168,85,0.35)',
   },
 } as const;
 

@@ -159,21 +159,21 @@ export default function TodayScreen() {
           </Text>
           <View style={styles.toolsGrid}>
             <ToolCard
-              emoji="🌬️"
+              icon="cloud-outline"
               title={t.today.breatheTitle}
               subtitle={t.today.breatheSub}
               accentColor={EmotionColors.fear}
               onPress={() => router.push('/breathe')}
             />
             <ToolCard
-              emoji="🌿"
+              icon="leaf-outline"
               title={t.today.groundTitle}
               subtitle={t.today.groundSub}
               accentColor={EmotionColors.trust}
               onPress={() => router.push('/ground')}
             />
             <ToolCard
-              emoji="📖"
+              icon="book-outline"
               title={t.feelingsLibraryScreen.cardTitle}
               subtitle={t.feelingsLibraryScreen.cardSub}
               accentColor={EmotionColors.disgust}
