@@ -1,6 +1,7 @@
 /**
  * LanguagePill — floating top-left pill shown on every screen except Settings
- * (which already has its own language section). Tapping opens a dropdown of
+ * (which already has its own language section) and Feelings Library (whose
+ * back button sits in the same top-left corner). Tapping opens a dropdown of
  * the four languages, each written in its own language.
  */
 
@@ -21,7 +22,7 @@ export function LanguagePill() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  if (pathname.startsWith('/settings')) return null;
+  if (pathname.startsWith('/settings') || pathname.startsWith('/feelings-library')) return null;
 
   const current = LANGUAGES.find((l) => l.locale === locale) ?? LANGUAGES[0];
 
