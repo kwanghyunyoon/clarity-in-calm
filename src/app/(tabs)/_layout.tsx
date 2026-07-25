@@ -1,5 +1,6 @@
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { Platform, StyleSheet, Text, View, useColorScheme } from 'react-native';
+import { ColorValue, Platform, StyleSheet, View, useColorScheme } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -8,10 +9,16 @@ import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors, Spacing, TAB_BAR_FLOAT_HEIGHT } from '@/constants/theme';
 import { useTranslation } from '@/hooks/use-translation';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
+function TabIcon({
+  name,
+  color,
+}: {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: ColorValue;
+}) {
   return (
-    <View style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center', opacity: focused ? 1 : 0.45 }}>
-      <Text style={{ fontSize: 20 }}>{emoji}</Text>
+    <View style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center' }}>
+      <Ionicons name={name} size={20} color={color} />
     </View>
   );
 }
@@ -69,7 +76,7 @@ export default function TabLayout() {
           options={{
             title: t.tabs.today,
             tabBarLabel: t.tabs.today,
-            tabBarIcon: ({ focused }) => <TabIcon emoji="☀️" focused={focused} />,
+            tabBarIcon: ({ color }) => <TabIcon name="sunny" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -77,7 +84,7 @@ export default function TabLayout() {
           options={{
             title: t.tabs.journal,
             tabBarLabel: t.tabs.journal,
-            tabBarIcon: ({ focused }) => <TabIcon emoji="📖" focused={focused} />,
+            tabBarIcon: ({ color }) => <TabIcon name="book" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -85,7 +92,7 @@ export default function TabLayout() {
           options={{
             title: t.tabs.emotions,
             tabBarLabel: t.tabs.emotions,
-            tabBarIcon: ({ focused }) => <TabIcon emoji="🌀" focused={focused} />,
+            tabBarIcon: ({ color }) => <TabIcon name="sync" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -93,7 +100,7 @@ export default function TabLayout() {
           options={{
             title: t.tabs.insights,
             tabBarLabel: t.tabs.insights,
-            tabBarIcon: ({ focused }) => <TabIcon emoji="✨" focused={focused} />,
+            tabBarIcon: ({ color }) => <TabIcon name="sparkles" color={color} />,
           }}
         />
         <Tabs.Screen
@@ -101,7 +108,7 @@ export default function TabLayout() {
           options={{
             title: t.tabs.settings,
             tabBarLabel: t.tabs.settings,
-            tabBarIcon: ({ focused }) => <TabIcon emoji="⚙️" focused={focused} />,
+            tabBarIcon: ({ color }) => <TabIcon name="settings" color={color} />,
           }}
         />
 
