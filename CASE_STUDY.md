@@ -1283,4 +1283,14 @@ Visually verified via Expo web + claude-in-chrome: zoomed on the tab bar and con
 
 Ran a lightweight review (skipped the full `/code-review` subagent choreography for this 25-line single-file diff, given no `CODING_STANDARDS.md`/issue-tracker doc exist in this repo to feed it): confirmed the `TabIcon` prop-typing pattern matches `IconChip.tsx`'s established `React.ComponentProps<typeof Ionicons>['name']` idiom, no scope creep beyond the one file the ticket named, and all five acceptance criteria met. No findings, no fixes needed.
 
-**Status:** #46 implemented and verified; committing next and closing on GitHub with the commit reference, matching #44/#45's pattern.
+**Status:** #46 implemented and verified; committed `0f17547`, closed on GitHub with commit reference, matching #44/#45's pattern.
+
+---
+
+## 2026-07-24 (continued) — Journal section-label spacing fix, session wrap
+
+User reported the Journal screen's section labels (`TEMPLATES`/`MOOD`/`TAGS`) sat too close to their pill rows below — a visual proximity issue, not part of the #43 icon-migration ticket line. Traced to `src/app/(tabs)/journal.tsx`'s `section` style, which set `gap: Spacing.two` (8px) between each label and its content row, tighter than the 16px (`Spacing.three`) rhythm already used between the sections themselves. Iterated with the user in the browser via Fast Refresh: first tried 12px (`Spacing.two + 4`), user asked for 16px instead — landed on `gap: Spacing.three` to reuse the existing constant rather than a new raw number, since it happens to match the outer section gap value exactly. `tsc --noEmit` and `expo lint` both clean on the file. Committed `3f2ae61`, pushed to `origin/main` on request.
+
+Mid-session, discovered two Expo web dev servers were running simultaneously (port 8081 — the one actually in use — and a stray port 8090 instance, leftover from a mid-session restart that didn't check for an existing server first) — two Metro bundlers competing for RAM on this 6.4GB machine was the likely cause of bash commands hanging past their timeouts. Killed the stray 8090 process tree; confirmed 8081 still healthy (curl 200) and left running per user request, since they wanted to keep using it without a cold restart next session.
+
+**Status:** local `main` pushed to `origin/main` at `3f2ae61` (includes #46 plus this spacing fix). Dev server intentionally left running on port 8081 for the user's convenience — next session should check it's still alive before starting a new one, to avoid repeating the duplicate-server issue. Ticket frontier unchanged: #47 (LanguagePill flag removal), #48 (remaining screens/components emoji→Ionicons), #49 (Settings cross-promotion section) all open and unblocked; #50 still blocks on all of #44–#49. Untracked `clarityincalm.aab`, `supabase/.temp/`, `list.md`, `Next.md` still sitting in the working tree, unrelated to this thread, still undecided.
