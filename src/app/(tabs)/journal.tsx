@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.three,
     gap: Spacing.three,
   },
-  section: { gap: Spacing.two },
+  section: { gap: Spacing.three },
   sectionLabel: {
     fontSize: 11,
     fontWeight: '700',
