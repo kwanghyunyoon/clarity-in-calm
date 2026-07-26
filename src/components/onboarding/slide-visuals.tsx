@@ -17,7 +17,11 @@ type Translation = ReturnType<typeof useTranslation>;
 
 // Slide 0 — Welcome: gently pulsing lotus
 function WelcomeVisual() {
-  const scale = useRef(new Animated.Value(1)).current;
+  const scaleRef = useRef<Animated.Value | null>(null);
+  if (!scaleRef.current) {
+    scaleRef.current = new Animated.Value(1);
+  }
+  const scale = scaleRef.current;
 
   useEffect(() => {
     const anim = Animated.loop(
@@ -28,7 +32,7 @@ function WelcomeVisual() {
     );
     anim.start();
     return () => anim.stop();
-  }, []);
+  }, [scale]);
 
   return (
     <Animated.View style={[s.welcomeOrb, { transform: [{ scale }] }]}>
