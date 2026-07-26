@@ -4,8 +4,9 @@
  * No data tracking; pure guided exercise.
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -13,6 +14,15 @@ import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+
+// Fixed sense order (see/touch/hear/smell/taste) — indexes match g.steps in every locale.
+const SENSE_ICONS: React.ComponentProps<typeof Ionicons>['name'][] = [
+  'eye-outline',
+  'hand-left-outline',
+  'ear-outline',
+  'flower-outline',
+  'restaurant-outline',
+];
 
 export default function GroundScreen() {
   const { colors } = useTheme();
@@ -22,7 +32,7 @@ export default function GroundScreen() {
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const steps = g.steps as readonly {
-    count: number; emoji: string; sense: string; instruction: string; tip: string;
+    count: number; sense: string; instruction: string; tip: string;
   }[];
 
   const [stepIndex, setStepIndex]   = useState(0);
@@ -49,7 +59,7 @@ export default function GroundScreen() {
     return (
       <Screen style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View style={s.completeWrap}>
-          <Text style={s.completeEmoji}>{g.complete.emoji}</Text>
+          <Ionicons name="leaf-outline" size={72} color={colors.primary} />
           <Text style={[s.completeTitle, { color: colors.text }]}>{g.complete.title}</Text>
           <Text style={[s.completeBody,  { color: colors.textSecondary }]}>{g.complete.body}</Text>
 
@@ -114,7 +124,7 @@ export default function GroundScreen() {
           {/* Big count bubble */}
           <View style={[s.countBubble, { backgroundColor: colors.primary + '22' }]}>
             <Text style={[s.countNum,   { color: colors.primary }]}>{step.count}</Text>
-            <Text style={[s.countEmoji, { color: colors.primary }]}>{step.emoji}</Text>
+            <Ionicons name={SENSE_ICONS[stepIndex]} size={22} color={colors.primary} />
           </View>
 
           <Text style={[s.senseLabel,   { color: colors.textSecondary }]}>{step.sense}</Text>
@@ -162,7 +172,6 @@ const s = StyleSheet.create({
   countBubble: { width: 96, height: 96, borderRadius: 48, alignItems: 'center',
                  justifyContent: 'center', gap: 2, marginBottom: Spacing.one },
   countNum:    { fontSize: 40, fontWeight: '800', lineHeight: 44 },
-  countEmoji:  { fontSize: 22 },
   senseLabel:  { fontSize: 14, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2 },
   instruction: { fontSize: 24, fontWeight: '700', textAlign: 'center', lineHeight: 33 },
   tip:         { fontSize: 16, lineHeight: 24, textAlign: 'center', fontWeight: '500', maxWidth: 300 },
@@ -181,7 +190,6 @@ const s = StyleSheet.create({
   // Completion
   completeWrap:  { flex: 1, justifyContent: 'center', alignItems: 'center',
                    paddingHorizontal: Spacing.four, gap: Spacing.three },
-  completeEmoji: { fontSize: 72 },
   completeTitle: { fontSize: 30, fontWeight: '800', letterSpacing: -0.5, textAlign: 'center' },
   completeBody:  { fontSize: 16, lineHeight: 24, textAlign: 'center', fontWeight: '500', maxWidth: 320 },
 });

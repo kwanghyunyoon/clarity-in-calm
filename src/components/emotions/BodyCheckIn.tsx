@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BODY_REGIONS } from '@/constants/emotions';
@@ -32,7 +33,11 @@ export function BodyCheckIn({ selected, onToggle, accentColor }: Props) {
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={region.label}
           >
-            <Text style={styles.emoji}>{region.emoji}</Text>
+            <Ionicons
+              name={region.icon}
+              size={14}
+              color={isSelected ? accentColor : colors.textSecondary}
+            />
             <Text style={[styles.label, { color: isSelected ? accentColor : colors.textSecondary }]}>
               {region.label}
             </Text>
@@ -57,9 +62,6 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: Spacing.two + 2,
     gap: 6,
-  },
-  emoji: {
-    fontSize: 14,
   },
   label: {
     fontSize: 13,

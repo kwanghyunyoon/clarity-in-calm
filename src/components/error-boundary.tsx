@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -23,10 +24,10 @@ export default class ErrorBoundary extends React.Component<Props, State> {
 
     return (
       <View style={styles.root}>
-        <Text style={styles.emoji}>🫁</Text>
+        <Ionicons name="body-outline" size={48} color="#208AEF" style={styles.emoji} />
         <Text style={styles.title}>Something went wrong</Text>
         <Text style={styles.body}>
-          Clarity in Calm ran into an unexpected error. Your journal is safe — it's encrypted on your device.
+          Clarity in Calm ran into an unexpected error. Your journal is safe — it&apos;s encrypted on your device.
         </Text>
         <TouchableOpacity
           style={styles.btn}
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 32,
   },
-  emoji:  { fontSize: 48, marginBottom: 24 },
+  emoji:  { marginBottom: 24 },
   title:  { fontSize: 22, fontWeight: '700', color: '#1a2b3c', textAlign: 'center', marginBottom: 12 },
   body:   { fontSize: 15, color: '#3a4a5a', textAlign: 'center', lineHeight: 24, marginBottom: 32 },
   btn: {

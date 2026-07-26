@@ -1,18 +1,16 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
-import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
@@ -72,7 +70,7 @@ export default function InsightsScreen() {
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{ti.subtitle}</Text>
         </ScreenHeader>
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>✨</Text>
+          <Ionicons name="sparkles-outline" size={48} color={colors.textSecondary} />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>{ti.empty.title}</Text>
           <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>{ti.empty.body}</Text>
         </View>
@@ -103,7 +101,10 @@ export default function InsightsScreen() {
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEmotions}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.statNum, { color: colors.primary }]}>{streak}🔥</Text>
+            <View style={styles.statNumRow}>
+              <Text style={[styles.statNum, { color: colors.primary }]}>{streak}</Text>
+              <Ionicons name="flame" size={20} color={colors.primary} />
+            </View>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.streakRecord}</Text>
           </View>
           {emotionLogs.length > 0 && (
@@ -185,7 +186,12 @@ export default function InsightsScreen() {
                   evening: ti.evening,
                   night: ti.night,
                 };
-                const emojis: Record<string, string> = { morning: '🌅', afternoon: '☀️', evening: '🌆', night: '🌙' };
+                const icons: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+                  morning: 'partly-sunny-outline',
+                  afternoon: 'sunny-outline',
+                  evening: 'cloudy-night-outline',
+                  night: 'moon-outline',
+                };
                 return (
                   <View key={period} style={styles.timeCol}>
                     <View style={styles.timeBarWrapper}>
@@ -196,7 +202,7 @@ export default function InsightsScreen() {
                         }]}
                       />
                     </View>
-                    <Text style={styles.timeEmoji}>{emojis[period]}</Text>
+                    <Ionicons name={icons[period]} size={16} color={colors.textSecondary} style={styles.timeEmoji} />
                     <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>{labels[period]}</Text>
                     <Text style={[styles.timeCount, { color: colors.text }]}>{count}</Text>
                   </View>
@@ -249,6 +255,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
+  statNumRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statNum: { fontSize: 28, fontWeight: '700', letterSpacing: -1 },
   statLabel: { fontSize: 12, textAlign: 'center' },
   card: {

@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { COPING_ACTIONS } from '@/constants/emotions';
@@ -34,7 +35,11 @@ export function CopingActionsSelector({ selected, onToggle }: Props) {
             accessibilityState={{ checked: isSelected }}
             accessibilityLabel={label}
           >
-            <Text style={styles.emoji}>{action.emoji}</Text>
+            <Ionicons
+              name={action.icon}
+              size={14}
+              color={isSelected ? colors.accent : colors.textSecondary}
+            />
             <Text style={[styles.label, { color: isSelected ? colors.accent : colors.textSecondary }]}>
               {label}
             </Text>
@@ -59,9 +64,6 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     paddingHorizontal: Spacing.two + 2,
     gap: 6,
-  },
-  emoji: {
-    fontSize: 14,
   },
   label: {
     fontSize: 13,

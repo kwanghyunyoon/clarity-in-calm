@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -135,8 +136,8 @@ export default function EmotionsScreen() {
                 <Text style={[styles.selectedLabel, { color: accentColor }]}>
                   {selectedEmotion.label}
                 </Text>
-                <TouchableOpacity onPress={() => setSelectedEmotion(null)}>
-                  <Text style={[styles.clearBtn, { color: colors.textSecondary }]}>✕</Text>
+                <TouchableOpacity onPress={() => setSelectedEmotion(null)} accessibilityLabel="Clear selected emotion" accessibilityRole="button">
+                  <Ionicons name="close" size={14} color={colors.textSecondary} />
                 </TouchableOpacity>
               </Animated.View>
             )}
@@ -274,7 +275,7 @@ export default function EmotionsScreen() {
                       accessibilityLabel="Delete emotion log"
                       accessibilityRole="button"
                     >
-                      <Text style={[styles.deleteBtn, { color: colors.textSecondary }]}>✕</Text>
+                      <Ionicons name="close" size={16} color={colors.textSecondary} style={styles.deleteBtn} />
                     </TouchableOpacity>
                   </Animated.View>
                 );
@@ -285,7 +286,7 @@ export default function EmotionsScreen() {
           {/* ── Empty state ── */}
           {emotionLogs.length === 0 && !selectedEmotion && (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>🌀</Text>
+              <Ionicons name="sync-outline" size={40} color={colors.textSecondary} />
               <Text style={[styles.emptyTitle, { color: colors.text }]}>{te.emptyTitle}</Text>
               <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>{te.emptyBody}</Text>
             </View>
@@ -328,7 +329,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  clearBtn: { fontSize: 14, fontWeight: '500' },
   section: {
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
@@ -389,13 +389,12 @@ const styles = StyleSheet.create({
   },
   miniChipText: { fontSize: 11, fontWeight: '500' },
   logNote: { fontSize: 13, lineHeight: 18, fontStyle: 'italic' },
-  deleteBtn: { fontSize: 16, padding: Spacing.three },
+  deleteBtn: { padding: Spacing.three },
   emptyState: {
     alignItems: 'center',
     paddingVertical: Spacing.six,
     gap: Spacing.two,
   },
-  emptyEmoji: { fontSize: 48 },
   emptyTitle: { fontSize: 17, fontWeight: '600', textAlign: 'center' },
   emptyBody: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
 });

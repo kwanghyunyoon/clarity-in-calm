@@ -3,7 +3,8 @@
  * tailored illustration in addition to its title/body text; SlideVisual is
  * the router that picks the right one by page index.
  */
-import { useEffect, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import React, { useEffect } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -16,8 +17,8 @@ export type ThemeColors = ReturnType<typeof useTheme>['colors'];
 type Translation = ReturnType<typeof useTranslation>;
 
 // Slide 0 — Welcome: gently pulsing lotus
-function WelcomeVisual() {
-  const scale = useRef(new Animated.Value(1)).current;
+function WelcomeVisual({ colors }: { colors: ThemeColors }) {
+  const scale = useState(new Animated.Value(1)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
@@ -28,11 +29,11 @@ function WelcomeVisual() {
     );
     anim.start();
     return () => anim.stop();
-  }, []);
+  }, [scale]);
 
   return (
     <Animated.View style={[s.welcomeOrb, { transform: [{ scale }] }]}>
-      <Text style={s.welcomeEmoji}>🌿</Text>
+      <Ionicons name="leaf-outline" size={64} color={colors.primary} />
     </Animated.View>
   );
 }
@@ -42,16 +43,18 @@ function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
   return (
     <View style={s.todayWrap}>
       <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
-        <Text style={s.streakFlame}>🔥</Text>
+        <Ionicons name="flame" size={28} color={colors.primary} />
         <Text style={[s.streakNum, { color: colors.text }]}>7</Text>
         <Text style={[s.streakLabel, { color: colors.textSecondary }]}>{t.home.progress.streak}</Text>
       </View>
       <View style={s.pillRow}>
-        <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>📖 {t.tabs.journal}</Text>
+        <View style={[s.pill, s.pillRowInner, { backgroundColor: colors.primary + '22' }]}>
+          <Ionicons name="book-outline" size={13} color={colors.primary} />
+          <Text style={[s.pillText, { color: colors.primary }]}>{t.tabs.journal}</Text>
         </View>
-        <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>🎭 {t.tabs.emotions}</Text>
+        <View style={[s.pill, s.pillRowInner, { backgroundColor: colors.primary + '22' }]}>
+          <Ionicons name="happy-outline" size={13} color={colors.primary} />
+          <Text style={[s.pillText, { color: colors.primary }]}>{t.tabs.emotions}</Text>
         </View>
       </View>
     </View>
@@ -60,10 +63,10 @@ function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
 
 // Slide 2 — Journal: template cards (mirrors 3 of the real JOURNAL_TEMPLATES)
 function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
-  const templates = [
-    { icon: '✏️', label: t.journalExtended.templateFreeWrite },
-    { icon: '🙏', label: t.journalExtended.templateGratitude },
-    { icon: '🔍', label: t.journalExtended.templateCBT },
+  const templates: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }[] = [
+    { icon: 'create-outline', label: t.journalExtended.templateFreeWrite },
+    { icon: 'sparkles-outline', label: t.journalExtended.templateGratitude },
+    { icon: 'search-outline', label: t.journalExtended.templateCBT },
   ];
   return (
     <View style={s.templateWrap}>
@@ -72,7 +75,7 @@ function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
           key={i}
           style={[s.templateCard, { backgroundColor: colors.backgroundElement }]}
         >
-          <Text style={s.templateIcon}>{tmpl.icon}</Text>
+          <Ionicons name={tmpl.icon} size={20} color={colors.text} />
           <Text style={[s.templateLabel, { color: colors.text }]}>{tmpl.label}</Text>
         </View>
       ))}
@@ -121,18 +124,19 @@ function InsightsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) 
 
 // Slide 5 — Settings: gear + toggle rows
 function SettingsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
-  const rows = [
-    { emoji: '🔔', label: t.settingsScreen.notifications },
-    { emoji: '🌐', label: t.settingsScreen.language },
-    { emoji: '🎨', label: t.settingsScreen.appearance },
+  const rows: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }[] = [
+    { icon: 'notifications-outline', label: t.settingsScreen.notifications },
+    { icon: 'globe-outline', label: t.settingsScreen.language },
+    { icon: 'color-palette-outline', label: t.settingsScreen.appearance },
   ];
   return (
     <View style={s.settingsWrap}>
-      <Text style={s.settingsGear}>⚙️</Text>
+      <Ionicons name="settings-outline" size={40} color={colors.text} />
       <View style={s.settingsRows}>
         {rows.map((row) => (
-          <View key={row.label} style={[s.settingsRow, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[s.settingsRowText, { color: colors.text }]}>{row.emoji} {row.label}</Text>
+          <View key={row.label} style={[s.settingsRow, s.settingsRowInner, { backgroundColor: colors.backgroundElement }]}>
+            <Ionicons name={row.icon} size={16} color={colors.text} />
+            <Text style={[s.settingsRowText, { color: colors.text }]}>{row.label}</Text>
           </View>
         ))}
       </View>
@@ -164,7 +168,7 @@ function ShieldVisual() {
 
 export function SlideVisual({ page, colors, t }: { page: number; colors: ThemeColors; t: Translation }) {
   switch (page) {
-    case 0: return <WelcomeVisual />;
+    case 0: return <WelcomeVisual colors={colors} />;
     case 1: return <TodayVisual colors={colors} t={t} />;
     case 2: return <JournalVisual colors={colors} t={t} />;
     case 3: return <EmotionsVisual t={t} />;
@@ -180,17 +184,15 @@ const s = StyleSheet.create({
   welcomeOrb:   { width: 120, height: 120, borderRadius: 60,
                   backgroundColor: 'rgba(130,190,130,0.15)',
                   alignItems: 'center', justifyContent: 'center' },
-  welcomeEmoji: { fontSize: 64 },
-
   // Today
   todayWrap:     { alignItems: 'center', gap: Spacing.two },
   streakCard:    { borderRadius: 18, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two,
                    alignItems: 'center', flexDirection: 'row', gap: Spacing.two },
-  streakFlame:   { fontSize: 28 },
   streakNum:     { fontSize: 36, fontWeight: '800', lineHeight: 42 },
   streakLabel:   { fontSize: 12, fontWeight: '600' },
   pillRow:       { flexDirection: 'row', gap: Spacing.two },
   pill:          { borderRadius: 50, paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 2 },
+  pillRowInner:  { flexDirection: 'row', alignItems: 'center', gap: 6 },
   pillText:      { fontSize: 13, fontWeight: '700' },
 
   // Journal templates
@@ -198,7 +200,6 @@ const s = StyleSheet.create({
   templateCard:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
                    borderRadius: 12, paddingHorizontal: Spacing.three,
                    paddingVertical: Spacing.one + 4, width: 180 },
-  templateIcon:  { fontSize: 20 },
   templateLabel: { fontSize: 14, fontWeight: '600' },
 
   // Emotions pill preview
@@ -216,10 +217,10 @@ const s = StyleSheet.create({
 
   // Settings
   settingsWrap:     { alignItems: 'center', gap: Spacing.two },
-  settingsGear:     { fontSize: 40 },
   settingsRows:     { gap: Spacing.one + 2 },
   settingsRow:      { borderRadius: 12, paddingHorizontal: Spacing.three,
                       paddingVertical: Spacing.one + 4, width: 180 },
+  settingsRowInner: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   settingsRowText:  { fontSize: 14, fontWeight: '600' },
 
   // Privacy shield
