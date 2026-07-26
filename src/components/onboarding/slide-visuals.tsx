@@ -4,7 +4,7 @@
  * the router that picks the right one by page index.
  */
 import { Ionicons } from '@expo/vector-icons';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
@@ -18,7 +18,7 @@ type Translation = ReturnType<typeof useTranslation>;
 
 // Slide 0 — Welcome: gently pulsing lotus
 function WelcomeVisual({ colors }: { colors: ThemeColors }) {
-  const scale = useState(new Animated.Value(1)).current;
+  const scale = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     const anim = Animated.loop(
