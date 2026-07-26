@@ -32,8 +32,9 @@ function getGreeting(t: ReturnType<typeof useTranslation>): string {
 }
 
 function getDailyQuote(t: ReturnType<typeof useTranslation>) {
+  const quotes = t.dailyContent?.quotes;
+  if (!Array.isArray(quotes) || quotes.length === 0) return null;
   const day = Math.floor(Date.now() / 86400000);
-  const quotes = t.dailyContent.quotes;
   return quotes[day % quotes.length];
 }
 
@@ -201,7 +202,7 @@ export default function TodayScreen() {
                 {affirmation.emoji} {(t.dailyContent.feelingsEase as Record<string, string>)[affirmation.id] ?? affirmation.ease}
               </Text>
             </AnimatedPressable>
-          ) : (
+          ) : quote ? (
             <View style={[styles.quoteCard, {
               backgroundColor: colors.surface,
               borderColor: colors.border,
@@ -216,7 +217,7 @@ export default function TodayScreen() {
                 — {quote.author}
               </Text>
             </View>
-          )}
+          ) : null}
         </Animated.View>
       </ScrollView>
     </Screen>
