@@ -3,8 +3,9 @@
  * tailored illustration in addition to its title/body text; SlideVisual is
  * the router that picks the right one by page index.
  */
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { BASIC_EMOTIONS } from '@/constants/emotions';
@@ -15,7 +16,7 @@ import { useTranslation } from '@/hooks/use-translation';
 export type ThemeColors = ReturnType<typeof useTheme>['colors'];
 type Translation = ReturnType<typeof useTranslation>;
 
-// Slide 0 — Welcome: gently pulsing lotus
+// Slide 0 — Welcome: gently pulsing orb with leaf icon
 function WelcomeVisual() {
   const scaleRef = useRef<Animated.Value | null>(null);
   if (!scaleRef.current) {
@@ -36,7 +37,7 @@ function WelcomeVisual() {
 
   return (
     <Animated.View style={[s.welcomeOrb, { transform: [{ scale }] }]}>
-      <Text style={s.welcomeEmoji}>🌿</Text>
+      <Ionicons name="leaf-outline" size={64} color="#5a9e6f" accessibilityLabel="Leaf" />
     </Animated.View>
   );
 }
@@ -46,16 +47,18 @@ function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
   return (
     <View style={s.todayWrap}>
       <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
-        <Text style={s.streakFlame}>🔥</Text>
+        <Ionicons name="flame" size={28} color="#EF5350" accessibilityLabel="Streak" />
         <Text style={[s.streakNum, { color: colors.text }]}>7</Text>
         <Text style={[s.streakLabel, { color: colors.textSecondary }]}>{t.home.progress.streak}</Text>
       </View>
       <View style={s.pillRow}>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>📖 {t.tabs.journal}</Text>
+          <Ionicons name="book-outline" size={14} color={colors.primary} />
+          <Text style={[s.pillText, { color: colors.primary }]}>{t.tabs.journal}</Text>
         </View>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
-          <Text style={[s.pillText, { color: colors.primary }]}>🎭 {t.tabs.emotions}</Text>
+          <Ionicons name="happy-outline" size={14} color={colors.primary} />
+          <Text style={[s.pillText, { color: colors.primary }]}>{t.tabs.emotions}</Text>
         </View>
       </View>
     </View>
@@ -64,10 +67,10 @@ function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
 
 // Slide 2 — Journal: template cards (mirrors 3 of the real JOURNAL_TEMPLATES)
 function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
-  const templates = [
-    { icon: '✏️', label: t.journalExtended.templateFreeWrite },
-    { icon: '🙏', label: t.journalExtended.templateGratitude },
-    { icon: '🔍', label: t.journalExtended.templateCBT },
+  const templates: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }[] = [
+    { icon: 'pencil-outline',  label: t.journalExtended.templateFreeWrite },
+    { icon: 'heart-outline',   label: t.journalExtended.templateGratitude },
+    { icon: 'search-outline',  label: t.journalExtended.templateCBT },
   ];
   return (
     <View style={s.templateWrap}>
@@ -76,7 +79,7 @@ function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
           key={i}
           style={[s.templateCard, { backgroundColor: colors.backgroundElement }]}
         >
-          <Text style={s.templateIcon}>{tmpl.icon}</Text>
+          <Ionicons name={tmpl.icon} size={20} color={colors.primary} accessibilityLabel={tmpl.label} />
           <Text style={[s.templateLabel, { color: colors.text }]}>{tmpl.label}</Text>
         </View>
       ))}
@@ -84,7 +87,7 @@ function JournalVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
   );
 }
 
-// Slide 3 — Emotions: mini preview of the emotion pill selector
+// Slide 3 — Emotions: mini preview of the emotion pill selector (no icon-purpose emoji here)
 function EmotionsVisual({ t }: { t: Translation }) {
   return (
     <View style={s.pillPreviewWrap}>
@@ -123,20 +126,21 @@ function InsightsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) 
   );
 }
 
-// Slide 5 — Settings: gear + toggle rows
+// Slide 5 — Settings: settings icon + toggle rows
 function SettingsVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
-  const rows = [
-    { emoji: '🔔', label: t.settingsScreen.notifications },
-    { emoji: '🌐', label: t.settingsScreen.language },
-    { emoji: '🎨', label: t.settingsScreen.appearance },
+  const rows: { icon: React.ComponentProps<typeof Ionicons>['name']; label: string }[] = [
+    { icon: 'notifications-outline', label: t.settingsScreen.notifications },
+    { icon: 'globe-outline',         label: t.settingsScreen.language },
+    { icon: 'color-palette-outline', label: t.settingsScreen.appearance },
   ];
   return (
     <View style={s.settingsWrap}>
-      <Text style={s.settingsGear}>⚙️</Text>
+      <Ionicons name="settings-outline" size={40} color={colors.textSecondary} accessibilityLabel="Settings" />
       <View style={s.settingsRows}>
         {rows.map((row) => (
           <View key={row.label} style={[s.settingsRow, { backgroundColor: colors.backgroundElement }]}>
-            <Text style={[s.settingsRowText, { color: colors.text }]}>{row.emoji} {row.label}</Text>
+            <Ionicons name={row.icon} size={16} color={colors.textSecondary} accessibilityLabel={row.label} />
+            <Text style={[s.settingsRowText, { color: colors.text }]}>{row.label}</Text>
           </View>
         ))}
       </View>
@@ -166,6 +170,11 @@ function ShieldVisual() {
   );
 }
 
+// Re-export Text so slides that still need it can import from here — avoids
+// importing react-native Text in the barrel just for the pill label.
+import { Text } from 'react-native';
+import React from 'react';
+
 export function SlideVisual({ page, colors, t }: { page: number; colors: ThemeColors; t: Translation }) {
   switch (page) {
     case 0: return <WelcomeVisual />;
@@ -184,17 +193,16 @@ const s = StyleSheet.create({
   welcomeOrb:   { width: 120, height: 120, borderRadius: 60,
                   backgroundColor: 'rgba(130,190,130,0.15)',
                   alignItems: 'center', justifyContent: 'center' },
-  welcomeEmoji: { fontSize: 64 },
 
   // Today
   todayWrap:     { alignItems: 'center', gap: Spacing.two },
   streakCard:    { borderRadius: 18, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two,
                    alignItems: 'center', flexDirection: 'row', gap: Spacing.two },
-  streakFlame:   { fontSize: 28 },
   streakNum:     { fontSize: 36, fontWeight: '800', lineHeight: 42 },
   streakLabel:   { fontSize: 12, fontWeight: '600' },
   pillRow:       { flexDirection: 'row', gap: Spacing.two },
-  pill:          { borderRadius: 50, paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 2 },
+  pill:          { borderRadius: 50, paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 2,
+                   flexDirection: 'row', alignItems: 'center', gap: 5 },
   pillText:      { fontSize: 13, fontWeight: '700' },
 
   // Journal templates
@@ -202,7 +210,6 @@ const s = StyleSheet.create({
   templateCard:  { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
                    borderRadius: 12, paddingHorizontal: Spacing.three,
                    paddingVertical: Spacing.one + 4, width: 180 },
-  templateIcon:  { fontSize: 20 },
   templateLabel: { fontSize: 14, fontWeight: '600' },
 
   // Emotions pill preview
@@ -220,10 +227,10 @@ const s = StyleSheet.create({
 
   // Settings
   settingsWrap:     { alignItems: 'center', gap: Spacing.two },
-  settingsGear:     { fontSize: 40 },
   settingsRows:     { gap: Spacing.one + 2 },
   settingsRow:      { borderRadius: 12, paddingHorizontal: Spacing.three,
-                      paddingVertical: Spacing.one + 4, width: 180 },
+                      paddingVertical: Spacing.one + 4, width: 180,
+                      flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
   settingsRowText:  { fontSize: 14, fontWeight: '600' },
 
   // Privacy shield

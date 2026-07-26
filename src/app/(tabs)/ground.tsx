@@ -4,8 +4,9 @@
  * No data tracking; pure guided exercise.
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -13,6 +14,17 @@ import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+
+// Maps each grounding step (by count: 5,4,3,2,1) to a sense-appropriate icon
+const STEP_ICONS: Record<number, IoniconsName> = {
+  5: 'eye-outline',          // 5 things you can SEE
+  4: 'hand-left-outline',    // 4 things you can TOUCH
+  3: 'ear-outline',          // 3 things you can HEAR
+  2: 'rose-outline',         // 2 things you can SMELL
+  1: 'restaurant-outline',   // 1 thing you can TASTE
+};
 
 export default function GroundScreen() {
   const { colors } = useTheme();
@@ -22,7 +34,7 @@ export default function GroundScreen() {
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const steps = g.steps as readonly {
-    count: number; emoji: string; sense: string; instruction: string; tip: string;
+    count: number; sense: string; instruction: string; tip: string;
   }[];
 
   const [stepIndex, setStepIndex]   = useState(0);
@@ -49,7 +61,12 @@ export default function GroundScreen() {
     return (
       <Screen style={{ paddingTop: insets.top, paddingBottom: insets.bottom }}>
         <View style={s.completeWrap}>
-          <Text style={s.completeEmoji}>{g.complete.emoji}</Text>
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={72}
+            color={colors.primary}
+            accessibilityLabel={g.complete.title}
+          />
           <Text style={[s.completeTitle, { color: colors.text }]}>{g.complete.title}</Text>
           <Text style={[s.completeBody,  { color: colors.textSecondary }]}>{g.complete.body}</Text>
 
@@ -113,8 +130,13 @@ export default function GroundScreen() {
         <View style={[s.stepCard, { backgroundColor: colors.backgroundElement }]}>
           {/* Big count bubble */}
           <View style={[s.countBubble, { backgroundColor: colors.primary + '22' }]}>
-            <Text style={[s.countNum,   { color: colors.primary }]}>{step.count}</Text>
-            <Text style={[s.countEmoji, { color: colors.primary }]}>{step.emoji}</Text>
+            <Text style={[s.countNum, { color: colors.primary }]}>{step.count}</Text>
+            <Ionicons
+              name={STEP_ICONS[step.count] ?? 'ellipse-outline'}
+              size={22}
+              color={colors.primary}
+              accessibilityLabel={step.sense}
+            />
           </View>
 
           <Text style={[s.senseLabel,   { color: colors.textSecondary }]}>{step.sense}</Text>
@@ -162,7 +184,7 @@ const s = StyleSheet.create({
   countBubble: { width: 96, height: 96, borderRadius: 48, alignItems: 'center',
                  justifyContent: 'center', gap: 2, marginBottom: Spacing.one },
   countNum:    { fontSize: 40, fontWeight: '800', lineHeight: 44 },
-  countEmoji:  { fontSize: 22 },
+
   senseLabel:  { fontSize: 14, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2 },
   instruction: { fontSize: 24, fontWeight: '700', textAlign: 'center', lineHeight: 33 },
   tip:         { fontSize: 16, lineHeight: 24, textAlign: 'center', fontWeight: '500', maxWidth: 300 },
@@ -181,7 +203,6 @@ const s = StyleSheet.create({
   // Completion
   completeWrap:  { flex: 1, justifyContent: 'center', alignItems: 'center',
                    paddingHorizontal: Spacing.four, gap: Spacing.three },
-  completeEmoji: { fontSize: 72 },
   completeTitle: { fontSize: 30, fontWeight: '800', letterSpacing: -0.5, textAlign: 'center' },
   completeBody:  { fontSize: 16, lineHeight: 24, textAlign: 'center', fontWeight: '500', maxWidth: 320 },
 });
