@@ -37,7 +37,6 @@ export function LanguagePill() {
         activeOpacity={0.8}
         accessibilityLabel="Change language"
       >
-        <Text style={styles.flag}>{current.flag}</Text>
         <Text style={[styles.code, { color: colors.text }]}>{current.locale.toUpperCase()}</Text>
       </TouchableOpacity>
 
@@ -58,7 +57,6 @@ export function LanguagePill() {
                   onPress={() => { setLocale(lang.locale); setOpen(false); }}
                   activeOpacity={0.75}
                 >
-                  <Text style={styles.rowFlag}>{lang.flag}</Text>
                   <Text style={[styles.rowLabel, { color: colors.text }, active && { fontWeight: '700' }]}>
                     {lang.nativeName}
                   </Text>
@@ -91,7 +89,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
   },
-  flag: { fontSize: 14 },
   code: { fontSize: 12, fontWeight: '700' },
 
   backdrop: { flex: 1 },
@@ -115,7 +112,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.two + 4,
     paddingVertical: Spacing.two,
   },
-  rowFlag: { fontSize: 16 },
   rowLabel: { fontSize: 14, flex: 1 },
   check: { fontSize: 14, fontWeight: '700' },
 });
