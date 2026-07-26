@@ -67,8 +67,8 @@ export default function EmotionsScreen() {
   }
 
   function toggleCopingAction(id: string) {
-    setCopingActions(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, a]);
-  }
+  setCopingActions(prev => (prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]));
+}
 
   function handleSave() {
     if (!selectedEmotion) return;
