@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -66,7 +67,7 @@ export default function EmotionsScreen() {
   }
 
   function toggleCopingAction(id: string) {
-    setCopingActions(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
+    setCopingActions(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, a]);
   }
 
   function handleSave() {
@@ -135,8 +136,12 @@ export default function EmotionsScreen() {
                 <Text style={[styles.selectedLabel, { color: accentColor }]}>
                   {selectedEmotion.label}
                 </Text>
-                <TouchableOpacity onPress={() => setSelectedEmotion(null)}>
-                  <Text style={[styles.clearBtn, { color: colors.textSecondary }]}>✕</Text>
+                <TouchableOpacity
+                  onPress={() => setSelectedEmotion(null)}
+                  accessibilityLabel="Clear selected emotion"
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="close" size={16} color={colors.textSecondary} />
                 </TouchableOpacity>
               </Animated.View>
             )}
@@ -147,7 +152,7 @@ export default function EmotionsScreen() {
               customPlaceholder={te.customPlaceholder}
             />
           </Animated.View>
-  
+
           {/* ── Intensity ── */}
           {selectedEmotion && (
             <Animated.View entering={SlideInDown.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -161,7 +166,7 @@ export default function EmotionsScreen() {
               />
             </Animated.View>
           )}
-  
+
           {/* ── Context tags ── */}
           {selectedEmotion && (
             <Animated.View entering={SlideInDown.delay(60).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -173,7 +178,7 @@ export default function EmotionsScreen() {
               />
             </Animated.View>
           )}
-  
+
           {/* ── Body check-in ── */}
           {selectedEmotion && (
             <Animated.View entering={SlideInDown.delay(90).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -185,7 +190,7 @@ export default function EmotionsScreen() {
               />
             </Animated.View>
           )}
-  
+
           {/* ── Coping actions ── */}
           {selectedEmotion && (
             <Animated.View entering={SlideInDown.delay(120).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -196,7 +201,7 @@ export default function EmotionsScreen() {
               />
             </Animated.View>
           )}
-  
+
           {/* ── Note ── */}
           {selectedEmotion && (
             <Animated.View entering={SlideInDown.delay(150).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -213,7 +218,7 @@ export default function EmotionsScreen() {
               />
             </Animated.View>
           )}
-  
+
           {/* ── Save button ── */}
           {selectedEmotion && (
             <Animated.View entering={FadeInDown.delay(180).springify()}>
@@ -228,7 +233,7 @@ export default function EmotionsScreen() {
               </AnimatedPressable>
             </Animated.View>
           )}
-  
+
           {/* ── Past logs ── */}
           {emotionLogs.length > 0 && (
             <View style={styles.pastSection}>
@@ -274,18 +279,23 @@ export default function EmotionsScreen() {
                       accessibilityLabel="Delete emotion log"
                       accessibilityRole="button"
                     >
-                      <Text style={[styles.deleteBtn, { color: colors.textSecondary }]}>✕</Text>
+                      <Ionicons name="close-circle-outline" size={20} color={colors.textSecondary} />
                     </TouchableOpacity>
                   </Animated.View>
                 );
               })}
             </View>
           )}
-  
+
           {/* ── Empty state ── */}
           {emotionLogs.length === 0 && !selectedEmotion && (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>🌀</Text>
+              <Ionicons
+                name="sync-circle-outline"
+                size={48}
+                color={colors.textSecondary}
+                accessibilityLabel="No emotion logs yet"
+              />
               <Text style={[styles.emptyTitle, { color: colors.text }]}>{te.emptyTitle}</Text>
               <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>{te.emptyBody}</Text>
             </View>
@@ -328,7 +338,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
   },
-  clearBtn: { fontSize: 14, fontWeight: '500' },
   section: {
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
@@ -389,13 +398,11 @@ const styles = StyleSheet.create({
   },
   miniChipText: { fontSize: 11, fontWeight: '500' },
   logNote: { fontSize: 13, lineHeight: 18, fontStyle: 'italic' },
-  deleteBtn: { fontSize: 16, padding: Spacing.three },
   emptyState: {
     alignItems: 'center',
     paddingVertical: Spacing.six,
     gap: Spacing.two,
   },
-  emptyEmoji: { fontSize: 48 },
   emptyTitle: { fontSize: 17, fontWeight: '600', textAlign: 'center' },
   emptyBody: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
 });

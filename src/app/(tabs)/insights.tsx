@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
   Platform,
@@ -64,6 +65,14 @@ export default function InsightsScreen() {
 
   const moods = t.moods;
 
+  // Time-of-day icons
+  const timeIcons: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
+    morning:   'sunny-outline',
+    afternoon: 'partly-sunny-outline',
+    evening:   'partly-cloudy-night-outline',
+    night:     'moon-outline',
+  };
+
   if (entries.length === 0 && emotionLogs.length === 0) {
     return (
       <Screen>
@@ -72,7 +81,12 @@ export default function InsightsScreen() {
           <Text style={[styles.headerSub, { color: colors.textSecondary }]}>{ti.subtitle}</Text>
         </ScreenHeader>
         <View style={styles.emptyState}>
-          <Text style={styles.emptyEmoji}>✨</Text>
+          <Ionicons
+            name="star-outline"
+            size={48}
+            color={colors.textSecondary}
+            accessibilityLabel="No insights yet"
+          />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>{ti.empty.title}</Text>
           <Text style={[styles.emptyBody, { color: colors.textSecondary }]}>{ti.empty.body}</Text>
         </View>
@@ -103,7 +117,8 @@ export default function InsightsScreen() {
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEmotions}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.statNum, { color: colors.primary }]}>{streak}🔥</Text>
+            <Text style={[styles.statNum, { color: colors.primary }]}>{streak}</Text>
+            <Ionicons name="flame" size={18} color="#EF5350" accessibilityLabel="Streak" />
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.streakRecord}</Text>
           </View>
           {emotionLogs.length > 0 && (
@@ -176,7 +191,7 @@ export default function InsightsScreen() {
           <Animated.View entering={FadeInDown.delay(190).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>{ti.timeOfDay}</Text>
             <View style={styles.timeChart}>
-              {([ 'morning', 'afternoon', 'evening', 'night'] as const).map(period => {
+              {(['morning', 'afternoon', 'evening', 'night'] as const).map(period => {
                 const count = timeOfDay[period];
                 const pct = count / maxTime;
                 const labels: Record<string, string> = {
@@ -185,7 +200,6 @@ export default function InsightsScreen() {
                   evening: ti.evening,
                   night: ti.night,
                 };
-                const emojis: Record<string, string> = { morning: '🌅', afternoon: '☀️', evening: '🌆', night: '🌙' };
                 return (
                   <View key={period} style={styles.timeCol}>
                     <View style={styles.timeBarWrapper}>
@@ -196,7 +210,12 @@ export default function InsightsScreen() {
                         }]}
                       />
                     </View>
-                    <Text style={styles.timeEmoji}>{emojis[period]}</Text>
+                    <Ionicons
+                      name={timeIcons[period]}
+                      size={16}
+                      color={colors.textSecondary}
+                      accessibilityLabel={labels[period]}
+                    />
                     <Text style={[styles.timeLabel, { color: colors.textSecondary }]}>{labels[period]}</Text>
                     <Text style={[styles.timeCount, { color: colors.text }]}>{count}</Text>
                   </View>
@@ -281,7 +300,6 @@ const styles = StyleSheet.create({
   timeCol: { flex: 1, alignItems: 'center', gap: 4 },
   timeBarWrapper: { height: 88, justifyContent: 'flex-end' },
   timeBar: { width: 28, borderRadius: BorderRadius.md },
-  timeEmoji: { fontSize: 16 },
   timeLabel: { fontSize: 11, textAlign: 'center' },
   timeCount: { fontSize: 13, fontWeight: '700' },
   triggerRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
@@ -290,7 +308,6 @@ const styles = StyleSheet.create({
   triggerFill: { height: '100%', borderRadius: BorderRadius.pill },
   triggerCount: { fontSize: 12, width: 20, textAlign: 'right' },
   emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: Spacing.two, padding: Spacing.six },
-  emptyEmoji: { fontSize: 48 },
   emptyTitle: { fontSize: 18, fontWeight: '600', textAlign: 'center' },
   emptyBody: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
 });

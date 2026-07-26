@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
@@ -37,6 +38,17 @@ const TEMPLATE_LABEL_KEYS = {
   'weekly-review': 'templateWeeklyReview',
   'future-self': 'templateFutureSelf',
 } as const;
+
+// Ionicons name for each journal template (replaces the emoji in JOURNAL_TEMPLATES)
+type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
+const TEMPLATE_ICONS: Record<string, IoniconsName> = {
+  free:          'pencil-outline',
+  gratitude:     'heart-outline',
+  reflection:    'sunny-outline',
+  cbt:           'search-outline',
+  'weekly-review': 'calendar-outline',
+  'future-self': 'mail-outline',
+};
 
 async function openUrl(rawUrl: string) {
   let url = rawUrl;
@@ -165,9 +177,6 @@ export default function JournalScreen() {
     ...customTags,
   ];
 
-  // Built-in tags are stored/matched by their canonical English id (so existing
-  // entries and search keep working); only the displayed label is localized.
-  // Custom tags aren't in this map, so they fall through to their stored text.
   const tagLabel = useCallback((tag: string) => {
     const tagLabels = te.tagLabels as Record<string, string>;
     return tagLabels[tag] ?? tag;
@@ -186,7 +195,7 @@ export default function JournalScreen() {
           entering={FadeInDown.delay(Math.min(i, 8) * 30).springify()}
           style={[styles.entryCard, styles.sealedCard, { backgroundColor: colors.surface, borderColor: colors.primary + '44' }]}
         >
-          <Text style={styles.sealedEnvelope}>💌</Text>
+          <Ionicons name="mail-outline" size={48} color={colors.primary} accessibilityLabel="Sealed future self entry" style={styles.sealedEnvelope} />
           <Text style={[styles.sealedTitle, { color: colors.text }]}>{te.futureSelfLocked}</Text>
           <Text style={[styles.sealedDate, { color: colors.primary }]}>
             {unlockDateObj.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })}
@@ -205,7 +214,8 @@ export default function JournalScreen() {
       >
         {entry.isFutureSelf && (
           <View style={[styles.futureSelfBadge, { backgroundColor: colors.primary + '18' }]}>
-            <Text style={[styles.futureSelfBadgeText, { color: colors.primary }]}>💌 {te.futureSelfUnlock}</Text>
+            <Ionicons name="mail-outline" size={12} color={colors.primary} />
+            <Text style={[styles.futureSelfBadgeText, { color: colors.primary }]}>{te.futureSelfUnlock}</Text>
           </View>
         )}
         <View style={styles.entryHeader}>
@@ -214,8 +224,12 @@ export default function JournalScreen() {
             <Text style={[styles.entryMoodLabel, { color: colors.text }]}>{moodDef?.label}</Text>
             {entry.templateId && (
               <View style={[styles.templateBadge, { backgroundColor: colors.backgroundElement }]}>
+                <Ionicons
+                  name={TEMPLATE_ICONS[entry.templateId] ?? 'document-outline'}
+                  size={11}
+                  color={colors.textSecondary}
+                />
                 <Text style={[styles.templateBadgeText, { color: colors.textSecondary }]}>
-                  {JOURNAL_TEMPLATES.find(t => t.id === entry.templateId)?.emoji ?? '📝'}{' '}
                   {templateLabel(entry.templateId)}
                 </Text>
               </View>
@@ -269,6 +283,7 @@ export default function JournalScreen() {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
           {JOURNAL_TEMPLATES.map(tmpl => {
             const isSelected = selectedTemplate.id === tmpl.id;
+            const iconName: IoniconsName = TEMPLATE_ICONS[tmpl.id] ?? 'document-outline';
             return (
               <AnimatedPressable
                 key={tmpl.id}
@@ -288,7 +303,12 @@ export default function JournalScreen() {
                 accessibilityRole="button"
                 accessibilityState={{ selected: isSelected }}
               >
-                <Text style={styles.templateEmoji}>{tmpl.emoji}</Text>
+                <Ionicons
+                  name={iconName}
+                  size={22}
+                  color={isSelected ? colors.primary : colors.textSecondary}
+                  accessibilityLabel={templateLabel(tmpl.id)}
+                />
                 <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
                   {templateLabel(tmpl.id)}
                 </Text>
@@ -350,7 +370,7 @@ export default function JournalScreen() {
           onPress={() => setShowDatePicker(true)}
           activeOpacity={0.8}
         >
-          <Text style={styles.unlockBannerIcon}>💌</Text>
+          <Ionicons name="mail-outline" size={22} color={colors.primary} accessibilityLabel="Future self" />
           <View style={styles.unlockBannerText}>
             <Text style={[styles.unlockBannerLabel, { color: colors.textSecondary }]}>
               {te.unlockDate}
@@ -361,7 +381,7 @@ export default function JournalScreen() {
                 : te.setDate}
             </Text>
           </View>
-          <Text style={[styles.unlockBannerChevron, { color: colors.textSecondary }]}>›</Text>
+          <Ionicons name="chevron-forward" size={22} color={colors.textSecondary} accessibilityLabel="" />
         </TouchableOpacity>
       )}
 
@@ -439,7 +459,7 @@ export default function JournalScreen() {
       <View style={styles.section}>
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.pastTitle}</Text>
         <View style={[styles.searchBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-          <Text style={[styles.searchIcon, { color: colors.textSecondary }]}>🔍</Text>
+          <Ionicons name="search-outline" size={14} color={colors.textSecondary} accessibilityLabel="Search" />
           <TextInput
             style={[styles.searchInput, { color: colors.text }]}
             placeholder={te.searchPlaceholder}
@@ -449,8 +469,12 @@ export default function JournalScreen() {
             returnKeyType="search"
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
-              <Text style={[styles.searchClear, { color: colors.textSecondary }]}>✕</Text>
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              accessibilityLabel="Clear search"
+              accessibilityRole="button"
+            >
+              <Ionicons name="close" size={14} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -460,7 +484,12 @@ export default function JournalScreen() {
 
   const listEmpty = (
     <View style={styles.emptyState}>
-      <Text style={styles.emptyEmoji}>📖</Text>
+      <Ionicons
+        name="book-outline"
+        size={40}
+        color={colors.textSecondary}
+        accessibilityLabel="No journal entries"
+      />
       <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
         {searchQuery ? te.noResults : tj.emptyTitle}
       </Text>
@@ -562,7 +591,6 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
     minWidth: 88,
   },
-  templateEmoji: { fontSize: 22 },
   templateLabel: { fontSize: 12, fontWeight: '600', textAlign: 'center' },
   moodRow: { flexDirection: 'row', gap: Spacing.two },
   moodBtn: {
@@ -627,11 +655,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.two,
     gap: Spacing.two,
   },
-  searchIcon: { fontSize: 14 },
   searchInput: { flex: 1, fontSize: 15 },
-  searchClear: { fontSize: 14, fontWeight: '600' },
   emptyState: { alignItems: 'center', paddingVertical: Spacing.six, gap: Spacing.two },
-  emptyEmoji: { fontSize: 40 },
   emptyText: { fontSize: 14, textAlign: 'center', lineHeight: 20 },
   entrySeparator: { height: Spacing.two + 4 },
   entryCard: {
@@ -649,6 +674,9 @@ const styles = StyleSheet.create({
   moodDot: { width: 10, height: 10, borderRadius: 5 },
   entryMoodLabel: { fontSize: 14, fontWeight: '600' },
   templateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     borderRadius: BorderRadius.sm,
     paddingVertical: 2,
     paddingHorizontal: 7,
@@ -704,18 +732,16 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     gap: Spacing.two,
   },
-  unlockBannerIcon:    { fontSize: 22 },
   unlockBannerText:    { flex: 1, gap: 2 },
   unlockBannerLabel:   { fontSize: 11, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.6 },
   unlockBannerValue:   { fontSize: 15, fontWeight: '700' },
-  unlockBannerChevron: { fontSize: 22, fontWeight: '300' },
 
   sealedCard:     { alignItems: 'center', paddingVertical: Spacing.five },
-  sealedEnvelope: { fontSize: 48, marginBottom: Spacing.one },
+  sealedEnvelope: { marginBottom: Spacing.one },
   sealedTitle:    { fontSize: 14, fontWeight: '600' },
   sealedDate:     { fontSize: 18, fontWeight: '800' },
   sealedHint:     { fontSize: 12, marginTop: Spacing.one },
 
-  futureSelfBadge:     { borderRadius: BorderRadius.sm, paddingVertical: 4, paddingHorizontal: Spacing.two, alignSelf: 'flex-start' },
+  futureSelfBadge:     { flexDirection: 'row', alignItems: 'center', gap: 4, borderRadius: BorderRadius.sm, paddingVertical: 4, paddingHorizontal: Spacing.two, alignSelf: 'flex-start' },
   futureSelfBadgeText: { fontSize: 12, fontWeight: '700' },
 });
