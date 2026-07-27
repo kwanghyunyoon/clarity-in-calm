@@ -69,7 +69,7 @@ export default function InsightsScreen() {
   const timeIcons: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
     morning:   'sunny-outline',
     afternoon: 'partly-sunny-outline',
-    evening:   'partly-cloudy-night-outline',
+    evening:   'cloudy-night-outline',
     night:     'moon-outline',
   };
 
