@@ -26,11 +26,12 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const toX = (v: number) => ((v - 1) / 9) * trackWidth;
   const toValue = (x: number) => Math.round((Math.max(0, Math.min(x, trackWidth)) / trackWidth) * 9) + 1;
 
-  const thumbX = useSharedValue(toX(value));
-  const startX = useRef(toX(value));
+  // Change this import line — add useMemo:
+import React, { useMemo, useRef, useState } from 'react';
 
-  // Fix 1: store the whole ref, not .current — access .current only outside render
-  const panResponderRef = useRef(
+// Replace the useRef block with useMemo:
+const panResponder = useMemo(
+  () =>
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
@@ -46,7 +47,9 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
         thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
       },
     }),
-  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  [trackWidth],
+);
 
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value - THUMB_SIZE / 2 }],
@@ -60,22 +63,21 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
     <View style={styles.container}>
       <View
         style={styles.track}
-        onLayout={(e) => {
-          const w = e.nativeEvent.layout.width;
-          if (w > 0 && w !== trackWidth) {
-            setTrackWidth(w);
-            // Fix 2: use runOnJS or just reassign — thumbX is a shared value,
-            // this is inside an event handler (not render), so it's fine here.
-            thumbX.value = toX(value);
-          }
-        }}
+        onLayout={e => {
+  const w = e.nativeEvent.layout.width;
+  if (w > 0 && w !== trackWidth) {
+    setTrackWidth(w);
+    // eslint-disable-next-line react-hooks/immutability
+    thumbX.value = toX(value);
+  }
+}}
       >
         <View style={[styles.trackBg, { backgroundColor: colors.border }]} />
         <Animated.View style={[styles.trackFill, { backgroundColor: color }, fillStyle]} />
         {/* Fix 3: access panResponderRef.current only here in JSX (event handler context) */}
         <Animated.View
           style={[styles.thumb, { backgroundColor: color, borderColor: '#fff' }, thumbStyle]}
-          {...panResponderRef.current.panHandlers}
+          {...panResponderRef.panHandlers}
         >
           <Text style={styles.thumbLabel}>{value}</Text>
         </Animated.View>

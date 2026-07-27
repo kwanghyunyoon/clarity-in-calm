@@ -3,7 +3,7 @@
  * tailored illustration in addition to its title/body text; SlideVisual is
  * the router that picks the right one by page index.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Svg, { Path } from 'react-native-svg';
