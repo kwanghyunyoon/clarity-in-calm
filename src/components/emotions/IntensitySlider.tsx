@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PanResponder, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -26,30 +26,31 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const toX = (v: number) => ((v - 1) / 9) * trackWidth;
   const toValue = (x: number) => Math.round((Math.max(0, Math.min(x, trackWidth)) / trackWidth) * 9) + 1;
 
-  // Change this import line — add useMemo:
-import React, { useMemo, useRef, useState } from 'react';
+  const thumbX = useSharedValue(toX(value));
+  const startX = useRef(toX(value));
 
-// Replace the useRef block with useMemo:
-const panResponder = useMemo(
-  () =>
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        startX.current = thumbX.value;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
-        thumbX.value = newX;
-        onChange(toValue(newX));
-      },
-      onPanResponderRelease: () => {
-        thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
-      },
-    }),
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  [trackWidth],
-);
+  // useMemo so PanResponder.create is not called during render on every re-render,
+  // and so the linter does not flag .current access at the call site in JSX.
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+          startX.current = thumbX.value;
+        },
+        onPanResponderMove: (_, gestureState) => {
+          const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
+          thumbX.value = newX;
+          onChange(toValue(newX));
+        },
+        onPanResponderRelease: () => {
+          thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
+        },
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [trackWidth],
+  );
 
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value - THUMB_SIZE / 2 }],
@@ -63,28 +64,28 @@ const panResponder = useMemo(
     <View style={styles.container}>
       <View
         style={styles.track}
+        accessibilityRole="adjustable"
+        accessibilityValue={{ min: 1, max: 10, now: value }}
         onLayout={e => {
-  const w = e.nativeEvent.layout.width;
-  if (w > 0 && w !== trackWidth) {
-    setTrackWidth(w);
-    // eslint-disable-next-line react-hooks/immutability
-    thumbX.value = toX(value);
-  }
-}}
+          const w = e.nativeEvent.layout.width;
+          if (w > 0 && w !== trackWidth) {
+            setTrackWidth(w);
+            thumbX.value = toX(value);
+          }
+        }}
       >
-        <View style={[styles.trackBg, { backgroundColor: colors.border }]} />
+        <View style={[styles.trackBg, { backgroundColor: colors.backgroundElement }]} />
         <Animated.View style={[styles.trackFill, { backgroundColor: color }, fillStyle]} />
-        {/* Fix 3: access panResponderRef.current only here in JSX (event handler context) */}
         <Animated.View
           style={[styles.thumb, { backgroundColor: color, borderColor: '#fff' }, thumbStyle]}
-          {...panResponderRef.panHandlers}
+          {...panResponder.panHandlers}
         >
           <Text style={styles.thumbLabel}>{value}</Text>
         </Animated.View>
       </View>
       <View style={styles.labels}>
-        <Text style={[styles.label, { color: colors.textMuted }]}>{lowLabel}</Text>
-        <Text style={[styles.label, { color: colors.textMuted }]}>{highLabel}</Text>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{lowLabel}</Text>
+        <Text style={[styles.label, { color: colors.textSecondary }]}>{highLabel}</Text>
       </View>
     </View>
   );
