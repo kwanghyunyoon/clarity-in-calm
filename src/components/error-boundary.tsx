@@ -33,7 +33,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
         />
         <Text style={styles.title}>Something went wrong</Text>
         <Text style={styles.body}>
-          Clarity in Calm ran into an unexpected error. Your journal is safe — it's encrypted on your device.
+          Clarity in Calm ran into an unexpected error. Your journal is safe — it&apos;s encrypted on your device.
         </Text>
         <TouchableOpacity
           style={styles.btn}

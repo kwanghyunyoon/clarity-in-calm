@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { PanResponder, StyleSheet, Text, View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
@@ -29,23 +29,29 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const thumbX = useSharedValue(toX(value));
   const startX = useRef(toX(value));
 
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: () => {
-        startX.current = thumbX.value;
-      },
-      onPanResponderMove: (_, gestureState) => {
-        const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
-        thumbX.value = newX;
-        onChange(toValue(newX));
-      },
-      onPanResponderRelease: () => {
-        thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
-      },
-    }),
-  ).current;
+  // PanResponder.create passes startX (a ref) into callbacks — these callbacks
+  // only run in event handlers (grant/move/release), never during render.
+  const panResponder = useMemo(
+    () =>
+      // eslint-disable-next-line react-hooks/refs
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+          startX.current = thumbX.value;
+        },
+        onPanResponderMove: (_, gestureState) => {
+          const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
+          thumbX.value = newX;
+          onChange(toValue(newX));
+        },
+        onPanResponderRelease: () => {
+          thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
+        },
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [trackWidth],
+  );
 
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value - THUMB_SIZE / 2 }],
@@ -65,6 +71,9 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
           const w = e.nativeEvent.layout.width;
           if (w > 0 && w !== trackWidth) {
             setTrackWidth(w);
+            // thumbX is a Reanimated shared value; assignment in onLayout
+            // (an event handler) is intentional and safe.
+            // eslint-disable-next-line react-hooks/immutability
             thumbX.value = toX(value);
           }
         }}
