@@ -173,7 +173,7 @@ export default function InsightsScreen() {
             <View style={styles.moodDist}>
               {moodDist.map((d, i) => (
                 <View key={i} style={styles.moodDistRow}>
-                  <Text style={styles.moodDistEmoji}>{moods[i].emoji}</Text>
+                  <View style={[styles.moodDistDot, { backgroundColor: moods[i].color }]} />
                   <View style={[styles.moodDistTrack, { backgroundColor: colors.backgroundElement }]}>
                     <View
                       style={[styles.moodDistFill, { width: `${d.pct * 100}%`, backgroundColor: moods[i].color }]}
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   chartLegend: { fontSize: 12, fontStyle: 'italic' },
   moodDist: { gap: Spacing.two },
   moodDistRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
-  moodDistEmoji: { fontSize: 18, width: 24, textAlign: 'center' },
+  moodDistDot: { width: 20, height: 20, borderRadius: 10 },
   moodDistTrack: { flex: 1, height: 8, borderRadius: BorderRadius.pill, overflow: 'hidden' },
   moodDistFill: { height: '100%', borderRadius: BorderRadius.pill },
   moodDistCount: { fontSize: 12, width: 24, textAlign: 'right' },
