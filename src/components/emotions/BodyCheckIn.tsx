@@ -4,6 +4,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { BODY_REGIONS } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useTranslation } from '@/hooks/use-translation';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -26,12 +27,15 @@ interface Props {
 
 export function BodyCheckIn({ selected, onToggle, accentColor }: Props) {
   const { colors } = useTheme();
+  const t = useTranslation();
+  const bodyRegionLabels = t.emotionsCatalog.bodyRegions as Record<string, string>;
 
   return (
     <View style={styles.grid}>
       {BODY_REGIONS.map(region => {
         const isSelected = selected.includes(region.id);
         const iconName: IoniconsName = BODY_REGION_ICONS[region.id] ?? 'ellipse-outline';
+        const label = bodyRegionLabels[region.id] ?? region.label;
         return (
           <TouchableOpacity
             key={region.id}
@@ -45,7 +49,7 @@ export function BodyCheckIn({ selected, onToggle, accentColor }: Props) {
             ]}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: isSelected }}
-            accessibilityLabel={region.label}
+            accessibilityLabel={label}
           >
             <Ionicons
               name={iconName}
@@ -53,7 +57,7 @@ export function BodyCheckIn({ selected, onToggle, accentColor }: Props) {
               color={isSelected ? accentColor : colors.textSecondary}
             />
             <Text style={[styles.label, { color: isSelected ? accentColor : colors.textSecondary }]}>
-              {region.label}
+              {label}
             </Text>
           </TouchableOpacity>
         );

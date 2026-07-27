@@ -646,6 +646,16 @@ export const en = {
       grounding:  '5-4-3-2-1',
       nothing:    'Nothing yet',
     },
+    bodyRegions: {
+  head:      'Head',
+  throat:    'Throat',
+  chest:     'Chest',
+  stomach:   'Stomach',
+  shoulders: 'Shoulders',
+  arms:      'Arms',
+  legs:      'Legs',
+  hands:     'Hands',
+},
   },
 
   feelingsLibraryContent: {
@@ -1044,6 +1054,16 @@ export const ko: Translations = {
       grounding:  '5-4-3-2-1',
       nothing:    '아직 없음',
     },
+     bodyRegions: {
+  head:      '머리',
+  throat:    '목',
+  chest:     '가슴',
+  stomach:   '배',
+  shoulders: '어깨',
+  arms:      '팔',
+  legs:      '다리',
+  hands:     '손',
+},
   },
 
   feelingsLibraryContent: {
@@ -1458,6 +1478,16 @@ export const es: Translations = {
       grounding:  '5-4-3-2-1',
       nothing:    'Nada todavía',
     },
+     bodyRegions: {
+  head:      'Cabeza',
+  throat:    'Garganta',
+  chest:     'Pecho',
+  stomach:   'Estómago',
+  shoulders: 'Hombros',
+  arms:      'Brazos',
+  legs:      'Piernas',
+  hands:     'Manos',
+},
   },
 
   feelingsLibraryContent: {
@@ -1854,6 +1884,16 @@ export const hi: Translations = {
       grounding:  '5-4-3-2-1',
       nothing:    'अभी कुछ नहीं',
     },
+     bodyRegions: {
+  head:      'सिर',
+  throat:    'गला',
+  chest:     'छाती',
+  stomach:   'पेट',
+  shoulders: 'कंधे',
+  arms:      'बाहें',
+  legs:      'पैर',
+  hands:     'हाथ',
+},
   },
 
   feelingsLibraryContent: {
