@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import { PREDEFINED_CONTEXT_TAGS } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -8,9 +8,10 @@ interface Props {
   selected: string[];
   onToggle: (tag: string) => void;
   customTags?: string[];
+  tagLabels?: Record<string, string>;
 }
 
-export function ContextTagSelector({ selected, onToggle, customTags = [] }: Props) {
+export function ContextTagSelector({ selected, onToggle, customTags = [], tagLabels }: Props) {
   const { colors } = useTheme();
 
   const allTags = [...PREDEFINED_CONTEXT_TAGS, ...customTags];
@@ -23,6 +24,7 @@ export function ContextTagSelector({ selected, onToggle, customTags = [] }: Prop
     >
       {allTags.map(tag => {
         const isSelected = selected.includes(tag);
+        const label = tagLabels?.[tag] ?? tag;
         return (
           <TouchableOpacity
             key={tag}
@@ -36,10 +38,10 @@ export function ContextTagSelector({ selected, onToggle, customTags = [] }: Prop
             ]}
             accessibilityRole="checkbox"
             accessibilityState={{ checked: isSelected }}
-            accessibilityLabel={tag}
+            accessibilityLabel={label}
           >
             <Text style={[styles.chipText, { color: isSelected ? colors.primary : colors.textSecondary }]}>
-              {tag}
+              {label}
             </Text>
           </TouchableOpacity>
         );

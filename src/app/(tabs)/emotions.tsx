@@ -67,8 +67,8 @@ export default function EmotionsScreen() {
   }
 
   function toggleCopingAction(id: string) {
-  setCopingActions(prev => (prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]));
-}
+    setCopingActions(prev => (prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]));
+  }
 
   function handleSave() {
     if (!selectedEmotion) return;
@@ -175,6 +175,7 @@ export default function EmotionsScreen() {
                 selected={contextTags}
                 onToggle={toggleTag}
                 customTags={customTags}
+                tagLabels={te.contextTagLabels}
               />
             </Animated.View>
           )}
@@ -262,7 +263,9 @@ export default function EmotionsScreen() {
                         <View style={styles.tagRow}>
                           {log.contextTags.slice(0, 4).map(tag => (
                             <View key={tag} style={[styles.miniChip, { backgroundColor: color + '18' }]}>
-                              <Text style={[styles.miniChipText, { color }]}>{tag}</Text>
+                              <Text style={[styles.miniChipText, { color }]}>
+                                {te.contextTagLabels[tag as keyof typeof te.contextTagLabels] ?? tag}
+                              </Text>
                             </View>
                           ))}
                         </View>
