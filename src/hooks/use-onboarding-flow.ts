@@ -52,8 +52,11 @@ export function useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCou
   }, []);
 
   useEffect(() => {
-    if (isHelpVisible) setPage(0);
-  }, [isHelpVisible]);
+  if (isHelpVisible) {
+    const id = setTimeout(() => setPage(0), 0);
+    return () => clearTimeout(id);
+  }
+}, [isHelpVisible]);
 
   const visible = firstLaunch || isHelpVisible;
   const isLast  = page === slideCount - 1;

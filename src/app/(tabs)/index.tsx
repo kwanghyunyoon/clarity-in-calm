@@ -211,7 +211,7 @@ export default function TodayScreen() {
                 {t.today.quote}
               </Text>
               <Text style={[styles.quoteText, { color: colors.text }]}>
-                "{quote.text}"
+                &ldquo;{quote.text}&rdquo;
               </Text>
               <Text style={[styles.quoteAuthor, { color: colors.textSecondary }]}>
                 — {quote.author}

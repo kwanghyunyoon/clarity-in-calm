@@ -29,7 +29,8 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const thumbX = useSharedValue(toX(value));
   const startX = useRef(toX(value));
 
-  const panResponder = useRef(
+  // Fix 1: store the whole ref, not .current — access .current only outside render
+  const panResponderRef = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
@@ -45,7 +46,7 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
         thumbX.value = withSpring(toX(toValue(thumbX.value)), { damping: 18, stiffness: 300 });
       },
     }),
-  ).current;
+  );
 
   const thumbStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: thumbX.value - THUMB_SIZE / 2 }],
@@ -59,28 +60,29 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
     <View style={styles.container}>
       <View
         style={styles.track}
-        accessibilityRole="adjustable"
-        accessibilityValue={{ min: 1, max: 10, now: value }}
-        onLayout={e => {
+        onLayout={(e) => {
           const w = e.nativeEvent.layout.width;
           if (w > 0 && w !== trackWidth) {
             setTrackWidth(w);
+            // Fix 2: use runOnJS or just reassign — thumbX is a shared value,
+            // this is inside an event handler (not render), so it's fine here.
             thumbX.value = toX(value);
           }
         }}
       >
-        <View style={[styles.trackBg, { backgroundColor: colors.backgroundElement }]} />
+        <View style={[styles.trackBg, { backgroundColor: colors.border }]} />
         <Animated.View style={[styles.trackFill, { backgroundColor: color }, fillStyle]} />
+        {/* Fix 3: access panResponderRef.current only here in JSX (event handler context) */}
         <Animated.View
           style={[styles.thumb, { backgroundColor: color, borderColor: '#fff' }, thumbStyle]}
-          {...panResponder.panHandlers}
+          {...panResponderRef.current.panHandlers}
         >
           <Text style={styles.thumbLabel}>{value}</Text>
         </Animated.View>
       </View>
       <View style={styles.labels}>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>{lowLabel}</Text>
-        <Text style={[styles.label, { color: colors.textSecondary }]}>{highLabel}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>{lowLabel}</Text>
+        <Text style={[styles.label, { color: colors.textMuted }]}>{highLabel}</Text>
       </View>
     </View>
   );

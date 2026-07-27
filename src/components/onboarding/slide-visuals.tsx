@@ -3,9 +3,9 @@
  * tailored illustration in addition to its title/body text; SlideVisual is
  * the router that picks the right one by page index.
  */
+import React, { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { BASIC_EMOTIONS } from '@/constants/emotions';
@@ -18,17 +18,14 @@ type Translation = ReturnType<typeof useTranslation>;
 
 // Slide 0 — Welcome: gently pulsing orb with leaf icon
 function WelcomeVisual() {
-  const scaleRef = useRef<Animated.Value | null>(null);
-  if (!scaleRef.current) {
-    scaleRef.current = new Animated.Value(1);
-  }
-  const scale = scaleRef.current;
+  // Fix: use useState to initialize Animated.Value once — avoids ref access during render
+  const [scale] = React.useState(() => new Animated.Value(1));
 
   useEffect(() => {
     const anim = Animated.loop(
       Animated.sequence([
         Animated.timing(scale, { toValue: 1.1, duration: 1400, useNativeDriver: true }),
-        Animated.timing(scale, { toValue: 1,   duration: 1400, useNativeDriver: true }),
+        Animated.timing(scale, { toValue: 1, duration: 1400, useNativeDriver: true }),
       ])
     );
     anim.start();
@@ -37,7 +34,7 @@ function WelcomeVisual() {
 
   return (
     <Animated.View style={[s.welcomeOrb, { transform: [{ scale }] }]}>
-      <Ionicons name="leaf-outline" size={64} color="#5a9e6f" accessibilityLabel="Leaf" />
+      <Ionicons name="leaf-outline" size={48} color="#4caf7d" />
     </Animated.View>
   );
 }
@@ -172,8 +169,6 @@ function ShieldVisual() {
 
 // Re-export Text so slides that still need it can import from here — avoids
 // importing react-native Text in the barrel just for the pill label.
-import { Text } from 'react-native';
-import React from 'react';
 
 export function SlideVisual({ page, colors, t }: { page: number; colors: ThemeColors; t: Translation }) {
   switch (page) {

@@ -20,7 +20,9 @@ export function AnimatedPressable({ style, children, scale = 0.96, ...rest }: Pr
   return (
     <AnimatedPressableBase
       style={[style, animStyle]}
+      // eslint-disable-next-line react-hooks/immutability
       onPressIn={() => { sv.value = withSpring(scale, { damping: 15, stiffness: 400 }); }}
+      // eslint-disable-next-line react-hooks/immutability
       onPressOut={() => { sv.value = withSpring(1, { damping: 15, stiffness: 400 }); }}
       {...rest}
     >

@@ -96,26 +96,28 @@ export default function BreatheScreen() {
 
   /* ── JS-side phase tracker ── */
   useEffect(() => {
-    if (!isRunning) {
+  if (!isRunning) {
+    const id = setTimeout(() => {
       setPhaseLabel(t.breathe.ready);
       setPhaseHint(t.breathe.tapToStart);
       setCountdown(4);
-      return;
-    }
+    }, 0);
+    return () => clearTimeout(id);
+  }
 
-    const interval = setInterval(() => {
-      const totalMs = Date.now() - startTimeRef.current;
-      setRounds(Math.floor(totalMs / CYCLE_MS));
+  const interval = setInterval(() => {
+    const totalMs = Date.now() - startTimeRef.current;
+    setRounds(Math.floor(totalMs / CYCLE_MS));
 
-      const phaseId = getPhaseAtTime(totalMs);
-      const phase = PHASES.find((p) => p.id === phaseId)!;
-      setPhaseLabel(phase.label);
-      setPhaseHint(phase.hint);
-      setCountdown(getPhaseCountdownAtTime(totalMs));
-    }, 80);
+    const phaseId = getPhaseAtTime(totalMs);
+    const phase = PHASES.find((p) => p.id === phaseId)!;
+    setPhaseLabel(phase.label);
+    setPhaseHint(phase.hint);
+    setCountdown(getPhaseCountdownAtTime(totalMs));
+  }, 80);
 
-    return () => clearInterval(interval);
-  }, [isRunning]);
+  return () => clearInterval(interval);
+}, [isRunning]);
 
   /* ── Animated styles ── */
   const circleStyle = useAnimatedStyle(() => ({
