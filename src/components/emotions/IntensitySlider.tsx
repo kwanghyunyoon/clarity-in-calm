@@ -29,10 +29,13 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const thumbX = useSharedValue(toX(value));
   const startX = useRef(toX(value));
 
-  // useMemo so PanResponder.create is not called during render on every re-render,
-  // and so the linter does not flag .current access at the call site in JSX.
+  // PanResponder.create passes startX (a ref) into callbacks — the linter flags
+  // this as a ref-during-render access, but these callbacks only run in event
+  // handlers (grant/move/release), never during render. Safe to suppress.
+  // eslint-disable-next-line react-hooks/refs
   const panResponder = useMemo(
     () =>
+      // eslint-disable-next-line react-hooks/refs
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
@@ -70,6 +73,9 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
           const w = e.nativeEvent.layout.width;
           if (w > 0 && w !== trackWidth) {
             setTrackWidth(w);
+            // thumbX is a Reanimated shared value; assignment in onLayout
+            // (an event handler) is intentional and safe.
+            // eslint-disable-next-line react-hooks/immutability
             thumbX.value = toX(value);
           }
         }}
