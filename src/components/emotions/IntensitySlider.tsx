@@ -29,10 +29,8 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
   const thumbX = useSharedValue(toX(value));
   const startX = useRef(toX(value));
 
-  // PanResponder.create passes startX (a ref) into callbacks — the linter flags
-  // this as a ref-during-render access, but these callbacks only run in event
-  // handlers (grant/move/release), never during render. Safe to suppress.
-  // eslint-disable-next-line react-hooks/refs
+  // PanResponder.create passes startX (a ref) into callbacks — these callbacks
+  // only run in event handlers (grant/move/release), never during render.
   const panResponder = useMemo(
     () =>
       // eslint-disable-next-line react-hooks/refs
