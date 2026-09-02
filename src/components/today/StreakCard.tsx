@@ -5,12 +5,11 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { Card } from '@/components/ui/Card';
 import { IconChip } from '@/components/ui/IconChip';
-import { Colors, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 interface Props {
@@ -38,6 +37,7 @@ export function StreakCard({ streak, streakLabel, streakStart, totalEntries, tot
         true,
       );
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [streak]);
 
   const flameStyle = useAnimatedStyle(() => ({

@@ -1,19 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
-  Platform,
+
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
-import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';

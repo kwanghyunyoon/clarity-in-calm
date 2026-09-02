@@ -17,7 +17,6 @@ import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
 import { CYCLE_MS, getPhaseAtTime, getPhaseCountdownAtTime, PHASE_DURATIONS } from '@/lib/breathing';
 
-const PHASE_END_SCALES = [1.00, 1.00, 0.58, 0.58] as const;
 
 export default function BreatheScreen() {
   const { colors } = useTheme();
@@ -25,7 +24,7 @@ export default function BreatheScreen() {
   const { addBreathingSession } = useWellness();
 
   // Build PHASES from translations so labels/hints are localised
-  const PHASES = [
+    const PHASES = [
     { id: 'inhale', label: t.breathe.phases.inhale.label, hint: t.breathe.phases.inhale.hint, duration: PHASE_DURATIONS[0] },
     { id: 'hold1',  label: t.breathe.phases.hold1.label,  hint: t.breathe.phases.hold1.hint,  duration: PHASE_DURATIONS[1] },
     { id: 'exhale', label: t.breathe.phases.exhale.label, hint: t.breathe.phases.exhale.hint, duration: PHASE_DURATIONS[2] },
@@ -92,6 +91,7 @@ export default function BreatheScreen() {
       cancelAnimation(ringScale);
       cancelAnimation(glowOpacity);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isRunning]);
 
   /* ── JS-side phase tracker ── */
@@ -104,7 +104,9 @@ export default function BreatheScreen() {
     }, 0);
     return () => clearTimeout(id);
   }
+}, [isRunning, scale, ringScale, glowOpacity, t.breathe.ready, t.breathe.tapToStart]);
 
+  useEffect(() => {
   const interval = setInterval(() => {
     const totalMs = Date.now() - startTimeRef.current;
     setRounds(Math.floor(totalMs / CYCLE_MS));
@@ -116,7 +118,9 @@ export default function BreatheScreen() {
     setCountdown(getPhaseCountdownAtTime(totalMs));
   }, 80);
 
+     
   return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [isRunning]);
 
   /* ── Animated styles ── */

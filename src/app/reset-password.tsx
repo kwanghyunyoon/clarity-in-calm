@@ -24,7 +24,6 @@ export default function ResetPassword() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
   useEffect(() => {
     const establishRecoverySession = async (url: string | null) => {
       const tokens = url ? parseRecoveryTokens(url) : null;
@@ -38,7 +37,7 @@ export default function ResetPassword() {
     void Linking.getInitialURL().then(establishRecoverySession);
     const sub = Linking.addEventListener('url', (e) => void establishRecoverySession(e.url));
     return () => sub.remove();
-  }, []);
+  }, [t.errors.expiredLink]);
 
   const handleReset = async () => {
     if (password.length < 8) {
