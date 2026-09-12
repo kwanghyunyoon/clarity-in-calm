@@ -1666,66 +1666,142 @@ export const SOURCE = {
       es: 'Seleccionado',
       hi: 'चुना गया',
     },
+    // Keyed by the raw values in PREDEFINED_CONTEXT_TAGS (src/constants/emotions.ts) —
+    // these were previously mislabeled with journal.tsx's tag vocabulary (work/home/
+    // family/...), which never matched a PREDEFINED_CONTEXT_TAGS value, so every
+    // context-tag chip silently rendered its raw English tag in every locale.
     contextTagLabels: {
-      work: {
-        en: 'Work',
-        ko: '업무',
-        es: 'trabajo',
-        hi: 'काम',
+      morning: {
+        en: 'Morning',
+        ko: '아침',
+        es: 'Mañana',
+        hi: 'सुबह',
       },
-      home: {
-        en: 'Home',
-        ko: '집',
-        es: 'hogar',
-        hi: 'घर',
+      afternoon: {
+        en: 'Afternoon',
+        ko: '오후',
+        es: 'Tarde',
+        hi: 'दोपहर',
       },
-      family: {
-        en: 'Family',
-        ko: '가족',
-        es: 'familia',
-        hi: 'परिवार',
+      evening: {
+        en: 'Evening',
+        ko: '저녁',
+        es: 'Noche',
+        hi: 'शाम',
       },
-      health: {
-        en: 'Health',
-        ko: '건강',
-        es: 'salud',
-        hi: 'स्वास्थ्य',
+      night: {
+        en: 'Night',
+        ko: '밤',
+        es: 'Madrugada',
+        hi: 'रात',
       },
-      relationship: {
-        en: 'Relationship',
-        ko: '관계',
-        es: 'relación',
-        hi: 'रिश्ता',
+      'at work': {
+        en: 'At work',
+        ko: '직장에서',
+        es: 'En el trabajo',
+        hi: 'काम पर',
       },
-      growth: {
-        en: 'Growth',
-        ko: '성장',
-        es: 'crecimiento',
-        hi: 'विकास',
+      'at home': {
+        en: 'At home',
+        ko: '집에서',
+        es: 'En casa',
+        hi: 'घर पर',
       },
-      gratitude: {
-        en: 'Gratitude',
-        ko: '감사',
-        es: 'gratitud',
-        hi: 'आभार',
+      commuting: {
+        en: 'Commuting',
+        ko: '통근 중',
+        es: 'En camino',
+        hi: 'आने-जाने के दौरान',
       },
-      stress: {
-        en: 'Stress',
-        ko: '스트레스',
-        es: 'estrés',
-        hi: 'तनाव',
+      outdoors: {
+        en: 'Outdoors',
+        ko: '야외에서',
+        es: 'Al aire libre',
+        hi: 'बाहर',
       },
-      joy: {
-        en: 'Joy',
-        ko: '기쁨',
-        es: 'alegría',
-        hi: 'खुशी',
+      'with family': {
+        en: 'With family',
+        ko: '가족과 함께',
+        es: 'Con la familia',
+        hi: 'परिवार के साथ',
       },
-      sleep: {
-        en: 'Sleep',
-        ko: '수면',
-        es: 'sueño',
-        hi: 'नींद',
+      'with friends': {
+        en: 'With friends',
+        ko: '친구와 함께',
+        es: 'Con amigos',
+        hi: 'दोस्तों के साथ',
+      },
+      alone: {
+        en: 'Alone',
+        ko: '혼자',
+        es: 'A solas',
+        hi: 'अकेले',
+      },
+      'in a crowd': {
+        en: 'In a crowd',
+        ko: '사람들 속에서',
+        es: 'Entre mucha gente',
+        hi: 'भीड़ में',
+      },
+      'after news': {
+        en: 'After news',
+        ko: '뉴스를 본 후',
+        es: 'Después de ver noticias',
+        hi: 'समाचार देखने के बाद',
+      },
+      'social media': {
+        en: 'Social media',
+        ko: '소셜 미디어',
+        es: 'Redes sociales',
+        hi: 'सोशल मीडिया',
+      },
+      'after argument': {
+        en: 'After argument',
+        ko: '다툼 후',
+        es: 'Después de una discusión',
+        hi: 'बहस के बाद',
+      },
+      'before big event': {
+        en: 'Before big event',
+        ko: '중요한 일 전',
+        es: 'Antes de un evento importante',
+        hi: 'बड़े कार्यक्रम से पहले',
+      },
+      tired: {
+        en: 'Tired',
+        ko: '피곤함',
+        es: 'Cansancio',
+        hi: 'थकान',
+      },
+      hungry: {
+        en: 'Hungry',
+        ko: '배고픔',
+        es: 'Hambre',
+        hi: 'भूख',
+      },
+      sick: {
+        en: 'Sick',
+        ko: '아픔',
+        es: 'Enfermo/a',
+        hi: 'बीमार',
+      },
+      'after exercise': {
+        en: 'After exercise',
+        ko: '운동 후',
+        es: 'Después de hacer ejercicio',
+        hi: 'व्यायाम के बाद',
+      },
+      'poor sleep': {
+        en: 'Poor sleep',
+        ko: '수면 부족',
+        es: 'Dormí mal',
+        hi: 'नींद कम आई',
+      },
+      'good sleep': {
+        en: 'Good sleep',
+        ko: '숙면',
+        es: 'Dormí bien',
+        hi: 'अच्छी नींद आई',
       },
     },
     deleteConfirm: {

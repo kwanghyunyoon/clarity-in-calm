@@ -48,6 +48,7 @@ export default function InsightsScreen() {
 
   // ── Top context triggers
   const triggerCounts = useMemo(() => computeTriggerCounts(emotionLogs), [emotionLogs]);
+  const contextTagLabels = t.emotionsScreen.contextTagLabels as Record<string, string>;
 
   // ── Time of day distribution
   const timeOfDay = useMemo(() => computeTimeOfDay(emotionLogs), [emotionLogs]);
@@ -154,7 +155,7 @@ export default function InsightsScreen() {
                     <View style={[styles.bar, { height: 4, backgroundColor: colors.backgroundElement }]} />
                   )}
                   <Text style={[styles.chartDayLabel, { color: colors.textSecondary }]}>
-                    {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'][new Date(last7Days[i]).getDay()]}
+                    {t.settingsScreen.daysShort[new Date(last7Days[i]).getDay()]}
                   </Text>
                 </View>
               );
@@ -230,7 +231,7 @@ export default function InsightsScreen() {
               const pct = count / (triggerCounts[0][1] || 1);
               return (
                 <View key={tag} style={styles.triggerRow}>
-                  <Text style={[styles.triggerTag, { color: colors.text }]}>{tag}</Text>
+                  <Text style={[styles.triggerTag, { color: colors.text }]}>{contextTagLabels[tag] ?? tag}</Text>
                   <View style={[styles.triggerTrack, { backgroundColor: colors.backgroundElement }]}>
                     <View style={[styles.triggerFill, { width: `${pct * 100}%`, backgroundColor: colors.accent }]} />
                   </View>
