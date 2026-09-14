@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const MINUTES = [0, 15, 30, 45];
 
 export function TimePicker({
   visible,
@@ -23,8 +26,15 @@ export function TimePicker({
   const [h, setH] = useState(hour);
   const [m, setM] = useState(minute);
 
-  const HOURS = Array.from({ length: 24 }, (_, i) => i);
-  const MINUTES = [0, 15, 30, 45];
+  // The Modal stays mounted between opens, so useState's initial value only
+  // ever applies once. Resync on each open, otherwise cancelling a change and
+  // reopening shows the discarded value instead of the saved one.
+  useEffect(() => {
+    if (visible) {
+      setH(hour);
+      setM(minute);
+    }
+  }, [visible, hour, minute]);
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -32,45 +42,63 @@ export function TimePicker({
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <Text style={[styles.title, { color: colors.text }]}>{tt.title}</Text>
 
-          <View style={styles.row}>
-            {/* Hour picker */}
-            <View style={styles.col}>
-              <Text style={[styles.colLabel, { color: colors.textSecondary }]}>{tt.hourLabel}</Text>
-              <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                {HOURS.map(hh => (
+          <View style={styles.group}>
+            <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{tt.hourLabel}</Text>
+            <View style={styles.grid}>
+              {HOURS.map(hh => {
+                const selected = hh === h;
+                return (
                   <TouchableOpacity
                     key={hh}
                     onPress={() => setH(hh)}
-                    style={[styles.item, hh === h && { backgroundColor: colors.primary + '22' }]}
+                    style={[
+                      styles.cell,
+                      { borderColor: colors.border },
+                      selected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={`${tt.hourLabel} ${String(hh).padStart(2, '0')}`}
                   >
-                    <Text style={[styles.itemText, { color: hh === h ? colors.primary : colors.text }]}>
+                    <Text style={[styles.cellText, { color: selected ? '#fff' : colors.text }]}>
                       {String(hh).padStart(2, '0')}
                     </Text>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                );
+              })}
             </View>
+          </View>
 
-            <Text style={[styles.colon, { color: colors.text }]}>:</Text>
-
-            {/* Minute picker */}
-            <View style={styles.col}>
-              <Text style={[styles.colLabel, { color: colors.textSecondary }]}>{tt.minuteLabel}</Text>
-              <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false}>
-                {MINUTES.map(mm => (
+          <View style={styles.group}>
+            <Text style={[styles.groupLabel, { color: colors.textSecondary }]}>{tt.minuteLabel}</Text>
+            <View style={styles.grid}>
+              {MINUTES.map(mm => {
+                const selected = mm === m;
+                return (
                   <TouchableOpacity
                     key={mm}
                     onPress={() => setM(mm)}
-                    style={[styles.item, mm === m && { backgroundColor: colors.primary + '22' }]}
+                    style={[
+                      styles.cell,
+                      { borderColor: colors.border },
+                      selected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={`${tt.minuteLabel} ${String(mm).padStart(2, '0')}`}
                   >
-                    <Text style={[styles.itemText, { color: mm === m ? colors.primary : colors.text }]}>
+                    <Text style={[styles.cellText, { color: selected ? '#fff' : colors.text }]}>
                       {String(mm).padStart(2, '0')}
                     </Text>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                );
+              })}
             </View>
           </View>
+
+          <Text style={[styles.preview, { color: colors.textSecondary }]}>
+            {String(h).padStart(2, '0')}:{String(m).padStart(2, '0')}
+          </Text>
 
           <TouchableOpacity
             style={[styles.btn, { backgroundColor: colors.primary }]}
@@ -91,13 +119,21 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: Spacing.four },
   sheet: { borderRadius: BorderRadius.xl, padding: Spacing.four, gap: Spacing.three },
   title: { fontSize: 18, fontWeight: '700', textAlign: 'center' },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: Spacing.four },
-  col: { alignItems: 'center', gap: Spacing.two },
-  colLabel: { fontSize: 12, fontWeight: '600', letterSpacing: 0.5 },
-  scroll: { height: 180 },
-  item: { paddingVertical: 10, paddingHorizontal: Spacing.three, borderRadius: BorderRadius.md, minWidth: 56, alignItems: 'center' },
-  itemText: { fontSize: 18, fontWeight: '600' },
-  colon: { fontSize: 24, fontWeight: '700', marginTop: 28 },
+  group: { gap: Spacing.two },
+  groupLabel: { fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
+  // Wraps to as many columns as the sheet fits, so narrow phones reflow
+  // instead of overflowing.
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  cell: {
+    minWidth: 52,
+    paddingVertical: 10,
+    paddingHorizontal: Spacing.two,
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  cellText: { fontSize: 16, fontWeight: '600' },
+  preview: { fontSize: 14, textAlign: 'center', fontWeight: '600' },
   btn: { borderRadius: BorderRadius.xl, paddingVertical: Spacing.three, alignItems: 'center' },
   btnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   cancel: { alignItems: 'center', paddingVertical: Spacing.two },
