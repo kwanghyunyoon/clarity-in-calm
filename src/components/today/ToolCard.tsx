@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Card } from '@/components/ui/Card';
 import { IconChip } from '@/components/ui/IconChip';
@@ -27,12 +27,15 @@ export function ToolCard({ icon, title, subtitle, accentColor, onPress }: Props)
     >
       <Card style={styles.card}>
         <IconChip name={icon} color={accentColor} />
-        <Text style={[styles.title, { color: colors.text, fontFamily: Fonts?.displaySans }]} numberOfLines={1}>
-          {title}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]} numberOfLines={2}>
-          {subtitle}
-        </Text>
+        <View style={styles.text}>
+          <Text style={[styles.title, { color: colors.text, fontFamily: Fonts?.displaySans }]}>
+            {title}
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            {subtitle}
+          </Text>
+        </View>
+        <Ionicons name="chevron-forward" size={18} color={colors.textSecondary} />
       </Card>
     </AnimatedPressable>
   );
@@ -40,19 +43,26 @@ export function ToolCard({ icon, title, subtitle, accentColor, onPress }: Props)
 
 const styles = StyleSheet.create({
   pressable: {
-    flex: 1,
+    width: '100%',
   },
   card: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: Spacing.three,
-    gap: Spacing.two,
+    gap: Spacing.three,
+  },
+  // Takes the row's leftover width so long titles wrap instead of clipping.
+  text: {
+    flex: 1,
+    gap: Spacing.one,
   },
   title: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '600',
     letterSpacing: -0.2,
   },
   subtitle: {
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

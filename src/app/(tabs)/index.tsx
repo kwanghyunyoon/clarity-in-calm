@@ -306,8 +306,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   toolsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing.two + 4,
   },
   quoteCard: {
