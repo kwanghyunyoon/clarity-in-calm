@@ -15,7 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AccountSection } from '@/components/settings/AccountSection';
-import { TimePicker } from '@/components/settings/TimePicker';
+import { TimePicker, formatTime12h } from '@/components/settings/TimePicker';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { SettingsGroup } from '@/components/ui/SettingsGroup';
@@ -176,7 +176,12 @@ export default function SettingsScreen() {
           {notifEnabled && (
             <SettingsRow
               label={ts.reminderTime}
-              value={`${String(settings.notifications.hour).padStart(2, '0')}:${String(settings.notifications.minute).padStart(2, '0')}`}
+              value={formatTime12h(
+                settings.notifications.hour,
+                settings.notifications.minute,
+                ts.timePicker.am,
+                ts.timePicker.pm,
+              )}
               onPress={() => setShowTimePicker(true)}
             />
           )}

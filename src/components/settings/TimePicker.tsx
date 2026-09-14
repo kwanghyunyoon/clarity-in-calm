@@ -19,6 +19,15 @@ function to24h(h12: number, isPm: boolean): number {
   return (h12 % 12) + (isPm ? 12 : 0);
 }
 
+/**
+ * Renders a stored 24h time the way the picker shows it, so the Settings row
+ * and the picker never disagree about the same value.
+ */
+export function formatTime12h(h24: number, minute: number, amLabel: string, pmLabel: string): string {
+  const { h12, isPm } = to12h(h24);
+  return `${h12}:${String(minute).padStart(2, '0')} ${isPm ? pmLabel : amLabel}`;
+}
+
 export function TimePicker({
   visible,
   hour,
