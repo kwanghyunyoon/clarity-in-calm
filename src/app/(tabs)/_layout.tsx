@@ -17,8 +17,8 @@ function TabIcon({
   color: ColorValue;
 }) {
   return (
-    <View style={{ width: 28, height: 28, alignItems: 'center', justifyContent: 'center' }}>
-      <Ionicons name={name} size={20} color={color} />
+    <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center' }}>
+      <Ionicons name={name} size={24} color={color} />
     </View>
   );
 }
