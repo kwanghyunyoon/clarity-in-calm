@@ -2285,6 +2285,18 @@ export const SOURCE = {
         es: 'Min',
         hi: 'मिनट',
       },
+      am: {
+        en: 'AM',
+        ko: '오전',
+        es: 'a.m.',
+        hi: 'पूर्वाह्न',
+      },
+      pm: {
+        en: 'PM',
+        ko: '오후',
+        es: 'p.m.',
+        hi: 'अपराह्न',
+      },
       confirm: {
         en: 'Set reminder',
         ko: '알림 설정',
