@@ -44,7 +44,11 @@ export default {
       [
         'expo-notifications',
         {
-          icon: './assets/images/icon.png',
+          // Android renders the small notification icon as a silhouette from
+          // the alpha channel: icon.png is RGB with no alpha, so every pixel
+          // is opaque and it draws as a solid white square. The monochrome
+          // asset has real transparency and renders as the actual mark.
+          icon: './assets/images/android-icon-monochrome.png',
           color: '#F0A855',
           sounds: [],
         },

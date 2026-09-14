@@ -3166,6 +3166,54 @@ export const SOURCE = {
     },
   },
   dailyContent: {
+    // Daily reminder push notification. One body per day of the week, so the
+    // reminder doesn't read as the same sentence every morning. Kept
+    // day-agnostic (no "new week" phrasing) so the rotation order carries no
+    // meaning and can shift without the copy going wrong.
+    reminderTitle: {
+      en: 'A moment for you',
+      ko: '당신을 위한 시간',
+      es: 'Un momento para ti',
+      hi: 'आपके लिए एक पल',
+    },
+    reminderBodies: {
+      en: [
+        'How are you arriving today? Take a moment to notice.',
+        'A breath, and a check-in. What are you feeling?',
+        'Your mind deserves a quiet minute. Ready?',
+        'What\'s present for you right now?',
+        'Pause for a moment — name what you\'re carrying.',
+        'Checking in. No pressure, just honesty.',
+        'A small moment of clarity is waiting.',
+      ],
+      ko: [
+        '오늘 어떤 마음으로 계신가요? 잠시 살펴보세요.',
+        '숨 한 번, 그리고 체크인. 지금 어떤 기분인가요?',
+        '마음에게 조용한 1분을 선물해 보세요.',
+        '지금 당신에게 떠오르는 감정은 무엇인가요?',
+        '잠시 멈추고, 품고 있는 감정에 이름을 붙여보세요.',
+        '체크인할 시간이에요. 부담 없이, 솔직하게.',
+        '작은 명료함의 순간이 기다리고 있어요.',
+      ],
+      es: [
+        '¿Cómo llegas hoy? Tómate un momento para notarlo.',
+        'Una respiración y un momento contigo. ¿Qué sientes?',
+        'Tu mente merece un minuto de calma. ¿Empezamos?',
+        '¿Qué está presente para ti ahora mismo?',
+        'Haz una pausa — ponle nombre a lo que llevas dentro.',
+        'Un momento para ti. Sin presión, solo honestidad.',
+        'Te espera un pequeño momento de claridad.',
+      ],
+      hi: [
+        'आज आप कैसा महसूस कर रहे हैं? एक पल रुककर देखिए।',
+        'एक साँस, और एक ठहराव। अभी क्या महसूस हो रहा है?',
+        'आपके मन को एक शांत मिनट चाहिए। तैयार हैं?',
+        'इस पल आपके भीतर क्या चल रहा है?',
+        'थोड़ा रुकिए — जो भाव साथ लिए हैं, उसे नाम दीजिए।',
+        'बस एक ठहराव। कोई दबाव नहीं, बस सच्चाई।',
+        'स्पष्टता का एक छोटा पल आपका इंतज़ार कर रहा है।',
+      ],
+    },
     quotes: {
       en: [
         {

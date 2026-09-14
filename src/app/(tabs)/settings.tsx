@@ -61,7 +61,12 @@ export default function SettingsScreen() {
         Alert.alert(ts.notifPermission.title, ts.notifPermission.body);
         return;
       }
-      await scheduleDailyReminder(settings.notifications.hour, settings.notifications.minute);
+      await scheduleDailyReminder(
+        settings.notifications.hour,
+        settings.notifications.minute,
+        t.dailyContent.reminderTitle,
+        t.dailyContent.reminderBodies,
+      );
     } else {
       await cancelDailyReminder();
     }
@@ -70,7 +75,7 @@ export default function SettingsScreen() {
 
   async function handleTimeConfirm(h: number, m: number) {
     setShowTimePicker(false);
-    await scheduleDailyReminder(h, m);
+    await scheduleDailyReminder(h, m, t.dailyContent.reminderTitle, t.dailyContent.reminderBodies);
     setNotificationSettings({ ...settings.notifications, hour: h, minute: m });
   }
 

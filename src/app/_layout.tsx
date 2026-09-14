@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AppState, Platform, StyleSheet, View, useColorScheme } from 'react-native';
 
 import ErrorBoundary from '@/components/error-boundary';
+import { ReminderLocaleSync } from '@/components/ReminderLocaleSync';
 import { EmotionProvider } from '@/context/emotion-context';
 import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
@@ -46,6 +47,7 @@ export default function RootLayout() {
               <WellnessProvider>
                 <EmotionProvider>
                   <PrivacyShield />
+                  <ReminderLocaleSync />
                   {/* Optional sign-in: all routes are always registered. The (tabs)
                       group is the app; (auth) is pushed from Settings; reset-password
                       is reached via the recovery deep link. No hard auth gate. */}

@@ -21,22 +21,54 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return status === 'granted';
 }
 
-export async function scheduleDailyReminder(hour: number, minute: number): Promise<void> {
+// expo-notifications weekdays are 1=Sunday .. 7=Saturday.
+const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
+
+const weekdayId = (weekday: number) => `${NOTIFICATION_ID_KEY}_${weekday}`;
+
+/**
+ * Schedules the daily reminder as seven weekly notifications rather than one
+ * daily one, so each day can carry different copy. A single DAILY trigger
+ * fixes its text at scheduling time and would repeat the same sentence every
+ * morning until the user next opened Settings.
+ *
+ * `bodies` must hold one entry per weekday; shorter lists wrap.
+ */
+export async function scheduleDailyReminder(
+  hour: number,
+  minute: number,
+  title: string,
+  bodies: readonly string[],
+): Promise<void> {
   await cancelDailyReminder();
-  await Notifications.scheduleNotificationAsync({
-    identifier: NOTIFICATION_ID_KEY,
-    content: {
-      title: 'Clarity in Calm',
-      body: 'Time for your daily check-in. How are you feeling?',
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute,
-    },
-  });
+  if (bodies.length === 0) return;
+
+  await Promise.all(
+    WEEKDAYS.map((weekday, i) =>
+      Notifications.scheduleNotificationAsync({
+        identifier: weekdayId(weekday),
+        content: {
+          title,
+          body: bodies[i % bodies.length],
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          weekday,
+          hour,
+          minute,
+        },
+      }),
+    ),
+  );
 }
 
 export async function cancelDailyReminder(): Promise<void> {
-  await Notifications.cancelScheduledNotificationAsync(NOTIFICATION_ID_KEY).catch(() => {});
+  await Promise.all([
+    // The pre-rotation single DAILY notification, so reminders scheduled by an
+    // older build don't survive alongside the weekly ones.
+    Notifications.cancelScheduledNotificationAsync(NOTIFICATION_ID_KEY).catch(() => {}),
+    ...WEEKDAYS.map(weekday =>
+      Notifications.cancelScheduledNotificationAsync(weekdayId(weekday)).catch(() => {}),
+    ),
+  ]);
 }
