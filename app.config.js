@@ -2,7 +2,7 @@ export default {
   expo: {
     name: 'clarity-in-calm',
     slug: 'clarity-in-calm',
-    version: '1.0.0',
+    version: '1.1.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
     scheme: 'clarityincalm',
@@ -15,7 +15,7 @@ export default {
     },
     android: {
       package: 'com.clarityincalm.app',
-      versionCode: 9,
+      versionCode: 18,
       jsEngine: 'hermes',
       adaptiveIcon: {
         backgroundColor: '#EDEAE5',
