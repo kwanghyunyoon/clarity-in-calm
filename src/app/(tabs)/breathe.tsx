@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, {
   cancelAnimation,
   Easing,
+  interpolate,
+  runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
-  withSequence,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -15,7 +17,17 @@ import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
-import { CYCLE_MS, getPhaseAtTime, getPhaseCountdownAtTime, PHASE_DURATIONS } from '@/lib/breathing';
+import {
+  CYCLE_MS,
+  DISC_SCALE,
+  getOpennessAtTime,
+  getPhaseAtTime,
+  getPhaseCountdownAtTime,
+  getTickAtTime,
+  GLOW_OPACITY,
+  PHASE_DURATIONS,
+  RING_SCALE,
+} from '@/lib/breathing';
 
 
 export default function BreatheScreen() {
@@ -31,119 +43,103 @@ export default function BreatheScreen() {
     { id: 'rest',   label: t.breathe.phases.rest.label,   hint: t.breathe.phases.rest.hint,   duration: PHASE_DURATIONS[3] },
   ];
 
-  const [isRunning,  setIsRunning]  = useState(false);
-  const [phaseLabel, setPhaseLabel] = useState<string>(t.breathe.ready);
-  const [phaseHint,  setPhaseHint]  = useState<string>(t.breathe.tapToStart);
-  const [countdown,  setCountdown]  = useState(4);
-  const [rounds,     setRounds]     = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [rounds,    setRounds]    = useState(0);
+  // Whole second of the cycle, 0…15. The single source of truth for the label,
+  // the hint and the countdown — all three are derived from it below.
+  const [tick,      setTick]      = useState(0);
 
-  const scale      = useSharedValue(0.58);
-  const ringScale  = useSharedValue(0.60);
-  const glowOpacity = useSharedValue(0.25);
+  /* ── The one clock ──
+   * `progress` runs 0 → CYCLE_MS linearly and repeats. The disc, ring, glow and
+   * label are every one of them derived from it, so they cannot drift apart.
+   * `restBlend` (0 = breathing, 1 = settled) eases the circle back to its resting
+   * size when the session stops, without needing a second animation of its own.
+   */
+  const progress  = useSharedValue(0);
+  const restBlend = useSharedValue(1);
 
-  const startTimeRef = useRef<number>(0);
+  const prevTickRef = useRef(-1);
 
-  /* ── Reanimated animation ── */
+  const handleTick = useCallback((next: number) => {
+    // The clock wrapped past the end of a cycle: one more round completed.
+    if (prevTickRef.current > next) setRounds((r) => r + 1);
+    prevTickRef.current = next;
+    setTick(next);
+  }, []);
+
   useEffect(() => {
     if (isRunning) {
-      startTimeRef.current = Date.now();
-
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.00, { duration: 4000, easing: Easing.inOut(Easing.cubic) }),
-          withTiming(1.00, { duration: 4000 }),
-          withTiming(0.58, { duration: 4000, easing: Easing.inOut(Easing.cubic) }),
-          withTiming(0.58, { duration: 4000 }),
-        ),
-        -1, false,
-      );
-
-      ringScale.value = withRepeat(
-        withSequence(
-          withTiming(1.08, { duration: 4000, easing: Easing.inOut(Easing.cubic) }),
-          withTiming(1.08, { duration: 4000 }),
-          withTiming(0.62, { duration: 4000, easing: Easing.inOut(Easing.cubic) }),
-          withTiming(0.62, { duration: 4000 }),
-        ),
-        -1, false,
-      );
-
-      glowOpacity.value = withRepeat(
-        withSequence(
-          withTiming(0.70, { duration: 4000 }),
-          withTiming(0.70, { duration: 4000 }),
-          withTiming(0.25, { duration: 4000 }),
-          withTiming(0.25, { duration: 4000 }),
-        ),
-        -1, false,
+      progress.value = 0;
+      restBlend.value = withTiming(0, { duration: 400 });
+      progress.value = withRepeat(
+        withTiming(CYCLE_MS, { duration: CYCLE_MS, easing: Easing.linear }),
+        -1,
+        false,
       );
     } else {
-      cancelAnimation(scale);
-      cancelAnimation(ringScale);
-      cancelAnimation(glowOpacity);
-      scale.value      = withTiming(0.58, { duration: 600 });
-      ringScale.value  = withTiming(0.60, { duration: 600 });
-      glowOpacity.value = withTiming(0.25, { duration: 600 });
+      cancelAnimation(progress);
+      restBlend.value = withTiming(1, { duration: 600 });
     }
 
     return () => {
-      cancelAnimation(scale);
-      cancelAnimation(ringScale);
-      cancelAnimation(glowOpacity);
+      cancelAnimation(progress);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isRunning]);
+  }, [isRunning, progress, restBlend]);
 
-  /* ── JS-side phase tracker ── */
-  useEffect(() => {
-  if (!isRunning) {
-    const id = setTimeout(() => {
-      setPhaseLabel(t.breathe.ready);
-      setPhaseHint(t.breathe.tapToStart);
-      setCountdown(4);
-    }, 0);
-    return () => clearTimeout(id);
-  }
-}, [isRunning, scale, ringScale, glowOpacity, t.breathe.ready, t.breathe.tapToStart]);
+  /* ── Label tracker ──
+   * Reads the same clock the animation does, and only crosses to the JS thread
+   * when the whole second changes — once a second, not once a frame.
+   */
+  useAnimatedReaction(
+    () => getTickAtTime(progress.value),
+    (current, previous) => {
+      if (current !== previous) runOnJS(handleTick)(current);
+    },
+  );
 
-  useEffect(() => {
-  const interval = setInterval(() => {
-    const totalMs = Date.now() - startTimeRef.current;
-    setRounds(Math.floor(totalMs / CYCLE_MS));
-
-    const phaseId = getPhaseAtTime(totalMs);
-    const phase = PHASES.find((p) => p.id === phaseId)!;
-    setPhaseLabel(phase.label);
-    setPhaseHint(phase.hint);
-    setCountdown(getPhaseCountdownAtTime(totalMs));
-  }, 80);
-
-     
-  return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isRunning]);
+  /* ── Derived from the clock ── */
+  const phase = PHASES.find((p) => p.id === getPhaseAtTime(tick * 1000))!;
+  const phaseLabel = isRunning ? phase.label : t.breathe.ready;
+  const phaseHint  = isRunning ? phase.hint  : t.breathe.tapToStart;
+  const countdown  = getPhaseCountdownAtTime(tick * 1000);
 
   /* ── Animated styles ── */
-  const circleStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
+  const circleStyle = useAnimatedStyle(() => {
+    const openness = getOpennessAtTime(progress.value) * (1 - restBlend.value);
+    return {
+      transform: [{ scale: interpolate(openness, [0, 1], [DISC_SCALE.min, DISC_SCALE.max]) }],
+    };
+  });
 
-  const ringStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: ringScale.value }],
-    opacity: glowOpacity.value,
-  }));
+  const ringStyle = useAnimatedStyle(() => {
+    const openness = getOpennessAtTime(progress.value) * (1 - restBlend.value);
+    return {
+      transform: [{ scale: interpolate(openness, [0, 1], [RING_SCALE.min, RING_SCALE.max]) }],
+      opacity: interpolate(openness, [0, 1], [GLOW_OPACITY.min, GLOW_OPACITY.max]),
+    };
+  });
 
-  const outerGlowStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: ringScale.value * 1.18 }],
-    opacity: glowOpacity.value * 0.35,
-  }));
+  const outerGlowStyle = useAnimatedStyle(() => {
+    const openness = getOpennessAtTime(progress.value) * (1 - restBlend.value);
+    return {
+      transform: [
+        { scale: interpolate(openness, [0, 1], [RING_SCALE.min, RING_SCALE.max]) * 1.18 },
+      ],
+      opacity: interpolate(openness, [0, 1], [GLOW_OPACITY.min, GLOW_OPACITY.max]) * 0.35,
+    };
+  });
 
   /* ── Toggle ── */
   const handleToggle = () => {
     if (isRunning && rounds > 0) {
       addBreathingSession();
     }
-    if (isRunning) setRounds(0);
+    setRounds(0);
+    if (!isRunning) {
+      // Rewind the label to the top of the cycle before the clock restarts.
+      prevTickRef.current = -1;
+      setTick(0);
+    }
     setIsRunning((v) => !v);
   };
 
