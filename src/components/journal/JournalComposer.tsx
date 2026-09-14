@@ -139,183 +139,188 @@ export function JournalComposer() {
 
   return (
     <>
-      {/* ── Template selector ── */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.templates}</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
-          {JOURNAL_TEMPLATES.map(tmpl => {
-            const isSelected = selectedTemplate.id === tmpl.id;
-            const iconName: IoniconsName = TEMPLATE_ICONS[tmpl.id] ?? 'document-outline';
-            return (
-              <AnimatedPressable
-                key={tmpl.id}
-                onPress={() => {
-                  setSelectedTemplate(tmpl);
-                  if (tmpl.id !== 'free') setNote(templatePrompts(tmpl).join('\n\n'));
-                  else setNote('');
-                  if (tmpl.id !== 'future-self') setUnlockDate(null);
-                }}
-                style={[
-                  styles.templateCard,
-                  {
-                    backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
-                    borderColor: isSelected ? colors.primary : colors.border,
-                  },
-                ]}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isSelected }}
-              >
-                <Ionicons
-                  name={iconName}
-                  size={22}
-                  color={isSelected ? colors.primary : colors.textSecondary}
-                  accessibilityLabel={templateLabel(tmpl.id)}
-                />
-                <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
-                  {templateLabel(tmpl.id)}
-                </Text>
-              </AnimatedPressable>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* ── Mood picker ── */}
-      <View style={styles.section}>
-        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.moodLabel}</Text>
-        <View style={styles.moodRow}>
-          {t.moods.map(m => {
-            const isSelected = mood === m.value;
-            return (
-              <AnimatedPressable
-                key={m.value}
-                onPress={() => setMood(m.value as MoodValue)}
-                style={[
-                  styles.moodBtn,
-                  {
-                    backgroundColor: isSelected ? m.color + '33' : colors.backgroundElement,
-                    borderColor: isSelected ? m.color : 'transparent',
-                  },
-                ]}
-                accessibilityRole="radio"
-                accessibilityState={{ selected: isSelected }}
-                accessibilityLabel={m.label}
-              >
-                <Text style={styles.moodEmoji}>{m.emoji}</Text>
-                <Text style={[styles.moodLabel, { color: isSelected ? colors.text : colors.textSecondary }]}>
-                  {m.label}
-                </Text>
-              </AnimatedPressable>
-            );
-          })}
+      {/* The composer renders inside the entry list's ListHeaderComponent, which
+       * flattens it into a single wrapper View — so the list's contentContainer
+       * gap never reaches these blocks. They own their own vertical rhythm. */}
+      <View style={styles.blocks}>
+        {/* ── Template selector ── */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.templates}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
+            {JOURNAL_TEMPLATES.map(tmpl => {
+              const isSelected = selectedTemplate.id === tmpl.id;
+              const iconName: IoniconsName = TEMPLATE_ICONS[tmpl.id] ?? 'document-outline';
+              return (
+                <AnimatedPressable
+                  key={tmpl.id}
+                  onPress={() => {
+                    setSelectedTemplate(tmpl);
+                    if (tmpl.id !== 'free') setNote(templatePrompts(tmpl).join('\n\n'));
+                    else setNote('');
+                    if (tmpl.id !== 'future-self') setUnlockDate(null);
+                  }}
+                  style={[
+                    styles.templateCard,
+                    {
+                      backgroundColor: isSelected ? colors.primary + '18' : colors.surface,
+                      borderColor: isSelected ? colors.primary : colors.border,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isSelected }}
+                >
+                  <Ionicons
+                    name={iconName}
+                    size={22}
+                    color={isSelected ? colors.primary : colors.textSecondary}
+                    accessibilityLabel={templateLabel(tmpl.id)}
+                  />
+                  <Text style={[styles.templateLabel, { color: isSelected ? colors.primary : colors.text }]}>
+                    {templateLabel(tmpl.id)}
+                  </Text>
+                </AnimatedPressable>
+              );
+            })}
+          </ScrollView>
         </View>
-      </View>
 
-      {/* ── Note input ── */}
-      <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        <TextInput
-          style={[styles.input, { color: colors.text }]}
-          placeholder={placeholder}
-          placeholderTextColor={colors.textSecondary}
-          value={note}
-          onChangeText={setNote}
-          multiline
-          textAlignVertical="top"
-          accessibilityLabel="Journal entry"
-        />
-      </View>
-
-      {/* ── Future Self unlock date ── */}
-      {selectedTemplate.id === 'future-self' && (
-        <TouchableOpacity
-          style={[styles.unlockBanner, { backgroundColor: colors.surface, borderColor: colors.primary + '55' }]}
-          onPress={() => setShowDatePicker(true)}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="mail-outline" size={22} color={colors.primary} accessibilityLabel="Future self" />
-          <View style={styles.unlockBannerText}>
-            <Text style={[styles.unlockBannerLabel, { color: colors.textSecondary }]}>
-              {te.unlockDate}
-            </Text>
-            <Text style={[styles.unlockBannerValue, { color: unlockDate ? colors.primary : colors.textSecondary }]}>
-              {unlockDate
-                ? unlockDate.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })
-                : te.setDate}
-            </Text>
+        {/* ── Mood picker ── */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.moodLabel}</Text>
+          <View style={styles.moodRow}>
+            {t.moods.map(m => {
+              const isSelected = mood === m.value;
+              return (
+                <AnimatedPressable
+                  key={m.value}
+                  onPress={() => setMood(m.value as MoodValue)}
+                  style={[
+                    styles.moodBtn,
+                    {
+                      backgroundColor: isSelected ? m.color + '33' : colors.backgroundElement,
+                      borderColor: isSelected ? m.color : 'transparent',
+                    },
+                  ]}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: isSelected }}
+                  accessibilityLabel={m.label}
+                >
+                  <Text style={styles.moodEmoji}>{m.emoji}</Text>
+                  <Text style={[styles.moodLabel, { color: isSelected ? colors.text : colors.textSecondary }]}>
+                    {m.label}
+                  </Text>
+                </AnimatedPressable>
+              );
+            })}
           </View>
-          <Ionicons name="chevron-forward" size={22} color={colors.textSecondary} accessibilityLabel="" />
-        </TouchableOpacity>
-      )}
-
-      {/* ── Tags ── */}
-      <View style={styles.section}>
-        <View style={styles.tagsHeader}>
-          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.tags}</Text>
-          <TouchableOpacity onPress={() => setShowTagInput(!showTagInput)}>
-            <Text style={[styles.addTagBtn, { color: colors.primary }]}>{te.addTag}</Text>
-          </TouchableOpacity>
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagRow}>
-          {allTags.map(tag => {
-            const isSelected = selectedTags.includes(tag);
-            return (
-              <TouchableOpacity
-                key={tag}
-                onPress={() => toggleTag(tag)}
-                style={[
-                  styles.tagChip,
-                  {
-                    backgroundColor: isSelected ? colors.accent + '22' : colors.backgroundElement,
-                    borderColor: isSelected ? colors.accent : colors.border,
-                  },
-                ]}
-                accessibilityRole="checkbox"
-                accessibilityState={{ checked: isSelected }}
-              >
-                <Text style={[styles.tagText, { color: isSelected ? colors.accent : colors.textSecondary }]}>
-                  #{tagLabel(tag)}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-        {showTagInput && (
-          <Animated.View entering={FadeInDown.springify()} style={styles.tagInputRow}>
-            <TextInput
-              style={[styles.tagInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-              placeholder={te.customTagPlaceholder}
-              placeholderTextColor={colors.textSecondary}
-              value={newTagText}
-              onChangeText={setNewTagText}
-              onSubmitEditing={handleAddCustomTag}
-              returnKeyType="done"
-              autoFocus
-            />
-            <TouchableOpacity onPress={handleAddCustomTag} style={[styles.tagAddConfirm, { backgroundColor: colors.primary }]}>
-              <Text style={styles.tagAddConfirmText}>{te.addTagConfirm}</Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-      </View>
 
-      {/* ── Save button ── */}
-      <AnimatedPressable
-        onPress={handleSaveAttempt}
-        disabled={!mood || savedAnim}
-        style={[
-          styles.saveBtn,
-          {
-            backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
-            opacity: mood ? 1 : 0.5,
-          },
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
-      >
-        <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
-          {savedAnim ? tj.savedBtn : tj.saveBtn}
-        </Text>
-      </AnimatedPressable>
+        {/* ── Note input ── */}
+        <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <TextInput
+            style={[styles.input, { color: colors.text }]}
+            placeholder={placeholder}
+            placeholderTextColor={colors.textSecondary}
+            value={note}
+            onChangeText={setNote}
+            multiline
+            textAlignVertical="top"
+            accessibilityLabel="Journal entry"
+          />
+        </View>
+
+        {/* ── Future Self unlock date ── */}
+        {selectedTemplate.id === 'future-self' && (
+          <TouchableOpacity
+            style={[styles.unlockBanner, { backgroundColor: colors.surface, borderColor: colors.primary + '55' }]}
+            onPress={() => setShowDatePicker(true)}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="mail-outline" size={22} color={colors.primary} accessibilityLabel="Future self" />
+            <View style={styles.unlockBannerText}>
+              <Text style={[styles.unlockBannerLabel, { color: colors.textSecondary }]}>
+                {te.unlockDate}
+              </Text>
+              <Text style={[styles.unlockBannerValue, { color: unlockDate ? colors.primary : colors.textSecondary }]}>
+                {unlockDate
+                  ? unlockDate.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' })
+                  : te.setDate}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={22} color={colors.textSecondary} accessibilityLabel="" />
+          </TouchableOpacity>
+        )}
+
+        {/* ── Tags ── */}
+        <View style={styles.section}>
+          <View style={styles.tagsHeader}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.tags}</Text>
+            <TouchableOpacity onPress={() => setShowTagInput(!showTagInput)}>
+              <Text style={[styles.addTagBtn, { color: colors.primary }]}>{te.addTag}</Text>
+            </TouchableOpacity>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagRow}>
+            {allTags.map(tag => {
+              const isSelected = selectedTags.includes(tag);
+              return (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => toggleTag(tag)}
+                  style={[
+                    styles.tagChip,
+                    {
+                      backgroundColor: isSelected ? colors.accent + '22' : colors.backgroundElement,
+                      borderColor: isSelected ? colors.accent : colors.border,
+                    },
+                  ]}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isSelected }}
+                >
+                  <Text style={[styles.tagText, { color: isSelected ? colors.accent : colors.textSecondary }]}>
+                    #{tagLabel(tag)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+          {showTagInput && (
+            <Animated.View entering={FadeInDown.springify()} style={styles.tagInputRow}>
+              <TextInput
+                style={[styles.tagInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
+                placeholder={te.customTagPlaceholder}
+                placeholderTextColor={colors.textSecondary}
+                value={newTagText}
+                onChangeText={setNewTagText}
+                onSubmitEditing={handleAddCustomTag}
+                returnKeyType="done"
+                autoFocus
+              />
+              <TouchableOpacity onPress={handleAddCustomTag} style={[styles.tagAddConfirm, { backgroundColor: colors.primary }]}>
+                <Text style={styles.tagAddConfirmText}>{te.addTagConfirm}</Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        </View>
+
+        {/* ── Save button ── */}
+        <AnimatedPressable
+          onPress={handleSaveAttempt}
+          disabled={!mood || savedAnim}
+          style={[
+            styles.saveBtn,
+            {
+              backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
+              opacity: mood ? 1 : 0.5,
+            },
+          ]}
+          accessibilityRole="button"
+          accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
+        >
+          <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
+            {savedAnim ? tj.savedBtn : tj.saveBtn}
+          </Text>
+        </AnimatedPressable>
+      </View>
 
       {/* ── Future Self date picker ── */}
       <DatePickerModal
@@ -360,6 +365,7 @@ export function JournalComposer() {
 }
 
 const styles = StyleSheet.create({
+  blocks: { gap: Spacing.four },
   section: { gap: Spacing.three },
   sectionLabel: {
     fontSize: 11,

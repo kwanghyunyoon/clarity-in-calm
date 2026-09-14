@@ -156,7 +156,7 @@ export function JournalEntryList({ header }: JournalEntryListProps) {
   }, [colors, t.moods, tj, te, deleteEntry, tagLabel, templateLabel]);
 
   const listHeader = (
-    <>
+    <View style={styles.listHeader}>
       {header}
 
       {/* ── Search ── */}
@@ -183,7 +183,7 @@ export function JournalEntryList({ header }: JournalEntryListProps) {
           )}
         </View>
       </View>
-    </>
+    </View>
   );
 
   const listEmpty = (
@@ -227,6 +227,9 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.three,
     gap: Spacing.three,
   },
+  /** Composer + search sit in one list-header wrapper, so the gap lives here
+   * rather than on the list's contentContainer (which only spaces cells). */
+  listHeader: { gap: Spacing.four, paddingBottom: Spacing.one },
   section: { gap: Spacing.three },
   sectionLabel: {
     fontSize: 11,
