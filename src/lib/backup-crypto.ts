@@ -112,6 +112,13 @@ function parseEnvelope(raw: string): BackupEnvelope | null {
 
 // ─── Public API ───────────────────────────────────────────────────────────────
 
+/** Checks the plaintext magic/formatVersion header only — no passphrase, no
+ * decryption. Lets restore flows reject an unrecognized file immediately,
+ * before ever asking the user for a passphrase. */
+export function isValidBackupEnvelope(raw: string): boolean {
+  return parseEnvelope(raw) !== null;
+}
+
 /** Throws on failure (crypto/randomness errors) — unlike restoreBackup, there
  * is no expected-failure mode to model as a typed result; callers show it. */
 export async function createBackup(data: Record<string, unknown>, passphrase: string): Promise<BackupEnvelope> {

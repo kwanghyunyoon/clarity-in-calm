@@ -3,7 +3,7 @@
  * module (issue #59). expo-crypto is jest-mocked (see __mocks__/) with real
  * WebCrypto AES-GCM, so encrypt/decrypt/tamper-detection behavior is genuine.
  */
-import { createBackup, restoreBackup } from '@/lib/backup-crypto';
+import { createBackup, isValidBackupEnvelope, restoreBackup } from '@/lib/backup-crypto';
 
 // A genuine 300,000+ iteration PBKDF2 derivation is, by design, slow (the
 // parent spec calls for "up to a few seconds"); each test below does two.
@@ -85,5 +85,15 @@ describe('BackupCrypto', () => {
     const result = await restoreBackup(corrupted, 'a passphrase');
 
     expect(result).toEqual({ ok: false, reason: 'invalid-envelope' });
+  });
+
+  test('isValidBackupEnvelope recognizes a genuine envelope header without decrypting', async () => {
+    const envelope = await createBackup(SAMPLE_DATA, 'a passphrase');
+    expect(isValidBackupEnvelope(JSON.stringify(envelope))).toBe(true);
+  });
+
+  test('isValidBackupEnvelope rejects an unrecognized file', () => {
+    expect(isValidBackupEnvelope(JSON.stringify({ hello: 'world' }))).toBe(false);
+    expect(isValidBackupEnvelope('not json at all')).toBe(false);
   });
 });

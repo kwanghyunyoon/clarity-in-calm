@@ -2250,6 +2250,144 @@ export const SOURCE = {
         hi: 'कुछ गड़बड़ हो गई।',
       },
     },
+    restoreSectionTitle: {
+      en: 'Restore a backup',
+      ko: '백업 복원',
+      es: 'Restaurar una copia de seguridad',
+      hi: 'बैकअप पुनर्स्थापित करें',
+    },
+    restoreSectionSubtitle: {
+      en: 'This replaces everything currently on this device with the contents of the backup file.',
+      ko: '이 작업은 현재 기기의 모든 데이터를 백업 파일의 내용으로 교체합니다.',
+      es: 'Esto reemplaza todo lo que hay actualmente en este dispositivo con el contenido del archivo de copia de seguridad.',
+      hi: 'यह इस डिवाइस पर मौजूद सब कुछ बैकअप फ़ाइल की सामग्री से बदल देगा।',
+    },
+    chooseFileButton: {
+      en: 'Choose backup file',
+      ko: '백업 파일 선택',
+      es: 'Elegir archivo de copia de seguridad',
+      hi: 'बैकअप फ़ाइल चुनें',
+    },
+    restorePassphrasePrompt: {
+      title: {
+        en: 'Enter passphrase',
+        ko: '암호 입력',
+        es: 'Ingresa la contraseña',
+        hi: 'पासफ़्रेज़ दर्ज करें',
+      },
+      body: {
+        en: 'Enter the passphrase you used to create this backup.',
+        ko: '이 백업을 만들 때 사용한 암호를 입력하세요.',
+        es: 'Ingresa la contraseña que usaste para crear esta copia de seguridad.',
+        hi: 'इस बैकअप को बनाने के लिए उपयोग किया गया पासफ़्रेज़ दर्ज करें।',
+      },
+      placeholder: {
+        en: 'Passphrase',
+        ko: '암호',
+        es: 'Contraseña',
+        hi: 'पासफ़्रेज़',
+      },
+      confirm: {
+        en: 'Continue',
+        ko: '계속',
+        es: 'Continuar',
+        hi: 'जारी रखें',
+      },
+      cancel: {
+        en: 'Cancel',
+        ko: '취소',
+        es: 'Cancelar',
+        hi: 'रद्द करें',
+      },
+    },
+    invalidFile: {
+      title: {
+        en: 'Not a valid backup file',
+        ko: '유효한 백업 파일이 아닙니다',
+        es: 'No es un archivo de copia de seguridad válido',
+        hi: 'यह एक मान्य बैकअप फ़ाइल नहीं है',
+      },
+      body: {
+        en: "This file doesn't look like a Clarity in Calm backup.",
+        ko: '이 파일은 Clarity in Calm 백업이 아닌 것 같습니다.',
+        es: 'Este archivo no parece ser una copia de seguridad de Clarity in Calm.',
+        hi: 'यह फ़ाइल Clarity in Calm बैकअप जैसी नहीं दिखती।',
+      },
+    },
+    wrongPassphrase: {
+      title: {
+        en: 'Wrong passphrase',
+        ko: '잘못된 암호',
+        es: 'Contraseña incorrecta',
+        hi: 'गलत पासफ़्रेज़',
+      },
+      body: {
+        en: 'That passphrase did not unlock this backup. Try again.',
+        ko: '해당 암호로 백업을 열 수 없습니다. 다시 시도해 주세요.',
+        es: 'Esa contraseña no desbloqueó esta copia de seguridad. Inténtalo de nuevo.',
+        hi: 'उस पासफ़्रेज़ से यह बैकअप अनलॉक नहीं हुआ। फिर से प्रयास करें।',
+      },
+    },
+    restoreConfirm: {
+      title: {
+        en: 'Replace all data on this device?',
+        ko: '이 기기의 모든 데이터를 교체할까요?',
+        es: '¿Reemplazar todos los datos de este dispositivo?',
+        hi: 'इस डिवाइस के सभी डेटा को बदलें?',
+      },
+      body: {
+        en: 'This device currently has {currentCount} journal entries. The backup has {backupCount}. Restoring replaces everything on this device with the backup — this cannot be undone.',
+        ko: '현재 이 기기에는 일기 {currentCount}개가 있습니다. 백업에는 {backupCount}개가 있습니다. 복원하면 이 기기의 모든 데이터가 백업 내용으로 교체되며, 취소할 수 없습니다.',
+        es: 'Este dispositivo tiene actualmente {currentCount} entradas de diario. La copia de seguridad tiene {backupCount}. Restaurar reemplaza todo en este dispositivo con la copia de seguridad; esto no se puede deshacer.',
+        hi: 'इस डिवाइस पर वर्तमान में {currentCount} डायरी प्रविष्टियाँ हैं। बैकअप में {backupCount} हैं। पुनर्स्थापित करने से इस डिवाइस का सब कुछ बैकअप से बदल जाएगा — इसे पूर्ववत नहीं किया जा सकता।',
+      },
+      confirm: {
+        en: 'Replace my data',
+        ko: '데이터 교체',
+        es: 'Reemplazar mis datos',
+        hi: 'मेरा डेटा बदलें',
+      },
+      cancel: {
+        en: 'Cancel',
+        ko: '취소',
+        es: 'Cancelar',
+        hi: 'रद्द करें',
+      },
+    },
+    restoring: {
+      en: 'Restoring your data…',
+      ko: '데이터를 복원하는 중…',
+      es: 'Restaurando tus datos…',
+      hi: 'आपका डेटा पुनर्स्थापित किया जा रहा है…',
+    },
+    restoreDone: {
+      title: {
+        en: 'Restore complete',
+        ko: '복원 완료',
+        es: 'Restauración completa',
+        hi: 'पुनर्स्थापना पूर्ण',
+      },
+      body: {
+        en: 'Your data has been restored from the backup.',
+        ko: '백업으로부터 데이터가 복원되었습니다.',
+        es: 'Tus datos se han restaurado desde la copia de seguridad.',
+        hi: 'आपका डेटा बैकअप से पुनर्स्थापित कर दिया गया है।',
+      },
+    },
+    restoreFailed: {
+      title: {
+        en: 'Restore failed',
+        ko: '복원 실패',
+        es: 'Error al restaurar',
+        hi: 'पुनर्स्थापना विफल',
+      },
+      fallbackBody: {
+        en: 'Something went wrong and no data was changed.',
+        ko: '문제가 발생했으며 데이터는 변경되지 않았습니다.',
+        es: 'Algo salió mal y no se cambió ningún dato.',
+        hi: 'कुछ गड़बड़ हो गई और कोई डेटा नहीं बदला गया।',
+      },
+    },
   },
   settingsScreen: {
     title: {

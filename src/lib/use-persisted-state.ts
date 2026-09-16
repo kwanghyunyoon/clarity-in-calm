@@ -18,18 +18,20 @@ export function usePersistedState<T>(
   key: string,
   initialValue: T,
   options: UsePersistedStateOptions<T> = {},
-): [T, Dispatch<SetStateAction<T>>, boolean] {
+): [T, Dispatch<SetStateAction<T>>, boolean, () => Promise<void>] {
   const { legacyKey, transform, onSaveResult } = options;
   const [value, setValue] = useState<T>(initialValue);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  async function load() {
+    const saved = (await secureRead<T>(key)) ?? (legacyKey ? await secureRead<T>(legacyKey) : null);
+    if (saved !== null) setValue(transform ? transform(saved) : saved);
+  }
+
   useEffect(() => {
-    async function load() {
-      const saved = (await secureRead<T>(key)) ?? (legacyKey ? await secureRead<T>(legacyKey) : null);
-      if (saved !== null) setValue(transform ? transform(saved) : saved);
-      setIsLoaded(true);
-    }
-    load().catch(() => setIsLoaded(true));
+    load()
+      .catch(() => {})
+      .finally(() => setIsLoaded(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -39,5 +41,7 @@ export function usePersistedState<T>(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, isLoaded]);
 
-  return [value, setValue, isLoaded];
+  // Re-runs the trusted read path (e.g. after a restore writes new values
+  // directly to storage, bypassing this hook's own setValue/secureWrite).
+  return [value, setValue, isLoaded, load];
 }

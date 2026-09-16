@@ -9,6 +9,7 @@ interface SettingsContextType {
   setThemeOverride: (t: ThemeOverride) => void;
   setLastBackupAt: (iso: string) => void;
   isLoaded: boolean;
+  reload: () => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextType | null>(null);
@@ -17,7 +18,7 @@ const STORAGE_KEY = 'wellness_settings_v1';
 export const SETTINGS_DATA_KEYS: DataKeySpec[] = [{ key: STORAGE_KEY, backend: 'secure' }];
 
 export function SettingsProvider({ children }: { children: React.ReactNode }) {
-  const [settings, setSettings, isLoaded] = usePersistedState<AppSettings>(STORAGE_KEY, DEFAULT_SETTINGS, {
+  const [settings, setSettings, isLoaded, reload] = usePersistedState<AppSettings>(STORAGE_KEY, DEFAULT_SETTINGS, {
     transform: saved => ({ ...DEFAULT_SETTINGS, ...saved }),
   });
 
@@ -35,7 +36,7 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <SettingsContext.Provider
-      value={{ settings, setNotificationSettings, setThemeOverride, setLastBackupAt, isLoaded }}
+      value={{ settings, setNotificationSettings, setThemeOverride, setLastBackupAt, isLoaded, reload }}
     >
       {children}
     </SettingsContext.Provider>

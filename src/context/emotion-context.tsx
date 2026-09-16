@@ -10,6 +10,7 @@ interface EmotionContextType {
   deleteEmotionLog: (id: string) => void;
   todayEmotions: EmotionLog[];
   isLoaded: boolean;
+  reload: () => Promise<void>;
 }
 
 const EmotionContext = createContext<EmotionContextType | null>(null);
@@ -18,7 +19,7 @@ const STORAGE_KEY = 'wellness_emotions_v1';
 export const EMOTION_DATA_KEYS: DataKeySpec[] = [{ key: STORAGE_KEY, backend: 'secure' }];
 
 export function EmotionProvider({ children }: { children: React.ReactNode }) {
-  const [emotionLogs, setEmotionLogs, isLoaded] = usePersistedState<EmotionLog[]>(STORAGE_KEY, []);
+  const [emotionLogs, setEmotionLogs, isLoaded, reload] = usePersistedState<EmotionLog[]>(STORAGE_KEY, []);
 
   const addEmotionLog = useCallback((log: Omit<EmotionLog, 'id' | 'date'>) => {
     if (!isLoaded) return;
@@ -43,7 +44,7 @@ export function EmotionProvider({ children }: { children: React.ReactNode }) {
   }, [emotionLogs]);
 
   return (
-    <EmotionContext.Provider value={{ emotionLogs, addEmotionLog, deleteEmotionLog, todayEmotions, isLoaded }}>
+    <EmotionContext.Provider value={{ emotionLogs, addEmotionLog, deleteEmotionLog, todayEmotions, isLoaded, reload }}>
       {children}
     </EmotionContext.Provider>
   );

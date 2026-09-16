@@ -21,6 +21,7 @@ interface WellnessContextType {
   isLoaded: boolean;
   saveError: boolean;
   clearSaveError: () => void;
+  reload: () => Promise<void>;
 }
 
 const WellnessContext = createContext<WellnessContextType | null>(null);
@@ -36,6 +37,13 @@ export const WELLNESS_DATA_KEYS: DataKeySpec[] = [
   STORAGE_KEY_SESSIONS,
   STORAGE_KEY_TAGS,
 ].map(key => ({ key, backend: 'secure' }));
+
+/** Counts journal entries in a raw data-registry dump (e.g. a decrypted
+ * backup payload), preferring v2 with the same v1 fallback used on load. */
+export function countEntriesInBackup(data: Record<string, unknown>): number {
+  const entries = (data[STORAGE_KEY_ENTRIES] as unknown[] | undefined) ?? (data[STORAGE_KEY_ENTRIES_LEGACY] as unknown[] | undefined);
+  return entries?.length ?? 0;
+}
 
 export function computeStreak(entries: JournalEntry[]): number {
   if (entries.length === 0) return 0;
@@ -59,15 +67,19 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   const onSaveResult = useCallback((ok: boolean) => { if (!ok) setSaveError(true); }, []);
 
   // Prefer v2; fall back to legacy v1 on first upgrade
-  const [entries, setEntries, entriesLoaded] = usePersistedState<JournalEntry[]>(
+  const [entries, setEntries, entriesLoaded, reloadEntries] = usePersistedState<JournalEntry[]>(
     STORAGE_KEY_ENTRIES, [], { legacyKey: STORAGE_KEY_ENTRIES_LEGACY, onSaveResult },
   );
-  const [breathingSessions, setBreathingSessions, sessionsLoaded] = usePersistedState<number>(
+  const [breathingSessions, setBreathingSessions, sessionsLoaded, reloadSessions] = usePersistedState<number>(
     STORAGE_KEY_SESSIONS, 0, { onSaveResult },
   );
-  const [customTags, setCustomTags, tagsLoaded] = usePersistedState<string[]>(STORAGE_KEY_TAGS, []);
+  const [customTags, setCustomTags, tagsLoaded, reloadTags] = usePersistedState<string[]>(STORAGE_KEY_TAGS, []);
 
   const isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded;
+
+  const reload = useCallback(async () => {
+    await Promise.all([reloadEntries(), reloadSessions(), reloadTags()]);
+  }, [reloadEntries, reloadSessions, reloadTags]);
 
   const addEntry = useCallback((
     mood: MoodValue,
@@ -119,7 +131,7 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
       entries, addEntry, updateEntry, deleteEntry,
       customTags, addCustomTag,
       todayMood, breathingSessions, addBreathingSession,
-      streak, isLoaded, saveError, clearSaveError,
+      streak, isLoaded, saveError, clearSaveError, reload,
     }}>
       {children}
     </WellnessContext.Provider>
