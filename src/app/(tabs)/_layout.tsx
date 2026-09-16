@@ -116,6 +116,7 @@ export default function TabLayout() {
         <Tabs.Screen name="breathe"  options={{ href: null }} />
         <Tabs.Screen name="ground"   options={{ href: null }} />
         <Tabs.Screen name="feelings-library" options={{ href: null }} />
+        <Tabs.Screen name="backup" options={{ href: null }} />
       </Tabs>
     </>
   );

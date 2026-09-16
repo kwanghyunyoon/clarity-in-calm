@@ -2149,6 +2149,108 @@ export const SOURCE = {
       },
     },
   },
+  backupScreen: {
+    title: {
+      en: 'Backup & Restore',
+      ko: '백업 및 복원',
+      es: 'Copia de seguridad y restauración',
+      hi: 'बैकअप और पुनर्स्थापना',
+    },
+    back: {
+      en: 'Back',
+      ko: '뒤로',
+      es: 'Atrás',
+      hi: 'वापस',
+    },
+    subtitle: {
+      en: 'Create an encrypted backup of everything stored on this device.',
+      ko: '이 기기에 저장된 모든 데이터를 암호화하여 백업합니다.',
+      es: 'Crea una copia de seguridad cifrada de todo lo guardado en este dispositivo.',
+      hi: 'इस डिवाइस पर संग्रहीत सभी डेटा का एन्क्रिप्टेड बैकअप बनाएं।',
+    },
+    warningTitle: {
+      en: '⚠️ You will not be able to recover this backup without your passphrase',
+      ko: '⚠️ 암호를 잊으면 이 백업을 복구할 수 없습니다',
+      es: '⚠️ No podrás recuperar esta copia de seguridad sin tu contraseña',
+      hi: '⚠️ पासफ़्रेज़ के बिना इस बैकअप को पुनर्प्राप्त नहीं किया जा सकेगा',
+    },
+    warningBody: {
+      en: "There is no way to reset a forgotten passphrase. If you lose it, this backup's data is gone for good.",
+      ko: '잊어버린 암호는 재설정할 방법이 없습니다. 암호를 잃어버리면 이 백업의 데이터는 영구적으로 복구할 수 없습니다.',
+      es: 'No hay forma de restablecer una contraseña olvidada. Si la pierdes, los datos de esta copia se perderán para siempre.',
+      hi: 'भूली हुई पासफ़्रेज़ को रीसेट करने का कोई तरीका नहीं है। यदि आप इसे खो देते हैं, तो इस बैकअप का डेटा हमेशा के लिए चला जाएगा।',
+    },
+    passphraseLabel: {
+      en: 'Passphrase',
+      ko: '암호',
+      es: 'Contraseña',
+      hi: 'पासफ़्रेज़',
+    },
+    passphrasePlaceholder: {
+      en: 'Enter a passphrase',
+      ko: '암호를 입력하세요',
+      es: 'Ingresa una contraseña',
+      hi: 'एक पासफ़्रेज़ दर्ज करें',
+    },
+    confirmPassphraseLabel: {
+      en: 'Confirm passphrase',
+      ko: '암호 확인',
+      es: 'Confirmar contraseña',
+      hi: 'पासफ़्रेज़ की पुष्टि करें',
+    },
+    confirmPassphrasePlaceholder: {
+      en: 'Enter it again',
+      ko: '다시 입력하세요',
+      es: 'Ingrésala de nuevo',
+      hi: 'इसे फिर से दर्ज करें',
+    },
+    mismatchError: {
+      en: "Passphrases don't match.",
+      ko: '암호가 일치하지 않습니다.',
+      es: 'Las contraseñas no coinciden.',
+      hi: 'पासफ़्रेज़ मेल नहीं खाते।',
+    },
+    createButton: {
+      en: 'Create backup',
+      ko: '백업 만들기',
+      es: 'Crear copia de seguridad',
+      hi: 'बैकअप बनाएं',
+    },
+    creating: {
+      en: 'Encrypting your data…',
+      ko: '데이터를 암호화하는 중…',
+      es: 'Cifrando tus datos…',
+      hi: 'आपका डेटा एन्क्रिप्ट किया जा रहा है…',
+    },
+    backupDone: {
+      title: {
+        en: 'Backup created',
+        ko: '백업 완료',
+        es: 'Copia de seguridad creada',
+        hi: 'बैकअप बनाया गया',
+      },
+      body: {
+        en: 'Your encrypted backup is ready to save or share.',
+        ko: '암호화된 백업을 저장하거나 공유할 수 있습니다.',
+        es: 'Tu copia de seguridad cifrada está lista para guardar o compartir.',
+        hi: 'आपका एन्क्रिप्टेड बैकअप सहेजने या साझा करने के लिए तैयार है।',
+      },
+    },
+    backupFailed: {
+      title: {
+        en: 'Backup failed',
+        ko: '백업 실패',
+        es: 'Error al crear la copia de seguridad',
+        hi: 'बैकअप विफल',
+      },
+      fallbackBody: {
+        en: 'Something went wrong.',
+        ko: '문제가 발생했습니다.',
+        es: 'Algo salió mal.',
+        hi: 'कुछ गड़बड़ हो गई।',
+      },
+    },
+  },
   settingsScreen: {
     title: {
       en: 'Settings',
@@ -2222,11 +2324,11 @@ export const SOURCE = {
       es: 'Tus datos',
       hi: 'आपका डेटा',
     },
-    exportData: {
-      en: 'Export all data (JSON)',
-      ko: '전체 데이터 내보내기 (JSON)',
-      es: 'Exportar todos los datos (JSON)',
-      hi: 'सारा डेटा निर्यात करें (JSON)',
+    backupRestore: {
+      en: 'Backup & Restore',
+      ko: '백업 및 복원',
+      es: 'Copia de seguridad y restauración',
+      hi: 'बैकअप और पुनर्स्थापना',
     },
     shareClarityAI: {
       en: 'Share data with ClarityAI',

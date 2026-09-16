@@ -38,6 +38,10 @@ export type ThemeOverride = 'system' | 'light' | 'dark';
 export interface AppSettings {
   notifications: NotificationSettings;
   themeOverride: ThemeOverride;
+  /** ISO timestamp of the last successful encrypted backup, or null if none
+   * yet. Set the moment a backup completes, regardless of whether any screen
+   * currently surfaces it — groundwork for a future reminder feature. */
+  lastBackupAt: string | null;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -47,5 +51,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
     minute: 0,
     days: [0, 1, 2, 3, 4, 5, 6],
   },
+  lastBackupAt: null,
   themeOverride: 'system',
 };

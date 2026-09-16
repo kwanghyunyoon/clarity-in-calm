@@ -7,6 +7,7 @@ interface SettingsContextType {
   settings: AppSettings;
   setNotificationSettings: (n: NotificationSettings) => void;
   setThemeOverride: (t: ThemeOverride) => void;
+  setLastBackupAt: (iso: string) => void;
   isLoaded: boolean;
 }
 
@@ -28,8 +29,14 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
     setSettings(prev => ({ ...prev, themeOverride: t }));
   }, [setSettings]);
 
+  const setLastBackupAt = useCallback((iso: string) => {
+    setSettings(prev => ({ ...prev, lastBackupAt: iso }));
+  }, [setSettings]);
+
   return (
-    <SettingsContext.Provider value={{ settings, setNotificationSettings, setThemeOverride, isLoaded }}>
+    <SettingsContext.Provider
+      value={{ settings, setNotificationSettings, setThemeOverride, setLastBackupAt, isLoaded }}
+    >
       {children}
     </SettingsContext.Provider>
   );

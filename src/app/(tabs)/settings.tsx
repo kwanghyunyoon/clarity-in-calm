@@ -1,5 +1,4 @@
-import { Directory, File, Paths } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
+import { router } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import React, { useState } from 'react';
 import {
@@ -27,7 +26,8 @@ import { useSettings } from '@/context/settings-context';
 import { useWellness } from '@/context/wellness-context';
 import { ALL_DATA_KEYS } from '@/lib/data-registry';
 import { buildClarityAIExport } from '@/lib/clarityai-export';
-import { deleteAllData, readAllData } from '@/lib/data-keys';
+import { deleteAllData } from '@/lib/data-keys';
+import { shareJsonFile } from '@/lib/share-json-file';
 import {
   cancelDailyReminder,
   requestNotificationPermission,
@@ -99,39 +99,14 @@ export default function SettingsScreen() {
     );
   }
 
-  async function handleExport() {
-    try {
-      const payload: Record<string, unknown> = {
-        exportedAt: new Date().toISOString(),
-        ...(await readAllData(ALL_DATA_KEYS)),
-      };
-      const json = JSON.stringify(payload, null, 2);
-      const filename = `clarity-export-${new Date().toISOString().slice(0, 10)}.json`;
-      const file = new File(new Directory(Paths.cache), filename);
-      file.write(json);
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Export data' });
-      } else {
-        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${file.uri}`);
-      }
-    } catch (e: any) {
-      Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
-    }
-  }
-
   async function handleShareClarityAI() {
     try {
       const payload = buildClarityAIExport(entries, breathingSessions);
       const json = JSON.stringify(payload, null, 2);
       const filename = `clarity-clarityai-${new Date().toISOString().slice(0, 10)}.json`;
-      const file = new File(new Directory(Paths.cache), filename);
-      file.write(json);
-      const canShare = await Sharing.isAvailableAsync();
-      if (canShare) {
-        await Sharing.shareAsync(file.uri, { mimeType: 'application/json', dialogTitle: 'Share data with ClarityAI' });
-      } else {
-        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${file.uri}`);
+      const { shared, uri } = await shareJsonFile(json, filename, 'Share data with ClarityAI');
+      if (!shared) {
+        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${uri}`);
       }
     } catch (e: any) {
       Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
@@ -250,8 +225,8 @@ export default function SettingsScreen() {
         <SectionHeader label={ts.data} />
         <SettingsGroup>
           <SettingsRow
-            label={ts.exportData}
-            onPress={handleExport}
+            label={ts.backupRestore}
+            onPress={() => router.push('/backup')}
           />
           <SettingsRow
             label={ts.shareClarityAI}
