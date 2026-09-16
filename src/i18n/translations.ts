@@ -494,6 +494,12 @@ export const SOURCE = {
       es: 'Continuar',
       hi: 'जारी रखें',
     },
+    restoreEntry: {
+      en: 'Already have a backup? Restore it',
+      ko: '이미 백업이 있나요? 복원하기',
+      es: '¿Ya tienes una copia de seguridad? Restaurarla',
+      hi: 'पहले से बैकअप है? उसे पुनर्स्थापित करें',
+    },
   },
   home: {
     greeting: {

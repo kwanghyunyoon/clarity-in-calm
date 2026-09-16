@@ -12,11 +12,13 @@ import { useState } from 'react';
 import { Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useLocale } from '@/context/language-context';
+import { useRestoreFlow } from '@/hooks/use-restore-flow';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useOnboardingFlow } from '@/hooks/use-onboarding-flow';
 
 import { FeedbackModal } from './feedback-modal';
+import { PassphrasePromptModal } from './passphrase-prompt-modal';
 import { LanguagePicker } from './onboarding/language-picker';
 import { LanguageStepView } from './onboarding/language-step';
 import { SlideVisual } from './onboarding/slide-visuals';
@@ -44,6 +46,16 @@ export function OnboardingModal() {
     handleClose,
     handleLanguageContinue,
   } = useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCount: slides.length });
+
+  const {
+    tb: restoreTb,
+    passphraseModalVisible,
+    passphraseBusy,
+    restoring,
+    handleChooseRestoreFile,
+    handlePassphraseConfirm,
+    cancelPassphrase,
+  } = useRestoreFlow(handleClose);
 
   const slide = slides[page];
 
@@ -81,6 +93,7 @@ export function OnboardingModal() {
             selected={langSelection}
             onSelect={setLangSelection}
             onContinue={handleLanguageContinue}
+            onRestorePress={restoring ? undefined : handleChooseRestoreFile}
           />
         ) : (
           <>
@@ -152,6 +165,18 @@ export function OnboardingModal() {
       </View>
 
       <FeedbackModal visible={feedbackVisible} onClose={() => setFeedbackVisible(false)} />
+
+      <PassphrasePromptModal
+        visible={passphraseModalVisible}
+        title={restoreTb.restorePassphrasePrompt.title}
+        body={restoreTb.restorePassphrasePrompt.body}
+        placeholder={restoreTb.restorePassphrasePrompt.placeholder}
+        confirmLabel={restoreTb.restorePassphrasePrompt.confirm}
+        cancelLabel={restoreTb.restorePassphrasePrompt.cancel}
+        busy={passphraseBusy}
+        onCancel={cancelPassphrase}
+        onConfirm={handlePassphraseConfirm}
+      />
     </Modal>
   );
 }

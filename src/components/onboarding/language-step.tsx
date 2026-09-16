@@ -16,12 +16,14 @@ export function LanguageStepView({
   selected,
   onSelect,
   onContinue,
+  onRestorePress,
 }: {
   colors: ThemeColors;
   t: ReturnType<typeof useTranslation>;
   selected: Locale | null;
   onSelect: (l: Locale) => void;
   onContinue: () => void;
+  onRestorePress?: () => void;
 }) {
   return (
     <View style={s.langStepRoot}>
@@ -41,6 +43,14 @@ export function LanguageStepView({
       >
         <Text style={s.btnText}>{t.onboarding.continueLabel}</Text>
       </TouchableOpacity>
+
+      {onRestorePress && (
+        <TouchableOpacity onPress={onRestorePress} activeOpacity={0.7} style={s.restoreEntryBtn}>
+          <Text style={[s.restoreEntryTxt, { color: colors.textSecondary }]}>
+            {t.onboarding.restoreEntry}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -61,4 +71,7 @@ const s = StyleSheet.create({
   btn:          { paddingHorizontal: Spacing.five, paddingVertical: Spacing.two + 6,
                   borderRadius: 50, alignItems: 'center', width: '100%' },
   btnText:      { fontSize: 17, fontWeight: '700', color: '#ffffff' },
+
+  restoreEntryBtn: { paddingVertical: 4, marginTop: Spacing.one },
+  restoreEntryTxt: { fontSize: 12, fontWeight: '500', textDecorationLine: 'underline' },
 });
