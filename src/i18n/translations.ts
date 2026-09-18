@@ -2474,12 +2474,6 @@ export const SOURCE = {
       es: 'Copia de seguridad y restauración',
       hi: 'बैकअप और पुनर्स्थापना',
     },
-    shareClarityAI: {
-      en: 'Share data with ClarityAI',
-      ko: 'ClarityAI와 데이터 공유',
-      es: 'Compartir datos con ClarityAI',
-      hi: 'ClarityAI के साथ डेटा साझा करें',
-    },
     deleteData: {
       en: 'Delete all data',
       ko: '전체 데이터 삭제',

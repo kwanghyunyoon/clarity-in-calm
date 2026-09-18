@@ -23,11 +23,8 @@ import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
 import { useSettings } from '@/context/settings-context';
-import { useWellness } from '@/context/wellness-context';
 import { ALL_DATA_KEYS } from '@/lib/data-registry';
-import { buildClarityAIExport } from '@/lib/clarityai-export';
 import { deleteAllData } from '@/lib/data-keys';
-import { shareJsonFile } from '@/lib/share-json-file';
 import {
   cancelDailyReminder,
   requestNotificationPermission,
@@ -45,7 +42,6 @@ export default function SettingsScreen() {
   const { settings, setNotificationSettings, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
   const { showHelp } = useHelp();
-  const { entries, breathingSessions } = useWellness();
 
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -97,20 +93,6 @@ export default function SettingsScreen() {
         },
       ],
     );
-  }
-
-  async function handleShareClarityAI() {
-    try {
-      const payload = buildClarityAIExport(entries, breathingSessions);
-      const json = JSON.stringify(payload, null, 2);
-      const filename = `clarity-clarityai-${new Date().toISOString().slice(0, 10)}.json`;
-      const { shared, uri } = await shareJsonFile(json, filename, 'Share data with ClarityAI');
-      if (!shared) {
-        Alert.alert(ts.exportSaved.title, `${ts.exportSaved.bodyPrefix}${uri}`);
-      }
-    } catch (e: any) {
-      Alert.alert(ts.exportFailed.title, e.message ?? ts.exportFailed.fallbackBody);
-    }
   }
 
   function openPrivacy() {
@@ -227,10 +209,6 @@ export default function SettingsScreen() {
           <SettingsRow
             label={ts.backupRestore}
             onPress={() => router.push('/backup')}
-          />
-          <SettingsRow
-            label={ts.shareClarityAI}
-            onPress={handleShareClarityAI}
           />
           <SettingsRow
             label={ts.deleteData}
