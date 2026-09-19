@@ -1,0 +1,41 @@
+name: Android debug build
+
+# Manual, on-demand debug APK build for real-device verification. Runs on a
+# GitHub-hosted runner instead of locally — this repo's dev machine has only
+# 6.4GB RAM shared across every open terminal, which has previously caused
+# ./gradlew assembleDebug to be silently OOM-killed mid-build (see AGENTS.md).
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # android/ is gitignored and regenerated from app.config.js — no
+      # local gradle.properties RAM/ABI overrides to reapply here, this
+      # runner has plenty of memory for all 4 ABIs.
+      - run: npx expo prebuild --platform android --no-install
+
+      - name: Build debug APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clarity-in-calm-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 14
