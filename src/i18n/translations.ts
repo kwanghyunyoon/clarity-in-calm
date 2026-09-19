@@ -1258,6 +1258,66 @@ export const SOURCE = {
         hi: 'फिर भी मेरी प्रविष्टि सहेजें',
       },
     },
+    traumaNotice: {
+      title: {
+        en: 'You don\'t have to process this alone',
+        ko: '혼자 감당하지 않아도 돼요',
+        es: 'No tienes que procesar esto sola/o',
+        hi: 'इसे अकेले संभालने की ज़रूरत नहीं है',
+      },
+      body: {
+        en: 'It sounds like you might be dealing with something like flashbacks, dissociation, or avoidance around a painful experience. These can be hard to work through safely on your own — a trauma-informed therapist or counselor can help more than journaling alone.\n\nThis is just a gentle note, not a diagnosis.',
+        ko: '플래시백, 해리(멍해짐), 회피처럼 힘든 경험과 관련된 감정을 겪고 계신 것 같아요. 이런 경험은 혼자 글로 정리하기보다 트라우마 전문 상담사나 치료사의 도움을 받는 것이 더 안전할 수 있어요.\n\n이건 진단이 아니라 다정한 안내예요.',
+        es: 'Parece que podrías estar lidiando con algo como flashbacks, disociación o evitación relacionados con una experiencia dolorosa. Este tipo de experiencias suelen ser más seguras de procesar con el apoyo de un terapeuta especializado en trauma, no solo escribiendo.\n\nEsto es solo un aviso amable, no un diagnóstico.',
+        hi: 'ऐसा लगता है कि आप फ्लैशबैक, डिसोसिएशन (खुद से अलग महसूस करना), या किसी दर्दनाक अनुभव से बचाव जैसी किसी चीज़ से गुज़र रहे हैं। इस तरह के अनुभवों को अकेले लिखकर संभालने के बजाय किसी ट्रॉमा-विशेषज्ञ थेरेपिस्ट या काउंसलर की मदद लेना अधिक सुरक्षित हो सकता है।\n\nयह सिर्फ एक सुझाव है, निदान नहीं।',
+      },
+      lines: {
+        en: [
+          {
+            emoji: '🌍',
+            title: 'Find support',
+            sub: 'findahelpline.com · Referrals worldwide',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        ko: [
+          {
+            emoji: '🌍',
+            title: '도움 찾기',
+            sub: 'findahelpline.com · 전 세계 상담 연계',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        es: [
+          {
+            emoji: '🌍',
+            title: 'Buscar apoyo',
+            sub: 'findahelpline.com · Recursos en todo el mundo',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        hi: [
+          {
+            emoji: '🌍',
+            title: 'सहायता खोजें',
+            sub: 'findahelpline.com · दुनिया भर के संसाधन',
+            action: 'https://findahelpline.com',
+          },
+        ],
+      },
+      confirmBtn: {
+        en: 'I\'ll look into support',
+        ko: '도움을 알아보겠습니다',
+        es: 'Buscaré apoyo',
+        hi: 'मैं सहायता तलाशूँगा / तलाशूँगी',
+      },
+      saveBtn: {
+        en: 'Save my entry anyway',
+        ko: '그래도 저장하기',
+        es: 'Guardar mi entrada de todas formas',
+        hi: 'फिर भी मेरी प्रविष्टि सहेजें',
+      },
+    },
     crisisKeywords: {
       suicidalIdeation: {
         en: [
@@ -1391,6 +1451,47 @@ export const SOURCE = {
         hi: [
           'दवा की अधिक मात्रा',
           'ओवरडोज़',
+        ],
+      },
+    },
+    traumaKeywords: {
+      traumaSymptoms: {
+        en: [
+          'flashback',
+          'flashbacks',
+          'dissociate',
+          'dissociating',
+          'dissociation',
+          'dissociative episode',
+          'derealization',
+          'depersonalization',
+          'avoiding anything that reminds me',
+          'avoid anything that reminds me',
+        ],
+        ko: [
+          '플래시백',
+          '해리 증상',
+          '해리성',
+          '이인증',
+          '비현실감',
+          '떠오르는 게 무서워서 피하게 된다',
+        ],
+        es: [
+          'flashback',
+          'flashbacks',
+          'disociación',
+          'disociarme',
+          'despersonalización',
+          'desrealización',
+          'evito todo lo que me lo recuerda',
+        ],
+        hi: [
+          'फ्लैशबैक',
+          'डिसोसिएशन',
+          'खुद से अलग महसूस',
+          'हकीकत से कटा हुआ महसूस',
+          'उससे जुड़ी हर चीज़ से बचता हूँ',
+          'उससे जुड़ी हर चीज़ से बचती हूँ',
         ],
       },
     },

@@ -22,7 +22,7 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { checkCrisis } from '@/lib/crisis-detection';
+import { detectConcern, type ConcernType } from '@/lib/crisis-detection';
 import type { MoodValue } from '@/types';
 
 async function openUrl(rawUrl: string) {
@@ -56,7 +56,7 @@ export function JournalComposer() {
   const [mood, setMood] = useState<MoodValue | null>(null);
   const [note, setNote] = useState('');
   const [savedAnim, setSavedAnim] = useState(false);
-  const [showCrisis, setShowCrisis] = useState(false);
+  const [concernType, setConcernType] = useState<ConcernType | null>(null);
   const [pendingSave, setPendingSave] = useState<{ mood: MoodValue; note: string } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<typeof JOURNAL_TEMPLATES[number]>(JOURNAL_TEMPLATES[0]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -73,9 +73,10 @@ export function JournalComposer() {
 
   function handleSaveAttempt() {
     if (!mood) return;
-    if (note.trim() && checkCrisis(note, tj.crisisKeywords)) {
+    const concern = note.trim() ? detectConcern(note, tj.crisisKeywords, tj.traumaKeywords) : null;
+    if (concern) {
       setPendingSave({ mood, note });
-      setShowCrisis(true);
+      setConcernType(concern);
     } else {
       doSave(mood, note);
     }
@@ -100,13 +101,13 @@ export function JournalComposer() {
   }
 
   function handleCrisisConfirm() {
-    setShowCrisis(false);
+    setConcernType(null);
     if (pendingSave) doSave(pendingSave.mood, pendingSave.note);
     setPendingSave(null);
   }
 
   function handleCrisisSave() {
-    setShowCrisis(false);
+    setConcernType(null);
     if (pendingSave) doSave(pendingSave.mood, pendingSave.note);
     setPendingSave(null);
   }
@@ -136,6 +137,10 @@ export function JournalComposer() {
     const tagLabels = te.tagLabels as Record<string, string>;
     return tagLabels[tag] ?? tag;
   }, [te]);
+
+  const concernNotice = concernType === 'crisis' ? tj.crisis
+    : concernType === 'trauma' ? tj.traumaNotice
+    : null;
 
   return (
     <>
@@ -329,37 +334,39 @@ export function JournalComposer() {
         onConfirm={(d) => setUnlockDate(d)}
       />
 
-      {/* ── Crisis modal ── */}
-      <Modal visible={showCrisis} transparent animationType="fade" onRequestClose={() => { setShowCrisis(false); setPendingSave(null); }}>
-        <View style={styles.modalOverlay}>
-          <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.crisisTitle, { color: colors.text }]}>{tj.crisis.title}</Text>
-            <Text style={[styles.crisisBody, { color: colors.textSecondary }]}>{tj.crisis.body}</Text>
-            {tj.crisis.lines.map((line) => (
+      {/* ── Crisis / trauma-notice modal ── */}
+      {concernNotice && (
+        <Modal visible transparent animationType="fade" onRequestClose={() => { setConcernType(null); setPendingSave(null); }}>
+          <View style={styles.modalOverlay}>
+            <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.crisisTitle, { color: colors.text }]}>{concernNotice.title}</Text>
+              <Text style={[styles.crisisBody, { color: colors.textSecondary }]}>{concernNotice.body}</Text>
+              {concernNotice.lines.map((line) => (
+                <TouchableOpacity
+                  key={line.title}
+                  style={[styles.crisisLine, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}
+                  onPress={() => openUrl(line.action)}
+                >
+                  <Text style={styles.crisisEmoji}>{line.emoji}</Text>
+                  <View style={styles.crisisLineText}>
+                    <Text style={[styles.crisisLineTitle, { color: colors.text }]}>{line.title}</Text>
+                    <Text style={[styles.crisisLineSub, { color: colors.textSecondary }]}>{line.sub}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
               <TouchableOpacity
-                key={line.title}
-                style={[styles.crisisLine, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}
-                onPress={() => openUrl(line.action)}
+                style={[styles.crisisBtn, { backgroundColor: colors.primary }]}
+                onPress={handleCrisisConfirm}
               >
-                <Text style={styles.crisisEmoji}>{line.emoji}</Text>
-                <View style={styles.crisisLineText}>
-                  <Text style={[styles.crisisLineTitle, { color: colors.text }]}>{line.title}</Text>
-                  <Text style={[styles.crisisLineSub, { color: colors.textSecondary }]}>{line.sub}</Text>
-                </View>
+                <Text style={styles.crisisBtnText}>{concernNotice.confirmBtn}</Text>
               </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={[styles.crisisBtn, { backgroundColor: colors.primary }]}
-              onPress={handleCrisisConfirm}
-            >
-              <Text style={styles.crisisBtnText}>{tj.crisis.confirmBtn}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleCrisisSave}>
-              <Text style={[styles.crisisSaveLink, { color: colors.textSecondary }]}>{tj.crisis.saveBtn}</Text>
-            </TouchableOpacity>
+              <TouchableOpacity onPress={handleCrisisSave}>
+                <Text style={[styles.crisisSaveLink, { color: colors.textSecondary }]}>{concernNotice.saveBtn}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </Modal>
+        </Modal>
+      )}
     </>
   );
 }

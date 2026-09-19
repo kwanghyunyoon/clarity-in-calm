@@ -30,3 +30,24 @@ describe('crisisKeywords locale parity', () => {
     }
   });
 });
+
+describe('traumaKeywords locale parity', () => {
+  const categoryKeys = LOCALES.map(locale => ({
+    locale,
+    keys: Object.keys(TRANSLATIONS[locale].journal.traumaKeywords).sort(),
+  }));
+
+  test('every locale defines the same trauma-keyword categories', () => {
+    const [expected, ...rest] = categoryKeys;
+    for (const { locale, keys } of rest) {
+      expect({ locale, keys }).toEqual({ locale, keys: expected.keys });
+    }
+  });
+
+  test.each(LOCALES)('%s has at least one phrase per trauma-keyword category', (locale: Locale) => {
+    const categories = TRANSLATIONS[locale].journal.traumaKeywords;
+    for (const [, phrases] of Object.entries(categories) as [string, readonly string[]][]) {
+      expect(phrases.length).toBeGreaterThan(0);
+    }
+  });
+});

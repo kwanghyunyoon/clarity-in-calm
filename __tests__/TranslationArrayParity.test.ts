@@ -12,11 +12,15 @@
  * journal.crisis.lines is exempt for the same reason: it's a list of
  * region-specific crisis hotlines, not a translated list — es has 6 entries
  * (covering Mexico, Colombia, Argentina, Peru) where en/ko/hi have 3.
+ *
+ * journal.traumaKeywords is exempt for the same reason as crisisKeywords:
+ * locale-tuned phrase lists (see __tests__/CrisisKeywordsParity.test.ts,
+ * "traumaKeywords locale parity", which checks that one separately).
  */
 import { SOURCE, type Locale } from '@/i18n/translations';
 
 const LOCALES: Locale[] = ['en', 'ko', 'es', 'hi'];
-const EXEMPT_PATHS = new Set(['journal.crisisKeywords', 'journal.crisis.lines']);
+const EXEMPT_PATHS = new Set(['journal.crisisKeywords', 'journal.crisis.lines', 'journal.traumaKeywords']);
 
 function isLocaleLeaf(v: unknown): v is Record<Locale, unknown> {
   return (
