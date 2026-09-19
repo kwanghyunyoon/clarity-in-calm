@@ -2740,18 +2740,6 @@ export const SOURCE = {
         es: 'Diario de sueños e información del sueño',
         hi: 'स्वप्न डायरी और नींद की जानकारी',
       },
-      clarityAIName: {
-        en: 'ClarityAI',
-        ko: 'ClarityAI',
-        es: 'ClarityAI',
-        hi: 'ClarityAI',
-      },
-      clarityAITagline: {
-        en: 'AI-powered reflection companion',
-        ko: 'AI 기반 성찰 동반자',
-        es: 'Compañero de reflexión con IA',
-        hi: 'एआई-संचालित चिंतन साथी',
-      },
     },
     privacy: {
       en: 'Privacy policy',
