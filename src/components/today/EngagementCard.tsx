@@ -1,75 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 import { Card } from '@/components/ui/Card';
 import { IconChip } from '@/components/ui/IconChip';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 interface Props {
-  streak: number;
-  streakLabel: string;
-  streakStart: string;
+  entriesThisMonth: number;
+  entriesThisMonthLabel: string;
   totalEntries: number;
   totalEmotions: number;
   entriesLabel: string;
   emotionsLabel: string;
 }
 
-export function StreakCard({ streak, streakLabel, streakStart, totalEntries, totalEmotions, entriesLabel, emotionsLabel }: Props) {
+export function EngagementCard({
+  entriesThisMonth, entriesThisMonthLabel, totalEntries, totalEmotions, entriesLabel, emotionsLabel,
+}: Props) {
   const { colors } = useTheme();
-  const flameScale = useSharedValue(1);
-
-  useEffect(() => {
-    if (streak > 0) {
-      flameScale.value = withRepeat(
-        withSequence(
-          withTiming(1.15, { duration: 700 }),
-          withTiming(0.95, { duration: 700 }),
-        ),
-        -1,
-        true,
-      );
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [streak]);
-
-  const flameStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: flameScale.value }],
-  }));
 
   return (
     <Card style={styles.card}>
-      <View style={styles.streakRow}>
-        <Animated.View style={flameStyle}>
-          <IconChip
-            name={streak > 0 ? 'flame' : 'leaf'}
-            color={colors.primary}
-            size={26}
-            chipSize={52}
-          />
-        </Animated.View>
+      <View style={styles.monthRow}>
+        <IconChip name="leaf" color={colors.primary} size={26} chipSize={52} />
         <View>
-          {streak > 0 ? (
-            <>
-              <Text style={[styles.streakNum, { color: colors.primary }]}>
-                {streak}
-              </Text>
-              <Text style={[styles.streakLabel, { color: colors.textSecondary }]}>
-                {streakLabel}
-              </Text>
-            </>
-          ) : (
-            <Text style={[styles.streakStart, { color: colors.textSecondary }]}>
-              {streakStart}
-            </Text>
-          )}
+          <Text style={[styles.monthNum, { color: colors.primary }]}>{entriesThisMonth}</Text>
+          <Text style={[styles.monthLabel, { color: colors.textSecondary }]}>{entriesThisMonthLabel}</Text>
         </View>
       </View>
 
@@ -94,25 +50,20 @@ const styles = StyleSheet.create({
   card: {
     padding: Spacing.three,
   },
-  streakRow: {
+  monthRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.three,
   },
-  streakNum: {
+  monthNum: {
     fontSize: 36,
     fontWeight: '700',
     letterSpacing: -1,
     lineHeight: 40,
   },
-  streakLabel: {
+  monthLabel: {
     fontSize: 13,
     fontWeight: '500',
-  },
-  streakStart: {
-    fontSize: 13,
-    lineHeight: 18,
-    maxWidth: 200,
   },
   divider: {
     height: 1,

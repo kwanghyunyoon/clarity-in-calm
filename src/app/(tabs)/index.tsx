@@ -11,7 +11,7 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { StreakCard } from '@/components/today/StreakCard';
+import { EngagementCard } from '@/components/today/EngagementCard';
 import { ToolCard } from '@/components/today/ToolCard';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
@@ -52,7 +52,7 @@ export default function TodayScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
   const insets = useSafeAreaInsets();
-  const { entries, streak } = useWellness();
+  const { entries, entriesThisMonth } = useWellness();
   const { todayEmotions, emotionLogs } = useEmotions();
   const { showHelp } = useHelp();
 
@@ -107,84 +107,8 @@ export default function TodayScreen() {
           </AnimatedPressable>
         </Animated.View>
 
-        {/* ── Today's emotions row ── */}
-        {todayEmotions.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
-            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-              {t.today.todayEmotions}
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.emotionRow}
-            >
-              {todayEmotions.map(log => {
-                const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
-                const color = emotion?.color ?? colors.primary;
-                return (
-                  <View
-                    key={log.id}
-                    style={[styles.emotionPill, {
-                      backgroundColor: color + '22',
-                      borderColor: color + '66',
-                    }]}
-                  >
-                    <Text style={[styles.emotionPillText, { color }]}>{log.emotionLabel}</Text>
-                    <Text style={[styles.emotionIntensity, { color: colors.textSecondary }]}>
-                      {' '}·{log.intensity}
-                    </Text>
-                  </View>
-                );
-              })}
-            </ScrollView>
-          </Animated.View>
-        )}
-
-        {/* ── Streak & stats ── */}
-        <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.section}>
-          <StreakCard
-            streak={streak}
-            streakLabel={t.today.streakDays}
-            streakStart={t.today.streakStart}
-            totalEntries={entries.length}
-            totalEmotions={emotionLogs.length}
-            entriesLabel={t.today.journalEntries}
-            emotionsLabel={t.today.emotionsLogged}
-          />
-        </Animated.View>
-
-        {/* ── Tool cards ── */}
-        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.section}>
-          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
-            {t.today.tools}
-          </Text>
-          <View style={styles.toolsGrid}>
-            <ToolCard
-              icon="cloud-outline"
-              title={t.today.breatheTitle}
-              subtitle={t.today.breatheSub}
-              accentColor={EmotionColors.fear}
-              onPress={() => router.push('/breathe')}
-            />
-            <ToolCard
-              icon="leaf-outline"
-              title={t.today.groundTitle}
-              subtitle={t.today.groundSub}
-              accentColor={EmotionColors.trust}
-              onPress={() => router.push('/ground')}
-            />
-            <ToolCard
-              icon="book-outline"
-              title={t.feelingsLibraryScreen.cardTitle}
-              subtitle={t.feelingsLibraryScreen.cardSub}
-              accentColor={EmotionColors.disgust}
-              onPress={() => router.push('/feelings-library')}
-            />
-          </View>
-        </Animated.View>
-
         {/* ── Daily quote / affirmation ── */}
-        <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(100).springify()} style={styles.section}>
           {affirmation ? (
             <AnimatedPressable
               onPress={() => router.push('/feelings-library')}
@@ -218,6 +142,81 @@ export default function TodayScreen() {
               </Text>
             </View>
           ) : null}
+        </Animated.View>
+
+        {/* ── Today's emotions row ── */}
+        {todayEmotions.length > 0 && (
+          <Animated.View entering={FadeInDown.delay(150).springify()} style={styles.section}>
+            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+              {t.today.todayEmotions}
+            </Text>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.emotionRow}
+            >
+              {todayEmotions.map(log => {
+                const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
+                const color = emotion?.color ?? colors.primary;
+                return (
+                  <View
+                    key={log.id}
+                    style={[styles.emotionPill, {
+                      backgroundColor: color + '22',
+                      borderColor: color + '66',
+                    }]}
+                  >
+                    <Text style={[styles.emotionPillText, { color }]}>{log.emotionLabel}</Text>
+                    <Text style={[styles.emotionIntensity, { color: colors.textSecondary }]}>
+                      {' '}·{log.intensity}
+                    </Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </Animated.View>
+        )}
+
+        {/* ── Engagement & stats ── */}
+        <Animated.View entering={FadeInDown.delay(200).springify()} style={styles.section}>
+          <EngagementCard
+            entriesThisMonth={entriesThisMonth}
+            entriesThisMonthLabel={t.today.entriesThisMonth}
+            totalEntries={entries.length}
+            totalEmotions={emotionLogs.length}
+            entriesLabel={t.today.journalEntries}
+            emotionsLabel={t.today.emotionsLogged}
+          />
+        </Animated.View>
+
+        {/* ── Tool cards ── */}
+        <Animated.View entering={FadeInDown.delay(250).springify()} style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>
+            {t.today.tools}
+          </Text>
+          <View style={styles.toolsGrid}>
+            <ToolCard
+              icon="cloud-outline"
+              title={t.today.breatheTitle}
+              subtitle={t.today.breatheSub}
+              accentColor={EmotionColors.fear}
+              onPress={() => router.push('/breathe')}
+            />
+            <ToolCard
+              icon="leaf-outline"
+              title={t.today.groundTitle}
+              subtitle={t.today.groundSub}
+              accentColor={EmotionColors.trust}
+              onPress={() => router.push('/ground')}
+            />
+            <ToolCard
+              icon="book-outline"
+              title={t.feelingsLibraryScreen.cardTitle}
+              subtitle={t.feelingsLibraryScreen.cardSub}
+              accentColor={EmotionColors.disgust}
+              onPress={() => router.push('/feelings-library')}
+            />
+          </View>
         </Animated.View>
       </ScrollView>
     </Screen>

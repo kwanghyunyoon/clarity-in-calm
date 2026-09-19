@@ -39,14 +39,14 @@ function WelcomeVisual() {
   );
 }
 
-// Slide 1 — Today: mini streak card + shortcut pills
+// Slide 1 — Today: mini engagement card + shortcut pills
 function TodayVisual({ colors, t }: { colors: ThemeColors; t: Translation }) {
   return (
     <View style={s.todayWrap}>
-      <View style={[s.streakCard, { backgroundColor: colors.backgroundElement }]}>
-        <Ionicons name="flame" size={28} color="#EF5350" accessibilityLabel="Streak" />
-        <Text style={[s.streakNum, { color: colors.text }]}>7</Text>
-        <Text style={[s.streakLabel, { color: colors.textSecondary }]}>{t.home.progress.streak}</Text>
+      <View style={[s.monthCard, { backgroundColor: colors.backgroundElement }]}>
+        <Ionicons name="leaf" size={28} color={colors.primary} accessibilityLabel="Entries this month" />
+        <Text style={[s.monthNum, { color: colors.text }]}>7</Text>
+        <Text style={[s.monthLabel, { color: colors.textSecondary }]}>{t.today.entriesThisMonth}</Text>
       </View>
       <View style={s.pillRow}>
         <View style={[s.pill, { backgroundColor: colors.primary + '22' }]}>
@@ -191,10 +191,10 @@ const s = StyleSheet.create({
 
   // Today
   todayWrap:     { alignItems: 'center', gap: Spacing.two },
-  streakCard:    { borderRadius: 18, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two,
+  monthCard:     { borderRadius: 18, paddingHorizontal: Spacing.five, paddingVertical: Spacing.two,
                    alignItems: 'center', flexDirection: 'row', gap: Spacing.two },
-  streakNum:     { fontSize: 36, fontWeight: '800', lineHeight: 42 },
-  streakLabel:   { fontSize: 12, fontWeight: '600' },
+  monthNum:      { fontSize: 36, fontWeight: '800', lineHeight: 42 },
+  monthLabel:    { fontSize: 12, fontWeight: '600' },
   pillRow:       { flexDirection: 'row', gap: Spacing.two },
   pill:          { borderRadius: 50, paddingHorizontal: Spacing.three, paddingVertical: Spacing.one + 2,
                    flexDirection: 'row', alignItems: 'center', gap: 5 },

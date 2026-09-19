@@ -17,7 +17,7 @@ interface WellnessContextType {
   todayMood: MoodValue | null;
   breathingSessions: number;
   addBreathingSession: () => void;
-  streak: number;
+  entriesThisMonth: number;
   isLoaded: boolean;
   saveError: boolean;
   clearSaveError: () => void;
@@ -45,21 +45,16 @@ export function countEntriesInBackup(data: Record<string, unknown>): number {
   return entries?.length ?? 0;
 }
 
-export function computeStreak(entries: JournalEntry[]): number {
-  if (entries.length === 0) return 0;
-  const uniqueDays = [...new Set(entries.map(e => toLocalDateStr(new Date(e.date))))].sort((a, b) => (a < b ? 1 : -1));
-  const today = toLocalDateStr(new Date());
-  const yd = new Date(); yd.setDate(yd.getDate() - 1);
-  const yesterday = toLocalDateStr(yd);
-  if (uniqueDays[0] !== today && uniqueDays[0] !== yesterday) return 0;
-  let count = 1;
-  for (let i = 1; i < uniqueDays.length; i++) {
-    const prev = new Date(uniqueDays[i - 1]);
-    const curr = new Date(uniqueDays[i]);
-    const diffDays = Math.round((prev.getTime() - curr.getTime()) / 86400000);
-    if (diffDays === 1) { count++; } else { break; }
-  }
-  return count;
+/** Neutral, non-punishing engagement stat: entries logged in the current
+ * calendar month. Deliberately not a "streak" — journaling.pdf warns that
+ * consecutive-day mechanics import guilt-inducing gamification into what
+ * should be a low-pressure activity. */
+export function countEntriesThisMonth(entries: JournalEntry[]): number {
+  const now = new Date();
+  return entries.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  }).length;
 }
 
 export function WellnessProvider({ children }: { children: React.ReactNode }) {
@@ -124,14 +119,14 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
     return raw !== undefined && raw >= 1 && raw <= 5 ? (raw as MoodValue) : null;
   })();
 
-  const streak = computeStreak(entries);
+  const entriesThisMonth = countEntriesThisMonth(entries);
 
   return (
     <WellnessContext.Provider value={{
       entries, addEntry, updateEntry, deleteEntry,
       customTags, addCustomTag,
       todayMood, breathingSessions, addBreathingSession,
-      streak, isLoaded, saveError, clearSaveError, reload,
+      entriesThisMonth, isLoaded, saveError, clearSaveError, reload,
     }}>
       {children}
     </WellnessContext.Provider>

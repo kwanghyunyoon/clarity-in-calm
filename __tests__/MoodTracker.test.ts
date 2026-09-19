@@ -1,8 +1,8 @@
 /**
- * Tests for mood tracking + streak logic, against the real functions
+ * Tests for mood tracking + engagement stat logic, against the real functions
  * shipped in wellness-context.tsx and date-utils.ts.
  */
-import { computeStreak } from '@/context/wellness-context';
+import { countEntriesThisMonth } from '@/context/wellness-context';
 import { toLocalDateStr } from '@/lib/date-utils';
 import type { JournalEntry, MoodValue } from '@/types';
 
@@ -27,25 +27,28 @@ describe('MoodTracker', () => {
     }
   });
 
-  test('logging mood today with no prior entries → streak of 1', () => {
-    const entries = [makeEntry(0)];
-    expect(computeStreak(entries)).toBe(1);
-  });
-
-  test('consecutive days → streak increments', () => {
+  test('counts entries logged this month', () => {
     const entries = [makeEntry(0), makeEntry(1), makeEntry(2)];
-    expect(computeStreak(entries)).toBe(3);
+    expect(countEntriesThisMonth(entries)).toBe(3);
   });
 
-  test('gap of 1 day resets streak to 0 (unless yesterday)', () => {
-    // Entries from 2 and 3 days ago — no today or yesterday → streak = 0
-    const entries = [makeEntry(2), makeEntry(3)];
-    expect(computeStreak(entries)).toBe(0);
+  test('multiple entries same day both count toward the monthly total', () => {
+    const entries = [makeEntry(0), makeEntry(0, 5), makeEntry(1)];
+    expect(countEntriesThisMonth(entries)).toBe(3);
   });
 
-  test('multiple entries same day count as a single day in streak', () => {
-    const entries = [makeEntry(0), makeEntry(0, 5), makeEntry(1), makeEntry(2)];
-    expect(computeStreak(entries)).toBe(3);
+  test('excludes entries from a different calendar month', () => {
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    const entries: JournalEntry[] = [
+      makeEntry(0),
+      { id: 'old', date: lastMonth.toISOString(), mood: 3, note: '' },
+    ];
+    expect(countEntriesThisMonth(entries)).toBe(1);
+  });
+
+  test('no entries this month → 0', () => {
+    expect(countEntriesThisMonth([])).toBe(0);
   });
 
   test('toLocalDateStr groups same-day entries under one key', () => {

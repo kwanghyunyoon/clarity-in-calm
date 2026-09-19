@@ -30,7 +30,7 @@ export default function InsightsScreen() {
   const t = useTranslation();
   const ti = t.insightsScreen;
   const insets = useSafeAreaInsets();
-  const { entries, streak } = useWellness();
+  const { entries, entriesThisMonth } = useWellness();
   const { emotionLogs } = useEmotions();
 
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
@@ -115,9 +115,8 @@ export default function InsightsScreen() {
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEmotions}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.statNum, { color: colors.primary }]}>{streak}</Text>
-            <Ionicons name="flame" size={18} color="#EF5350" accessibilityLabel="Streak" />
-            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.streakRecord}</Text>
+            <Text style={[styles.statNum, { color: colors.primary }]}>{entriesThisMonth}</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.entriesThisMonth}</Text>
           </View>
           {emotionLogs.length > 0 && (
             <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>

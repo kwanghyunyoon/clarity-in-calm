@@ -274,7 +274,7 @@ export const SOURCE = {
         {
           emoji: '🗓️',
           title: 'Your Daily Dashboard',
-          body: 'The Today tab shows your streak and recent entries, with one-tap shortcuts to check in on how you feel.',
+          body: 'The Today tab shows recent entries and a monthly log count, with one-tap shortcuts to check in on how you feel.',
         },
         {
           emoji: '📖',
@@ -289,7 +289,7 @@ export const SOURCE = {
         {
           emoji: '📊',
           title: 'Discover Your Patterns',
-          body: 'The Insights tab surfaces mood trends, top emotions, and your streak — giving you a clearer picture of your inner world.',
+          body: 'The Insights tab surfaces mood trends, top emotions, and how often you\'ve logged this month — giving you a clearer picture of your inner world.',
         },
         {
           emoji: '⚙️',
@@ -311,7 +311,7 @@ export const SOURCE = {
         {
           emoji: '🗓️',
           title: '오늘의 대시보드',
-          body: '오늘 탭에서 연속 기록과 최근 항목을 확인하고, 버튼 하나로 지금 기분을 기록해보세요.',
+          body: '오늘 탭에서 최근 항목과 이번 달 기록 수를 확인하고, 버튼 하나로 지금 기분을 기록해보세요.',
         },
         {
           emoji: '📖',
@@ -326,7 +326,7 @@ export const SOURCE = {
         {
           emoji: '📊',
           title: '패턴 발견하기',
-          body: '인사이트 탭에서 기분 추세, 주요 감정, 연속 기록을 확인해 나의 내면 세계를 더 명확히 살펴보세요.',
+          body: '인사이트 탭에서 기분 추세, 주요 감정, 이번 달 기록 수를 확인해 나의 내면 세계를 더 명확히 살펴보세요.',
         },
         {
           emoji: '⚙️',
@@ -348,7 +348,7 @@ export const SOURCE = {
         {
           emoji: '🗓️',
           title: 'Tu panel del día',
-          body: 'La pestaña Hoy muestra tu racha y entradas recientes, con accesos directos para registrar cómo te sientes.',
+          body: 'La pestaña Hoy muestra entradas recientes y cuántas registraste este mes, con accesos directos para registrar cómo te sientes.',
         },
         {
           emoji: '📖',
@@ -363,7 +363,7 @@ export const SOURCE = {
         {
           emoji: '📊',
           title: 'Descubre tus patrones',
-          body: 'La pestaña Perspectivas muestra tendencias de humor, emociones principales y tu racha — una imagen más clara de tu mundo interior.',
+          body: 'La pestaña Perspectivas muestra tendencias de humor, emociones principales y cuántas registraste este mes — una imagen más clara de tu mundo interior.',
         },
         {
           emoji: '⚙️',
@@ -385,7 +385,7 @@ export const SOURCE = {
         {
           emoji: '🗓️',
           title: 'आपका दैनिक डैशबोर्ड',
-          body: 'आज का टैब आपकी स्ट्रीक और हाल की प्रविष्टियाँ दिखाता है, एक टैप में अपनी भावना दर्ज करें।',
+          body: 'आज का टैब हाल की प्रविष्टियाँ और इस महीने की प्रविष्टि संख्या दिखाता है, एक टैप में अपनी भावना दर्ज करें।',
         },
         {
           emoji: '📖',
@@ -400,7 +400,7 @@ export const SOURCE = {
         {
           emoji: '📊',
           title: 'अपने पैटर्न खोजें',
-          body: 'इनसाइट्स टैब मूड रुझान, शीर्ष भावनाएँ और स्ट्रीक दिखाता है — आपकी आंतरिक दुनिया की स्पष्ट तस्वीर।',
+          body: 'इनसाइट्स टैब मूड रुझान, शीर्ष भावनाएँ और इस महीने की प्रविष्टि संख्या दिखाता है — आपकी आंतरिक दुनिया की स्पष्ट तस्वीर।',
         },
         {
           emoji: '⚙️',
@@ -583,38 +583,6 @@ export const SOURCE = {
         es: '5-4-3-2-1 · Vuelve al presente',
         hi: '5-4-3-2-1 · अभी करें',
       },
-    },
-    progress: {
-      title: {
-        en: 'Your progress',
-        ko: '나의 진행 상황',
-        es: 'Tu progreso',
-        hi: 'आपकी प्रगति',
-      },
-      streak: {
-        en: 'day streak',
-        ko: '일 연속',
-        es: 'días seguidos',
-        hi: 'दिन की स्ट्रीक',
-      },
-      entries: {
-        en: 'entries',
-        ko: '기록',
-        es: 'registros',
-        hi: 'प्रविष्टियाँ',
-      },
-      sessions: {
-        en: 'sessions',
-        ko: '세션',
-        es: 'sesiones',
-        hi: 'सत्र',
-      },
-    },
-    streakHow: {
-      en: 'Log a journal entry every day to grow your streak',
-      ko: '매일 일기를 작성하면 연속 기록이 늘어나요',
-      es: 'Registra una entrada en el diario cada día para aumentar tu racha',
-      hi: 'स्ट्रीक बढ़ाने के लिए हर दिन डायरी में प्रविष्टि करें',
     },
     helpBtn: {
       en: 'Not sure where to go?',
@@ -1472,17 +1440,11 @@ export const SOURCE = {
       es: 'Registrar emoción',
       hi: 'भावना दर्ज करें',
     },
-    streakDays: {
-      en: 'day streak',
-      ko: '일 연속',
-      es: 'días seguidos',
-      hi: 'दिन लगातार',
-    },
-    streakStart: {
-      en: 'Start your streak — log an emotion today',
-      ko: '오늘 감정을 기록해 스트릭을 시작하세요',
-      es: 'Registra una emoción hoy para comenzar tu racha',
-      hi: 'स्ट्रीक शुरू करने के लिए आज भावना दर्ज करें',
+    entriesThisMonth: {
+      en: 'entries this month',
+      ko: '이번 달 기록',
+      es: 'registros este mes',
+      hi: 'इस महीने की प्रविष्टियाँ',
     },
     tools: {
       en: 'Quick tools',
@@ -1954,11 +1916,11 @@ export const SOURCE = {
       es: 'Principal desencadenante',
       hi: 'मुख्य ट्रिगर',
     },
-    streakRecord: {
-      en: 'Best streak',
-      ko: '최고 스트릭',
-      es: 'Mejor racha',
-      hi: 'सर्वश्रेष्ठ स्ट्रीक',
+    entriesThisMonth: {
+      en: 'This month',
+      ko: '이번 달',
+      es: 'Este mes',
+      hi: 'इस महीने',
     },
     timeOfDay: {
       en: 'Time of day',
@@ -2075,26 +2037,6 @@ export const SOURCE = {
       ko: '기분 분석',
       es: 'Distribución de ánimo',
       hi: 'मूड विश्लेषण',
-    },
-    streakMotiv: {
-      week: {
-        en: 'Amazing! A full week! 🌟',
-        ko: '대단해요! 일주일! 🌟',
-        es: '¡Increíble! ¡Una semana! 🌟',
-        hi: 'अद्भुत! पूरा सप्ताह! 🌟',
-      },
-      days: {
-        en: 'days in a row!',
-        ko: '일 연속!',
-        es: 'días seguidos',
-        hi: 'दिन लगातार!',
-      },
-      sub: {
-        en: 'You\'re building a real self-care habit.',
-        ko: '진정한 자기 관리 습관이에요.',
-        es: 'Estás creando un hábito de autocuidado.',
-        hi: 'आप आत्म-देखभाल की आदत बना रहे हैं।',
-      },
     },
     insights: {
       title: {
