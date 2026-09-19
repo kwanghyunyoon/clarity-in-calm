@@ -11,6 +11,23 @@ export interface JournalEntry {
   title?: string;
   isFutureSelf?: boolean;
   unlockAt?: string; // ISO — for future self letters
+
+  // Unified journal/mood entry model (issue #64) — antecedent/trigger,
+  // coping effectiveness, sleep, and positive-event tagging per journaling.pdf.
+  // All optional/undefined on entries predating this ticket.
+  contextTags?: string[]; // antecedent/trigger tags
+  copingActions?: string[];
+  copingHelped?: boolean; // set once per entry when copingActions is non-empty
+  sleepHours?: number;
+  sleepQuality?: 1 | 2 | 3; // poor/ok/good
+  isPositiveEvent?: boolean; // detail lives in `note`
+
+  // Carried over as-is from EmotionLog, optional, untouched by this ticket —
+  // populated once the storage migration (issue #66) is designed.
+  emotionId?: string;
+  emotionLabel?: string;
+  primaryEmotion?: string;
+  bodyRegions?: string[];
 }
 
 export interface EmotionLog {
