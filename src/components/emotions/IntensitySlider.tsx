@@ -31,14 +31,22 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
 
   // PanResponder.create passes startX (a ref) into callbacks — these callbacks
   // only run in event handlers (grant/move/release), never during render.
+  //
+  // panHandlers live on the whole track (see below), not just the 28px thumb —
+  // a touch target that small was the main source of "finnicky" drags. Grant
+  // also jumps straight to the touched position (tap-to-set), like a native
+  // slider, instead of requiring the user to land exactly on the thumb first.
   const panResponder = useMemo(
     () =>
       // eslint-disable-next-line react-hooks/refs
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: () => {
-          startX.current = thumbX.value;
+        onPanResponderGrant: (evt) => {
+          const touchX = Math.max(0, Math.min(evt.nativeEvent.locationX, trackWidth));
+          startX.current = touchX;
+          thumbX.value = touchX;
+          onChange(toValue(touchX));
         },
         onPanResponderMove: (_, gestureState) => {
           const newX = Math.max(0, Math.min(startX.current + gestureState.dx, trackWidth));
@@ -67,6 +75,7 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
         style={styles.track}
         accessibilityRole="adjustable"
         accessibilityValue={{ min: 1, max: 10, now: value }}
+        hitSlop={{ top: 12, bottom: 12 }}
         onLayout={e => {
           const w = e.nativeEvent.layout.width;
           if (w > 0 && w !== trackWidth) {
@@ -77,12 +86,12 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
             thumbX.value = toX(value);
           }
         }}
+        {...panResponder.panHandlers}
       >
         <View style={[styles.trackBg, { backgroundColor: colors.backgroundElement }]} />
         <Animated.View style={[styles.trackFill, { backgroundColor: color }, fillStyle]} />
         <Animated.View
           style={[styles.thumb, { backgroundColor: color, borderColor: '#fff' }, thumbStyle]}
-          {...panResponder.panHandlers}
         >
           <Text style={styles.thumbLabel}>{value}</Text>
         </Animated.View>
@@ -97,7 +106,9 @@ export function IntensitySlider({ value, onChange, color, lowLabel = 'mild', hig
 
 const styles = StyleSheet.create({
   container: { gap: Spacing.two },
-  track: { height: THUMB_SIZE, justifyContent: 'center', position: 'relative' },
+  // Taller than THUMB_SIZE alone — a touch target that small was the main
+  // source of "finnicky" drags. The thumb/track stay visually centered.
+  track: { height: 44, justifyContent: 'center', position: 'relative' },
   trackBg: { height: TRACK_HEIGHT, borderRadius: BorderRadius.pill, position: 'absolute', left: 0, right: 0 },
   trackFill: { height: TRACK_HEIGHT, borderRadius: BorderRadius.pill, position: 'absolute', left: 0 },
   thumb: {
