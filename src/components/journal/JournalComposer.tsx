@@ -22,8 +22,10 @@ import { BorderRadius, Spacing } from '@/constants/theme';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { detectConcern, type ConcernType } from '@/lib/crisis-detection';
+import { detectConcern, detectPattern, shouldShowPatternNotice, type ConcernType, type PatternConcern } from '@/lib/crisis-detection';
 import type { MoodValue } from '@/types';
+
+type ModalConcernType = ConcernType | 'pattern';
 
 async function openUrl(rawUrl: string) {
   let url = rawUrl;
@@ -43,7 +45,7 @@ export function JournalComposer() {
   const t = useTranslation();
   const tj = t.journal;
   const te = t.journalExtended;
-  const { addEntry, customTags, addCustomTag } = useWellness();
+  const { addEntry, customTags, addCustomTag, entries, lastPatternNotice, recordPatternNotice } = useWellness();
 
   const templateLabel = useCallback((id: string) => {
     const key = TEMPLATE_LABEL_KEYS[id as keyof typeof TEMPLATE_LABEL_KEYS];
@@ -56,7 +58,8 @@ export function JournalComposer() {
   const [mood, setMood] = useState<MoodValue | null>(null);
   const [note, setNote] = useState('');
   const [savedAnim, setSavedAnim] = useState(false);
-  const [concernType, setConcernType] = useState<ConcernType | null>(null);
+  const [concernType, setConcernType] = useState<ModalConcernType | null>(null);
+  const [patternConcern, setPatternConcern] = useState<PatternConcern | null>(null);
   const [pendingSave, setPendingSave] = useState<{ mood: MoodValue; note: string } | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<typeof JOURNAL_TEMPLATES[number]>(JOURNAL_TEMPLATES[0]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -77,9 +80,20 @@ export function JournalComposer() {
     if (concern) {
       setPendingSave({ mood, note });
       setConcernType(concern);
-    } else {
-      doSave(mood, note);
+      return;
     }
+    // Per-save keyword hits (crisis/trauma) already covered above, so this
+    // entry itself can never be the one completing a pattern below — only
+    // its already-saved history can.
+    const now = new Date();
+    const pattern = detectPattern(entries, now, tj.crisisKeywords, tj.traumaKeywords);
+    if (pattern && shouldShowPatternNotice(pattern, lastPatternNotice, now)) {
+      setPendingSave({ mood, note });
+      setPatternConcern(pattern);
+      setConcernType('pattern');
+      return;
+    }
+    doSave(mood, note);
   }
 
   function doSave(m: MoodValue, n: string) {
@@ -100,16 +114,20 @@ export function JournalComposer() {
     }, 1600);
   }
 
-  function handleCrisisConfirm() {
+  function resolveConcernModal() {
+    if (concernType === 'pattern' && patternConcern) recordPatternNotice(patternConcern);
     setConcernType(null);
+    setPatternConcern(null);
     if (pendingSave) doSave(pendingSave.mood, pendingSave.note);
     setPendingSave(null);
   }
 
+  function handleCrisisConfirm() {
+    resolveConcernModal();
+  }
+
   function handleCrisisSave() {
-    setConcernType(null);
-    if (pendingSave) doSave(pendingSave.mood, pendingSave.note);
-    setPendingSave(null);
+    resolveConcernModal();
   }
 
   function toggleTag(tag: string) {
@@ -140,6 +158,7 @@ export function JournalComposer() {
 
   const concernNotice = concernType === 'crisis' ? tj.crisis
     : concernType === 'trauma' ? tj.traumaNotice
+    : concernType === 'pattern' ? tj.patternNotice
     : null;
 
   return (
@@ -336,7 +355,7 @@ export function JournalComposer() {
 
       {/* ── Crisis / trauma-notice modal ── */}
       {concernNotice && (
-        <Modal visible transparent animationType="fade" onRequestClose={() => { setConcernType(null); setPendingSave(null); }}>
+        <Modal visible transparent animationType="fade" onRequestClose={() => { setConcernType(null); setPatternConcern(null); setPendingSave(null); }}>
           <View style={styles.modalOverlay}>
             <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
               <Text style={[styles.crisisTitle, { color: colors.text }]}>{concernNotice.title}</Text>

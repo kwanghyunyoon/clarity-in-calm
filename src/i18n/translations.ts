@@ -1318,6 +1318,66 @@ export const SOURCE = {
         hi: 'फिर भी मेरी प्रविष्टि सहेजें',
       },
     },
+    patternNotice: {
+      title: {
+        en: 'A pattern worth bringing to someone',
+        ko: '전문가와 나눠볼 만한 패턴이 보여요',
+        es: 'Un patrón que vale la pena compartir',
+        hi: 'एक पैटर्न जिसे किसी के साथ साझा करना चाहिए',
+      },
+      body: {
+        en: 'Looking back over your recent entries, something keeps showing up — not just once, but as a pattern over time. That kind of pattern is exactly the sort of thing a therapist can help with more than a journal can on its own.\n\nThis isn\'t a diagnosis — just a nudge, based on what you\'ve been writing.',
+        ko: '최근 기록들을 보니 한 번이 아니라 시간이 지나도 계속 반복되는 무언가가 보여요. 이런 패턴은 일기만으로는 다루기 어렵고, 상담사나 치료사의 도움을 받는 것이 더 도움이 될 수 있어요.\n\n이건 진단이 아니라, 그동안 쓰신 내용을 바탕으로 드리는 가벼운 안내예요.',
+        es: 'Al revisar tus entradas recientes, algo sigue apareciendo — no solo una vez, sino como un patrón a lo largo del tiempo. Ese tipo de patrón es justo lo que un terapeuta puede ayudarte a trabajar mejor que un diario por sí solo.\n\nEsto no es un diagnóstico, solo un aviso basado en lo que has estado escribiendo.',
+        hi: 'आपकी हाल की प्रविष्टियों को देखने पर, कुछ बार-बार सामने आ रहा है — सिर्फ एक बार नहीं, बल्कि समय के साथ एक पैटर्न के रूप में। इस तरह का पैटर्न वही है जिसमें एक थेरेपिस्ट अकेले जर्नल से कहीं ज़्यादा मदद कर सकता है।\n\nयह निदान नहीं है — बस आपने जो लिखा है, उसके आधार पर एक सुझाव है।',
+      },
+      lines: {
+        en: [
+          {
+            emoji: '🌍',
+            title: 'Find support',
+            sub: 'findahelpline.com · Referrals worldwide',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        ko: [
+          {
+            emoji: '🌍',
+            title: '도움 찾기',
+            sub: 'findahelpline.com · 전 세계 상담 연계',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        es: [
+          {
+            emoji: '🌍',
+            title: 'Buscar apoyo',
+            sub: 'findahelpline.com · Recursos en todo el mundo',
+            action: 'https://findahelpline.com',
+          },
+        ],
+        hi: [
+          {
+            emoji: '🌍',
+            title: 'सहायता खोजें',
+            sub: 'findahelpline.com · दुनिया भर के संसाधन',
+            action: 'https://findahelpline.com',
+          },
+        ],
+      },
+      confirmBtn: {
+        en: 'I\'ll bring this to someone',
+        ko: '이 내용을 전문가와 나눠보겠습니다',
+        es: 'Compartiré esto con alguien',
+        hi: 'मैं इसे किसी के साथ साझा करूँगा / करूँगी',
+      },
+      saveBtn: {
+        en: 'Save my entry anyway',
+        ko: '그래도 저장하기',
+        es: 'Guardar mi entrada de todas formas',
+        hi: 'फिर भी मेरी प्रविष्टि सहेजें',
+      },
+    },
     crisisKeywords: {
       suicidalIdeation: {
         en: [

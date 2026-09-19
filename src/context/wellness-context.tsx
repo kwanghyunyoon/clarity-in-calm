@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useState } from 'react';
 import { DataKeySpec } from '@/lib/data-keys';
 import { toLocalDateStr } from '@/lib/date-utils';
+import { PatternConcern, PatternNoticeRecord } from '@/lib/crisis-detection';
 import { usePersistedState } from '@/lib/use-persisted-state';
 import { JournalEntry, MoodValue } from '@/types';
 
@@ -22,6 +23,8 @@ interface WellnessContextType {
   saveError: boolean;
   clearSaveError: () => void;
   reload: () => Promise<void>;
+  lastPatternNotice: PatternNoticeRecord | null;
+  recordPatternNotice: (concern: PatternConcern) => void;
 }
 
 const WellnessContext = createContext<WellnessContextType | null>(null);
@@ -30,12 +33,14 @@ const STORAGE_KEY_ENTRIES  = 'wellness_entries_v2';
 const STORAGE_KEY_ENTRIES_LEGACY = 'wellness_entries_v1';
 const STORAGE_KEY_SESSIONS = 'wellness_sessions_v1';
 const STORAGE_KEY_TAGS     = 'wellness_custom_tags_v1';
+const STORAGE_KEY_PATTERN_NOTICE = 'wellness_pattern_notice_v1';
 
 export const WELLNESS_DATA_KEYS: DataKeySpec[] = [
   STORAGE_KEY_ENTRIES,
   STORAGE_KEY_ENTRIES_LEGACY,
   STORAGE_KEY_SESSIONS,
   STORAGE_KEY_TAGS,
+  STORAGE_KEY_PATTERN_NOTICE,
 ].map(key => ({ key, backend: 'secure' }));
 
 /** Counts journal entries in a raw data-registry dump (e.g. a decrypted
@@ -69,12 +74,19 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
     STORAGE_KEY_SESSIONS, 0, { onSaveResult },
   );
   const [customTags, setCustomTags, tagsLoaded, reloadTags] = usePersistedState<string[]>(STORAGE_KEY_TAGS, []);
+  const [lastPatternNotice, setLastPatternNotice, patternNoticeLoaded, reloadPatternNotice] =
+    usePersistedState<PatternNoticeRecord | null>(STORAGE_KEY_PATTERN_NOTICE, null, { onSaveResult });
 
-  const isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded;
+  const isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded && patternNoticeLoaded;
 
   const reload = useCallback(async () => {
-    await Promise.all([reloadEntries(), reloadSessions(), reloadTags()]);
-  }, [reloadEntries, reloadSessions, reloadTags]);
+    await Promise.all([reloadEntries(), reloadSessions(), reloadTags(), reloadPatternNotice()]);
+  }, [reloadEntries, reloadSessions, reloadTags, reloadPatternNotice]);
+
+  const recordPatternNotice = useCallback((concern: PatternConcern) => {
+    if (!isLoaded) return;
+    setLastPatternNotice({ ...concern, shownAt: new Date().toISOString() });
+  }, [isLoaded, setLastPatternNotice]);
 
   const addEntry = useCallback((
     mood: MoodValue,
@@ -127,6 +139,7 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
       customTags, addCustomTag,
       todayMood, breathingSessions, addBreathingSession,
       entriesThisMonth, isLoaded, saveError, clearSaveError, reload,
+      lastPatternNotice, recordPatternNotice,
     }}>
       {children}
     </WellnessContext.Provider>
