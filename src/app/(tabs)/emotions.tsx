@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -21,13 +22,23 @@ import { EmotionPillSelector, SelectedEmotion } from '@/components/emotions/Emot
 import { IntensitySlider } from '@/components/emotions/IntensitySlider';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
+import { SpotlightRect, TourOverlay } from '@/components/tour/TourOverlay';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { EMOTIONS_TOUR } from '@/constants/tour-keys';
 import { useWellness } from '@/context/wellness-context';
+import { useScreenTour } from '@/hooks/use-screen-tour';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { filterEmotionEntries } from '@/lib/insights-analytics';
 import { MoodValue } from '@/types';
+
+// Only 'picker' has a real anchor visible before a selection is made — every
+// other section (intensity/context/note/save) only mounts once the user
+// picks an emotion, so instead of a run of anchorless centered-dialogue
+// steps (one per section), they're collapsed into a single 'more' step.
+const EMOTIONS_TOUR_STEP_IDS = ['picker', 'more'] as const;
+const MEASURE_SETTLE_MS = 350;
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -58,6 +69,38 @@ export default function EmotionsScreen() {
 
   const accentColor = selectedEmotion?.color ?? colors.primary;
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
+
+  const pickerRef = useRef<View>(null);
+
+  const { visible: tourVisible, step: tourStep, totalSteps: tourTotalSteps, next: tourNext, skip: tourSkip } = useScreenTour({
+    tourId: EMOTIONS_TOUR.tourId,
+    storageKey: EMOTIONS_TOUR.storageKey,
+    stepIds: EMOTIONS_TOUR_STEP_IDS,
+  });
+
+  const [tourSpotlight, setTourSpotlight] = useState<SpotlightRect | null>(null);
+  const [tourFocused, setTourFocused] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTourFocused(true);
+      return () => setTourFocused(false);
+    }, []),
+  );
+
+  useEffect(() => {
+    if (!tourVisible || tourStep.id !== 'picker') return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      pickerRef.current?.measureInWindow((x, y, width, height) => {
+        if (!cancelled) setTourSpotlight({ x, y, width, height });
+      });
+    }, MEASURE_SETTLE_MS);
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [tourVisible, tourStep.id]);
+
+  const tourStepCopy = t.tour.emotions.steps[tourStep.index];
 
   function toggleTag(tag: string) {
     setContextTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
@@ -128,7 +171,7 @@ export default function EmotionsScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* ── Wheel ── */}
-          <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.wheelSection}>
+          <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.wheelSection} ref={pickerRef}>
             {!selectedEmotion && (
               <Text style={[styles.wheelPrompt, { color: colors.textSecondary }]}>
                 {te.selectEmotion}
@@ -309,6 +352,21 @@ export default function EmotionsScreen() {
           )}
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <TourOverlay
+        visible={tourVisible && tourFocused}
+        spotlight={tourStep.id === 'picker' ? tourSpotlight : null}
+        title={tourStepCopy.title}
+        body={tourStepCopy.body}
+        stepIndex={tourStep.index}
+        totalSteps={tourTotalSteps}
+        isLast={tourStep.isLast}
+        skipLabel={t.tour.common.skip}
+        nextLabel={t.tour.common.next}
+        doneLabel={t.tour.common.done}
+        onNext={tourNext}
+        onSkip={tourSkip}
+      />
     </Screen>
   );
 }

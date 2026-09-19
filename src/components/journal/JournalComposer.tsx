@@ -27,6 +27,13 @@ import type { MoodValue } from '@/types';
 
 type ModalConcernType = ConcernType | 'pattern';
 
+interface JournalComposerProps {
+  /** Anchor refs for the Journal tour's spotlight steps (all optional). */
+  templatesRef?: React.RefObject<View | null>;
+  noteInputRef?: React.RefObject<View | null>;
+  saveBtnRef?: React.RefObject<View | null>;
+}
+
 async function openUrl(rawUrl: string) {
   let url = rawUrl;
   if (Platform.OS === 'android' && url.startsWith('sms:') && url.includes('?')) {
@@ -40,7 +47,7 @@ async function openUrl(rawUrl: string) {
   }
 }
 
-export function JournalComposer() {
+export function JournalComposer({ templatesRef, noteInputRef, saveBtnRef }: JournalComposerProps) {
   const { colors } = useTheme();
   const t = useTranslation();
   const tj = t.journal;
@@ -168,7 +175,7 @@ export function JournalComposer() {
        * gap never reaches these blocks. They own their own vertical rhythm. */}
       <View style={styles.blocks}>
         {/* ── Template selector ── */}
-        <View style={styles.section}>
+        <View style={styles.section} ref={templatesRef}>
           <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{te.templates}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.templateRow}>
             {JOURNAL_TEMPLATES.map(tmpl => {
@@ -240,7 +247,7 @@ export function JournalComposer() {
         </View>
 
         {/* ── Note input ── */}
-        <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]} ref={noteInputRef}>
           <TextInput
             style={[styles.input, { color: colors.text }]}
             placeholder={placeholder}
@@ -327,23 +334,25 @@ export function JournalComposer() {
         </View>
 
         {/* ── Save button ── */}
-        <AnimatedPressable
-          onPress={handleSaveAttempt}
-          disabled={!mood || savedAnim}
-          style={[
-            styles.saveBtn,
-            {
-              backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
-              opacity: mood ? 1 : 0.5,
-            },
-          ]}
-          accessibilityRole="button"
-          accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
-        >
-          <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
-            {savedAnim ? tj.savedBtn : tj.saveBtn}
-          </Text>
-        </AnimatedPressable>
+        <View ref={saveBtnRef}>
+          <AnimatedPressable
+            onPress={handleSaveAttempt}
+            disabled={!mood || savedAnim}
+            style={[
+              styles.saveBtn,
+              {
+                backgroundColor: savedAnim ? colors.accent : mood ? colors.primary : colors.backgroundElement,
+                opacity: mood ? 1 : 0.5,
+              },
+            ]}
+            accessibilityRole="button"
+            accessibilityLabel={savedAnim ? tj.savedBtn : tj.saveBtn}
+          >
+            <Text style={[styles.saveBtnText, { color: mood ? '#fff' : colors.textSecondary }]}>
+              {savedAnim ? tj.savedBtn : tj.saveBtn}
+            </Text>
+          </AnimatedPressable>
+        </View>
       </View>
 
       {/* ── Future Self date picker ── */}

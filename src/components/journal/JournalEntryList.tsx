@@ -31,9 +31,12 @@ function formatTimestamp(iso: string) {
 
 interface JournalEntryListProps {
   header: ReactNode;
+  /** Anchor refs for the Journal tour's spotlight steps (both optional). */
+  listRef?: React.RefObject<FlatList | null>;
+  pastSectionRef?: React.RefObject<View | null>;
 }
 
-export function JournalEntryList({ header }: JournalEntryListProps) {
+export function JournalEntryList({ header, listRef, pastSectionRef }: JournalEntryListProps) {
   const { colors } = useTheme();
   const t = useTranslation();
   const tj = t.journal;
@@ -160,7 +163,7 @@ export function JournalEntryList({ header }: JournalEntryListProps) {
       {header}
 
       {/* ── Search ── */}
-      <View style={styles.section}>
+      <View style={styles.section} ref={pastSectionRef}>
         <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{tj.pastTitle}</Text>
         <View style={[styles.searchBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
           <Ionicons name="search-outline" size={14} color={colors.textSecondary} accessibilityLabel="Search" />
@@ -202,6 +205,7 @@ export function JournalEntryList({ header }: JournalEntryListProps) {
 
   return (
     <FlatList
+      ref={listRef}
       style={styles.scroll}
       contentContainerStyle={[styles.content, { paddingBottom: bottomPad }]}
       showsVerticalScrollIndicator={false}

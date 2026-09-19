@@ -501,6 +501,242 @@ export const SOURCE = {
       hi: 'पहले से बैकअप है? उसे पुनर्स्थापित करें',
     },
   },
+  tour: {
+    common: {
+      skip: {
+        en: 'Skip',
+        ko: '건너뛰기',
+        es: 'Omitir',
+        hi: 'छोड़ें',
+      },
+      next: {
+        en: 'Next',
+        ko: '다음',
+        es: 'Siguiente',
+        hi: 'अगला',
+      },
+      done: {
+        en: 'Got it',
+        ko: '확인했어요',
+        es: 'Entendido',
+        hi: 'समझ गया',
+      },
+    },
+    journal: {
+      replay: {
+        en: 'Replay Journal tour',
+        ko: '일기 화면 둘러보기 다시 보기',
+        es: 'Repetir el recorrido del Diario',
+        hi: 'जर्नल टूर फिर से देखें',
+      },
+      steps: {
+        en: [
+          {
+            title: 'Start with a template',
+            body: "Pick a template like Free write or Gratitude to guide your entry, or skip straight to writing.",
+          },
+          {
+            title: 'Write freely',
+            body: "Type whatever's on your mind. Your words stay private on this device.",
+          },
+          {
+            title: 'Save your entry',
+            body: "Tap Save when you're done — you can edit or delete it anytime.",
+          },
+          {
+            title: 'Your past entries',
+            body: "Scroll down to revisit anything you've written before.",
+          },
+        ],
+        ko: [
+          {
+            title: '템플릿으로 시작하기',
+            body: '자유 쓰기나 감사 같은 템플릿을 선택해 일기를 시작하거나, 바로 작성으로 넘어가세요.',
+          },
+          {
+            title: '자유롭게 쓰기',
+            body: '떠오르는 대로 적어보세요. 작성한 내용은 이 기기에만 안전하게 저장돼요.',
+          },
+          {
+            title: '일기 저장하기',
+            body: '작성이 끝나면 저장을 눌러주세요 — 언제든지 수정하거나 삭제할 수 있어요.',
+          },
+          {
+            title: '지난 일기 보기',
+            body: '아래로 스크롤하면 예전에 쓴 일기를 다시 볼 수 있어요.',
+          },
+        ],
+        es: [
+          {
+            title: 'Empieza con una plantilla',
+            body: 'Elige una plantilla como Escritura libre o Gratitud para guiar tu entrada, o pasa directo a escribir.',
+          },
+          {
+            title: 'Escribe libremente',
+            body: 'Escribe lo que tengas en mente. Tus palabras permanecen privadas en este dispositivo.',
+          },
+          {
+            title: 'Guarda tu entrada',
+            body: 'Toca Guardar cuando termines — puedes editarla o eliminarla cuando quieras.',
+          },
+          {
+            title: 'Tus entradas anteriores',
+            body: 'Desplázate hacia abajo para volver a ver lo que has escrito antes.',
+          },
+        ],
+        hi: [
+          {
+            title: 'किसी टेम्पलेट से शुरू करें',
+            body: 'अपनी एंट्री के लिए फ्री राइट या ग्रेटिट्यूड जैसा कोई टेम्पलेट चुनें, या सीधे लिखना शुरू करें।',
+          },
+          {
+            title: 'बेझिझक लिखें',
+            body: 'जो भी मन में आए लिखें। आपके शब्द इसी डिवाइस पर निजी रहते हैं।',
+          },
+          {
+            title: 'अपनी एंट्री सेव करें',
+            body: 'पूरा होने पर सेव पर टैप करें — आप इसे कभी भी बदल या हटा सकते हैं।',
+          },
+          {
+            title: 'आपकी पुरानी एंट्रियाँ',
+            body: 'पहले लिखी गई किसी भी एंट्री को फिर देखने के लिए नीचे स्क्रॉल करें।',
+          },
+        ],
+      },
+    },
+    emotions: {
+      replay: {
+        en: 'Replay Emotions tour',
+        ko: '감정 화면 둘러보기 다시 보기',
+        es: 'Repetir el recorrido de Emociones',
+        hi: 'इमोशन टूर फिर से देखें',
+      },
+      steps: {
+        en: [
+          {
+            title: 'Name what you feel',
+            body: 'Tap one of the 7 core emotions, or add your own.',
+          },
+          {
+            title: "There's more once you pick a feeling",
+            body: "A slider for how strong it is, tags for context and body sensations, coping actions, and a note — all appear below, ready to save.",
+          },
+        ],
+        ko: [
+          {
+            title: '느끼는 감정에 이름 붙이기',
+            body: '7가지 기본 감정 중 하나를 탭하거나, 직접 입력해보세요.',
+          },
+          {
+            title: '감정을 선택하면 더 많은 항목이 나타나요',
+            body: '강도 슬라이더, 맥락 태그와 몸의 감각, 대처 행동, 메모까지 — 모두 아래에 나타나고 바로 저장할 수 있어요.',
+          },
+        ],
+        es: [
+          {
+            title: 'Nombra lo que sientes',
+            body: 'Toca una de las 7 emociones básicas, o añade la tuya propia.',
+          },
+          {
+            title: 'Aparece más al elegir una emoción',
+            body: 'Un control de intensidad, etiquetas de contexto y sensaciones corporales, acciones de afrontamiento y una nota — todo aparece abajo, listo para guardar.',
+          },
+        ],
+        hi: [
+          {
+            title: 'अपनी भावना को नाम दें',
+            body: '7 मुख्य भावनाओं में से किसी एक पर टैप करें, या अपनी खुद की भावना जोड़ें।',
+          },
+          {
+            title: 'भावना चुनते ही और भी विकल्प दिखेंगे',
+            body: 'तीव्रता का स्लाइडर, संदर्भ और शरीर की संवेदनाओं के टैग, कोपिंग एक्शन, और एक नोट — सब कुछ नीचे दिखेगा, सेव करने के लिए तैयार।',
+          },
+        ],
+      },
+    },
+    insights: {
+      replay: {
+        en: 'Replay Insights tour',
+        ko: '인사이트 화면 둘러보기 다시 보기',
+        es: 'Repetir el recorrido de Información',
+        hi: 'इनसाइट्स टूर फिर से देखें',
+      },
+      steps: {
+        en: [
+          {
+            title: 'Your numbers at a glance',
+            body: "See how many entries, emotion logs, and check-ins you've made this month.",
+          },
+          {
+            title: '7-day mood trend',
+            body: 'Track how your mood has moved over the past week.',
+          },
+          {
+            title: 'Patterns emerge',
+            body: 'See your mood distribution and what time of day you tend to check in.',
+          },
+          {
+            title: "What's driving it",
+            body: 'Your most common context tags show up here, so you can spot what tends to affect you.',
+          },
+        ],
+        ko: [
+          {
+            title: '한눈에 보는 수치',
+            body: '이번 달에 기록한 항목 수, 감정 기록, 체크인 횟수를 확인해보세요.',
+          },
+          {
+            title: '7일간 기분 추이',
+            body: '지난 한 주 동안 기분이 어떻게 변했는지 살펴보세요.',
+          },
+          {
+            title: '패턴 발견하기',
+            body: '기분 분포와 주로 어느 시간대에 체크인하는지 확인해보세요.',
+          },
+          {
+            title: '영향을 주는 요인',
+            body: '가장 자주 등장하는 맥락 태그가 여기 표시돼요 — 나에게 영향을 주는 요인을 발견해보세요.',
+          },
+        ],
+        es: [
+          {
+            title: 'Tus números de un vistazo',
+            body: 'Mira cuántas entradas, registros de emociones y check-ins has hecho este mes.',
+          },
+          {
+            title: 'Tendencia de ánimo de 7 días',
+            body: 'Sigue cómo se ha movido tu ánimo durante la última semana.',
+          },
+          {
+            title: 'Aparecen patrones',
+            body: 'Mira la distribución de tu ánimo y en qué momento del día sueles registrar tus check-ins.',
+          },
+          {
+            title: 'Qué lo está causando',
+            body: 'Tus etiquetas de contexto más comunes aparecen aquí, para que detectes qué suele afectarte.',
+          },
+        ],
+        hi: [
+          {
+            title: 'एक नज़र में आपके आंकड़े',
+            body: 'देखें कि इस महीने आपने कितनी एंट्रियाँ, इमोशन लॉग और चेक-इन किए हैं।',
+          },
+          {
+            title: '7-दिन का मूड ट्रेंड',
+            body: 'पिछले एक हफ्ते में आपका मूड कैसे बदला है, इसे ट्रैक करें।',
+          },
+          {
+            title: 'पैटर्न सामने आते हैं',
+            body: 'अपना मूड डिस्ट्रिब्यूशन देखें और यह भी कि आप दिन के किस समय ज़्यादा चेक-इन करते हैं।',
+          },
+          {
+            title: 'इसकी वजह क्या है',
+            body: 'आपके सबसे आम संदर्भ टैग यहाँ दिखते हैं, ताकि आप देख सकें कि आपको आमतौर पर क्या प्रभावित करता है।',
+          },
+        ],
+      },
+    },
+  },
   home: {
     greeting: {
       morning: {

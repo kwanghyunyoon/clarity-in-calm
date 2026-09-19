@@ -32,3 +32,20 @@ backend/account system or data, versus just looking related. Resolved via `/gril
 #29: the trio stays three fully independent apps/backends (no SSO, no cross-app data access),
 connected only by lightweight cross-promotion (store-listing links), no deep-linking. See
 [ADR-0002](docs/adr/0002-trio-app-connections.md).
+
+### Screen tour vs. Onboarding
+
+Two distinct first-run explainer concepts that must not be folded into one flag or flow
+(resolved via `/grilling`, 2026-09-19):
+
+- **Onboarding** — the app-level, full-screen, blocking first-launch flow (`useOnboardingFlow`,
+  `@cic:hasSeenOnboarding`). Covers the whole app once, ever (until replayed from Settings).
+- **Screen tour** — a narrower, per-screen coach-mark/spotlight walkthrough (`useScreenTour`,
+  one `@cic:hasSeen*Tour` flag per screen) for a screen's own content — e.g. Journal, Emotions,
+  Insights. Auto-shows once per screen, independently of onboarding and of each other; each has
+  its own Settings replay row. Fires immediately the first time its screen is unseen, with no
+  gate on onboarding having just closed. A step whose anchor doesn't exist yet at tour-start
+  (content that only appears after a user action) renders as a centered dialogue with no
+  spotlight rather than being skipped — but if *most* of a screen's steps would be anchorless,
+  the tour is collapsed to fewer, denser steps instead of a run of empty-state cards (this is
+  why the Emotions tour is 2 steps, not one step per section).

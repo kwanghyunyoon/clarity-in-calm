@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
 
   ScrollView,
@@ -10,8 +11,11 @@ import {
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
+import { SpotlightRect, TourOverlay } from '@/components/tour/TourOverlay';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { INSIGHTS_TOUR } from '@/constants/tour-keys';
 import { useWellness } from '@/context/wellness-context';
+import { useScreenTour } from '@/hooks/use-screen-tour';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import {
@@ -24,6 +28,11 @@ import {
   filterEmotionEntries,
   getLast7Days,
 } from '@/lib/insights-analytics';
+
+// Deferred until there's at least one entry to spotlight — this screen has
+// no anchors at all on its empty state.
+const INSIGHTS_TOUR_STEP_IDS = ['stats', 'chart', 'breakdown', 'triggers'] as const;
+const MEASURE_SETTLE_MS = 350;
 
 export default function InsightsScreen() {
   const { colors } = useTheme();
@@ -63,6 +72,49 @@ export default function InsightsScreen() {
   const moodDist = useMemo(() => computeMoodDistribution(entries), [entries]);
 
   const moods = t.moods;
+
+  const statsRef = useRef<View>(null);
+  const chartRef = useRef<View>(null);
+  const breakdownRef = useRef<View>(null);
+  const triggersRef = useRef<View>(null);
+  const insightsAnchorRefs = { stats: statsRef, chart: chartRef, breakdown: breakdownRef, triggers: triggersRef };
+
+  const { visible: tourVisible, step: tourStep, totalSteps: tourTotalSteps, next: tourNext, skip: tourSkip } = useScreenTour({
+    tourId: INSIGHTS_TOUR.tourId,
+    storageKey: INSIGHTS_TOUR.storageKey,
+    stepIds: INSIGHTS_TOUR_STEP_IDS,
+    ready: entries.length > 0,
+  });
+
+  const [tourSpotlight, setTourSpotlight] = useState<SpotlightRect | null>(null);
+  const [tourFocused, setTourFocused] = useState(true);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTourFocused(true);
+      return () => setTourFocused(false);
+    }, []),
+  );
+
+  useEffect(() => {
+    if (!tourVisible) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      if (cancelled) return;
+      const node = insightsAnchorRefs[tourStep.id as keyof typeof insightsAnchorRefs]?.current;
+      if (node) {
+        node.measureInWindow((x, y, width, height) => {
+          if (!cancelled) setTourSpotlight({ x, y, width, height });
+        });
+      } else {
+        setTourSpotlight(null);
+      }
+    }, MEASURE_SETTLE_MS);
+    return () => { cancelled = true; clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tourVisible, tourStep.id]);
+
+  const tourStepCopy = t.tour.insights.steps[tourStep.index];
 
   // Time-of-day icons
   const timeIcons: Record<string, React.ComponentProps<typeof Ionicons>['name']> = {
@@ -106,7 +158,7 @@ export default function InsightsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Monthly summary cards ── */}
-        <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.statsGrid}>
+        <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.statsGrid} ref={statsRef}>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.statNum, { color: colors.primary }]}>{entries.length}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEntries}</Text>
@@ -139,7 +191,7 @@ export default function InsightsScreen() {
         )}
 
         {/* ── 7-day mood chart ── */}
-        <Animated.View entering={FadeInDown.delay(130).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <Animated.View entering={FadeInDown.delay(130).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]} ref={chartRef}>
           <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>{ti.last7}</Text>
           <View style={styles.chart}>
             {dayMoods.map((mood, i) => {
@@ -166,7 +218,7 @@ export default function InsightsScreen() {
 
         {/* ── Mood breakdown ── */}
         {entries.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(160).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Animated.View entering={FadeInDown.delay(160).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]} ref={breakdownRef}>
             <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>{ti.moodBreakdown}</Text>
             <View style={styles.moodDist}>
               {moodDist.map((d, i) => (
@@ -225,7 +277,7 @@ export default function InsightsScreen() {
 
         {/* ── Trigger analysis ── */}
         {triggerCounts.length > 0 && (
-          <Animated.View entering={FadeInDown.delay(220).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Animated.View entering={FadeInDown.delay(220).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]} ref={triggersRef}>
             <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>{ti.triggers}</Text>
             {triggerCounts.map(([tag, count]) => {
               const pct = count / (triggerCounts[0][1] || 1);
@@ -242,6 +294,21 @@ export default function InsightsScreen() {
           </Animated.View>
         )}
       </ScrollView>
+
+      <TourOverlay
+        visible={tourVisible && tourFocused}
+        spotlight={tourSpotlight}
+        title={tourStepCopy.title}
+        body={tourStepCopy.body}
+        stepIndex={tourStep.index}
+        totalSteps={tourTotalSteps}
+        isLast={tourStep.isLast}
+        skipLabel={t.tour.common.skip}
+        nextLabel={t.tour.common.next}
+        doneLabel={t.tour.common.done}
+        onNext={tourNext}
+        onSkip={tourSkip}
+      />
     </Screen>
   );
 }

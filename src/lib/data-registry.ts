@@ -8,6 +8,8 @@
 import { SETTINGS_DATA_KEYS } from '@/context/settings-context';
 import { WELLNESS_DATA_KEYS } from '@/context/wellness-context';
 import { ONBOARDING_DATA_KEYS } from '@/hooks/use-onboarding-flow';
+import { tourDataKey } from '@/hooks/use-screen-tour';
+import { EMOTIONS_TOUR, INSIGHTS_TOUR, JOURNAL_TOUR } from '@/constants/tour-keys';
 import { DataKeySpec } from './data-keys';
 
 // wellness_emotions_v1 (formerly EMOTION_DATA_KEYS, owned by the now-removed
@@ -17,4 +19,7 @@ export const ALL_DATA_KEYS: DataKeySpec[] = [
   ...WELLNESS_DATA_KEYS,
   ...SETTINGS_DATA_KEYS,
   ...ONBOARDING_DATA_KEYS,
+  tourDataKey(JOURNAL_TOUR.storageKey),
+  tourDataKey(EMOTIONS_TOUR.storageKey),
+  tourDataKey(INSIGHTS_TOUR.storageKey),
 ];

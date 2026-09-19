@@ -7,6 +7,7 @@ import { ReminderLocaleSync } from '@/components/ReminderLocaleSync';
 import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
 import { SettingsProvider } from '@/context/settings-context';
+import { TourReplayProvider } from '@/context/tour-replay-context';
 import { WellnessProvider } from '@/context/wellness-context';
 
 // Register service worker for PWA offline support (web only)
@@ -42,20 +43,22 @@ export default function RootLayout() {
       <ThemeProvider value={scheme === 'dark' ? DarkTheme : DefaultTheme}>
         <SettingsProvider>
           <HelpProvider>
-            <LanguageProvider>
-              <WellnessProvider>
-                <PrivacyShield />
-                <ReminderLocaleSync />
-                {/* Optional sign-in: all routes are always registered. The (tabs)
-                    group is the app; (auth) is pushed from Settings; reset-password
-                    is reached via the recovery deep link. No hard auth gate. */}
-                <Stack screenOptions={{ headerShown: false }}>
-                  <Stack.Screen name="(tabs)" />
-                  <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
-                  <Stack.Screen name="reset-password" />
-                </Stack>
-              </WellnessProvider>
-            </LanguageProvider>
+            <TourReplayProvider>
+              <LanguageProvider>
+                <WellnessProvider>
+                  <PrivacyShield />
+                  <ReminderLocaleSync />
+                  {/* Optional sign-in: all routes are always registered. The (tabs)
+                      group is the app; (auth) is pushed from Settings; reset-password
+                      is reached via the recovery deep link. No hard auth gate. */}
+                  <Stack screenOptions={{ headerShown: false }}>
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
+                    <Stack.Screen name="reset-password" />
+                  </Stack>
+                </WellnessProvider>
+              </LanguageProvider>
+            </TourReplayProvider>
           </HelpProvider>
         </SettingsProvider>
       </ThemeProvider>

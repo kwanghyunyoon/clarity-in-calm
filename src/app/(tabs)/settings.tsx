@@ -22,8 +22,10 @@ import { SettingsGroup } from '@/components/ui/SettingsGroup';
 import { SettingsRow } from '@/components/ui/SettingsRow';
 import { LANGUAGES } from '@/constants/languages';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { EMOTIONS_TOUR, INSIGHTS_TOUR, JOURNAL_TOUR } from '@/constants/tour-keys';
 import { useHelp } from '@/context/help-context';
 import { useSettings } from '@/context/settings-context';
+import { useTourReplay } from '@/context/tour-replay-context';
 import { ALL_DATA_KEYS } from '@/lib/data-registry';
 import { deleteAllData } from '@/lib/data-keys';
 import {
@@ -43,6 +45,7 @@ export default function SettingsScreen() {
   const { settings, setNotificationSettings, setThemeOverride } = useSettings();
   const { locale, setLocale } = useLocale();
   const { showHelp } = useHelp();
+  const { requestRestart: requestTourRestart } = useTourReplay();
 
   const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -274,6 +277,9 @@ export default function SettingsScreen() {
         <SectionHeader label={ts.about} />
         <SettingsGroup>
           <SettingsRow label={t.onboarding.replayOnboarding} onPress={showHelp} />
+          <SettingsRow label={t.tour.journal.replay} onPress={() => { requestTourRestart(JOURNAL_TOUR.tourId); router.push('/journal'); }} />
+          <SettingsRow label={t.tour.emotions.replay} onPress={() => { requestTourRestart(EMOTIONS_TOUR.tourId); router.push('/emotions'); }} />
+          <SettingsRow label={t.tour.insights.replay} onPress={() => { requestTourRestart(INSIGHTS_TOUR.tourId); router.push('/insights'); }} />
           <SettingsRow label={ts.privacy} onPress={openPrivacy} />
           <SettingsRow label={ts.youtube} onPress={openYoutube} />
           <SettingsRow label={ts.version} value="1.0.0" />
