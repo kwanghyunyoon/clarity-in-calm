@@ -61,12 +61,17 @@ export interface AppSettings {
   lastBackupAt: string | null;
 }
 
+// Mon/Wed/Fri/Sat — a 4x/week starting cadence per journaling.pdf's guidance
+// against daily-from-day-one commitments ("the most common reason people
+// quit"). Users can still pick every day from the reminder days picker.
+export const DEFAULT_REMINDER_DAYS = [1, 3, 5, 6];
+
 export const DEFAULT_SETTINGS: AppSettings = {
   notifications: {
     enabled: false,
     hour: 20,
     minute: 0,
-    days: [0, 1, 2, 3, 4, 5, 6],
+    days: DEFAULT_REMINDER_DAYS,
   },
   lastBackupAt: null,
   themeOverride: 'system',

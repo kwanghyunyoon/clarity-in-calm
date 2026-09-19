@@ -20,7 +20,7 @@ export function ReminderLocaleSync() {
   const { locale } = useLocale();
   const t = useTranslation();
   const { settings, isLoaded } = useSettings();
-  const { enabled, hour, minute } = settings.notifications;
+  const { enabled, hour, minute, days } = settings.notifications;
 
   // Skip the first run after load: those reminders were already scheduled in
   // this locale, and rescheduling on every launch is needless work.
@@ -35,8 +35,8 @@ export function ReminderLocaleSync() {
     if (lastLocale.current === locale) return;
     lastLocale.current = locale;
 
-    scheduleDailyReminder(hour, minute, t.dailyContent.reminderTitle, t.dailyContent.reminderBodies);
-  }, [locale, isLoaded, enabled, hour, minute, t]);
+    scheduleDailyReminder(hour, minute, t.dailyContent.reminderTitle, t.dailyContent.reminderBodies, days);
+  }, [locale, isLoaded, enabled, hour, minute, days, t]);
 
   return null;
 }

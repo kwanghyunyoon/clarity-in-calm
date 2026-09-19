@@ -294,7 +294,7 @@ export const SOURCE = {
         {
           emoji: '⚙️',
           title: 'Make It Yours',
-          body: 'The Settings tab lets you set reminders, switch language, adjust the theme, and manage your data — all in one place.',
+          body: 'The Settings tab lets you set reminders, switch language, adjust the theme, and manage your data — all in one place. A few check-ins a week is plenty to start; daily is fine once it feels sustainable.',
         },
         {
           emoji: '🛡️',
@@ -331,7 +331,7 @@ export const SOURCE = {
         {
           emoji: '⚙️',
           title: '나에게 맞게 설정하기',
-          body: '설정 탭에서 알림, 언어, 테마를 조정하고 데이터를 관리할 수 있어요 — 모두 한곳에서.',
+          body: '설정 탭에서 알림, 언어, 테마를 조정하고 데이터를 관리할 수 있어요 — 모두 한곳에서. 처음에는 일주일에 몇 번만 기록해도 충분해요 — 습관이 자리 잡으면 매일 써도 좋아요.',
         },
         {
           emoji: '🛡️',
@@ -368,7 +368,7 @@ export const SOURCE = {
         {
           emoji: '⚙️',
           title: 'Hazlo tuyo',
-          body: 'La pestaña Ajustes te permite configurar recordatorios, cambiar el idioma, ajustar el tema y gestionar tus datos — todo en un solo lugar.',
+          body: 'La pestaña Ajustes te permite configurar recordatorios, cambiar el idioma, ajustar el tema y gestionar tus datos — todo en un solo lugar. Unas pocas veces por semana es suficiente para empezar; hazlo a diario cuando se sienta sostenible.',
         },
         {
           emoji: '🛡️',
@@ -405,7 +405,7 @@ export const SOURCE = {
         {
           emoji: '⚙️',
           title: 'इसे अपने अनुसार बनाएं',
-          body: 'सेटिंग्स टैब में आप रिमाइंडर सेट कर सकते हैं, भाषा बदल सकते हैं, थीम समायोजित कर सकते हैं, और अपना डेटा प्रबंधित कर सकते हैं — सब एक ही जगह।',
+          body: 'सेटिंग्स टैब में आप रिमाइंडर सेट कर सकते हैं, भाषा बदल सकते हैं, थीम समायोजित कर सकते हैं, और अपना डेटा प्रबंधित कर सकते हैं — सब एक ही जगह। शुरुआत में हफ्ते में कुछ बार लिखना ही काफी है — जब यह आसान लगने लगे, तब रोज़ लिखें।',
         },
         {
           emoji: '🛡️',
@@ -2373,6 +2373,18 @@ export const SOURCE = {
       ko: '요일',
       es: 'Días',
       hi: 'दिन',
+    },
+    reminderCadenceHint: {
+      en: 'A few days a week is a solid start — daily is fine once it feels sustainable.',
+      ko: '일주일에 몇 번만 기록해도 좋은 시작이에요 — 습관이 자리 잡으면 매일 써도 괜찮아요.',
+      es: 'Unos días a la semana es un buen comienzo; hazlo a diario cuando se sienta sostenible.',
+      hi: 'हफ्ते में कुछ दिन लिखना भी एक अच्छी शुरुआत है — जब यह सहज लगे, तब रोज़ लिखें।',
+    },
+    weekdayShort: {
+      en: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      ko: ['일', '월', '화', '수', '목', '금', '토'],
+      es: ['D', 'L', 'M', 'X', 'J', 'V', 'S'],
+      hi: ['र', 'सो', 'मं', 'बु', 'गु', 'शु', 'श'],
     },
     appearance: {
       en: 'Appearance',

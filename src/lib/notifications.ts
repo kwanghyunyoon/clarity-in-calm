@@ -26,30 +26,38 @@ const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
 
 const weekdayId = (weekday: number) => `${NOTIFICATION_ID_KEY}_${weekday}`;
 
+/** Converts a NotificationSettings day (0=Sun..6=Sat) to expo's weekday (1=Sun..7=Sat). */
+export const toExpoWeekday = (day: number): number => day + 1;
+
 /**
- * Schedules the daily reminder as seven weekly notifications rather than one
- * daily one, so each day can carry different copy. A single DAILY trigger
- * fixes its text at scheduling time and would repeat the same sentence every
- * morning until the user next opened Settings.
+ * Schedules the reminder as one weekly notification per selected day, so
+ * each day can carry different copy. A single DAILY trigger fixes its text
+ * at scheduling time and would repeat the same sentence every morning until
+ * the user next opened Settings.
  *
- * `bodies` must hold one entry per weekday; shorter lists wrap.
+ * `days` holds NotificationSettings-style weekdays (0=Sun..6=Sat); an empty
+ * list schedules nothing. `bodies` must hold one entry per weekday; shorter
+ * lists wrap, indexed by `days`' position so the same day always gets the
+ * same rotating body regardless of which other days are selected.
  */
 export async function scheduleDailyReminder(
   hour: number,
   minute: number,
   title: string,
   bodies: readonly string[],
+  days: readonly number[],
 ): Promise<void> {
   await cancelDailyReminder();
-  if (bodies.length === 0) return;
+  if (bodies.length === 0 || days.length === 0) return;
 
   await Promise.all(
-    WEEKDAYS.map((weekday, i) =>
-      Notifications.scheduleNotificationAsync({
+    days.map(day => {
+      const weekday = toExpoWeekday(day);
+      return Notifications.scheduleNotificationAsync({
         identifier: weekdayId(weekday),
         content: {
           title,
-          body: bodies[i % bodies.length],
+          body: bodies[day % bodies.length],
         },
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
@@ -57,8 +65,8 @@ export async function scheduleDailyReminder(
           hour,
           minute,
         },
-      }),
-    ),
+      });
+    }),
   );
 }
 

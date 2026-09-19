@@ -63,6 +63,7 @@ export default function SettingsScreen() {
         settings.notifications.minute,
         t.dailyContent.reminderTitle,
         t.dailyContent.reminderBodies,
+        settings.notifications.days,
       );
     } else {
       await cancelDailyReminder();
@@ -72,8 +73,29 @@ export default function SettingsScreen() {
 
   async function handleTimeConfirm(h: number, m: number) {
     setShowTimePicker(false);
-    await scheduleDailyReminder(h, m, t.dailyContent.reminderTitle, t.dailyContent.reminderBodies);
+    await scheduleDailyReminder(
+      h,
+      m,
+      t.dailyContent.reminderTitle,
+      t.dailyContent.reminderBodies,
+      settings.notifications.days,
+    );
     setNotificationSettings({ ...settings.notifications, hour: h, minute: m });
+  }
+
+  async function toggleReminderDay(day: number) {
+    const current = settings.notifications.days;
+    const days = current.includes(day)
+      ? current.filter(d => d !== day)
+      : [...current, day].sort((a, b) => a - b);
+    await scheduleDailyReminder(
+      settings.notifications.hour,
+      settings.notifications.minute,
+      t.dailyContent.reminderTitle,
+      t.dailyContent.reminderBodies,
+      days,
+    );
+    setNotificationSettings({ ...settings.notifications, days });
   }
 
   // ── Data ───────────────────────────────────────────────────────────────────
@@ -137,16 +159,44 @@ export default function SettingsScreen() {
             }
           />
           {notifEnabled && (
-            <SettingsRow
-              label={ts.reminderTime}
-              value={formatTime12h(
-                settings.notifications.hour,
-                settings.notifications.minute,
-                ts.timePicker.am,
-                ts.timePicker.pm,
-              )}
-              onPress={() => setShowTimePicker(true)}
-            />
+            <>
+              <SettingsRow
+                label={ts.reminderTime}
+                value={formatTime12h(
+                  settings.notifications.hour,
+                  settings.notifications.minute,
+                  ts.timePicker.am,
+                  ts.timePicker.pm,
+                )}
+                onPress={() => setShowTimePicker(true)}
+              />
+              <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                <Text style={[styles.rowLabel, { color: colors.text }]}>{ts.reminderDays}</Text>
+                <View style={styles.dayToggle}>
+                  {ts.weekdayShort.map((label, day) => {
+                    const isSelected = settings.notifications.days.includes(day);
+                    return (
+                      <TouchableOpacity
+                        key={day}
+                        onPress={() => toggleReminderDay(day)}
+                        style={[
+                          styles.dayOption,
+                          { backgroundColor: isSelected ? colors.primary : colors.backgroundElement },
+                        ]}
+                        accessibilityRole="checkbox"
+                        accessibilityState={{ checked: isSelected }}
+                        accessibilityLabel={label}
+                      >
+                        <Text style={[styles.dayOptionText, { color: isSelected ? '#fff' : colors.textSecondary }]}>
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
+              <Text style={[styles.cadenceHint, { color: colors.textSecondary }]}>{ts.reminderCadenceHint}</Text>
+            </>
           )}
         </SettingsGroup>
 
@@ -274,6 +324,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.two + 2,
   },
   themeOptionText: { fontSize: 13, fontWeight: '600' },
+  dayToggle: { flexDirection: 'row', gap: Spacing.one, flexShrink: 0 },
+  dayOption: {
+    width: 28,
+    height: 28,
+    borderRadius: BorderRadius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayOptionText: { fontSize: 12, fontWeight: '600' },
+  cadenceHint: {
+    fontSize: 12,
+    lineHeight: 16,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+  },
   langFlag: { fontSize: 20 },
   checkmark: { fontSize: 16, fontWeight: '700' },
   aboutBody: {
