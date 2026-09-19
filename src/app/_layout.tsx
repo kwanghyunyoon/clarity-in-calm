@@ -7,8 +7,10 @@ import { ReminderLocaleSync } from '@/components/ReminderLocaleSync';
 import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
 import { SettingsProvider } from '@/context/settings-context';
+import { TourOverlayProvider } from '@/context/tour-overlay-context';
 import { TourReplayProvider } from '@/context/tour-replay-context';
 import { WellnessProvider } from '@/context/wellness-context';
+import { TourOverlayHost } from '@/components/tour/TourOverlay';
 
 // Register service worker for PWA offline support (web only)
 if (Platform.OS === 'web' && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -44,20 +46,23 @@ export default function RootLayout() {
         <SettingsProvider>
           <HelpProvider>
             <TourReplayProvider>
-              <LanguageProvider>
-                <WellnessProvider>
-                  <PrivacyShield />
-                  <ReminderLocaleSync />
-                  {/* Optional sign-in: all routes are always registered. The (tabs)
-                      group is the app; (auth) is pushed from Settings; reset-password
-                      is reached via the recovery deep link. No hard auth gate. */}
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="reset-password" />
-                  </Stack>
-                </WellnessProvider>
-              </LanguageProvider>
+              <TourOverlayProvider>
+                <LanguageProvider>
+                  <WellnessProvider>
+                    <PrivacyShield />
+                    <ReminderLocaleSync />
+                    {/* Optional sign-in: all routes are always registered. The (tabs)
+                        group is the app; (auth) is pushed from Settings; reset-password
+                        is reached via the recovery deep link. No hard auth gate. */}
+                    <Stack screenOptions={{ headerShown: false }}>
+                      <Stack.Screen name="(tabs)" />
+                      <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
+                      <Stack.Screen name="reset-password" />
+                    </Stack>
+                    <TourOverlayHost />
+                  </WellnessProvider>
+                </LanguageProvider>
+              </TourOverlayProvider>
             </TourReplayProvider>
           </HelpProvider>
         </SettingsProvider>

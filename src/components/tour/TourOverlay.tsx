@@ -7,14 +7,22 @@
  * `spotlight: null` renders a centered dialogue with no cutout, for a step
  * whose anchor doesn't exist yet (e.g. content that only appears after a
  * user action) rather than skipping or blocking the tour.
+ *
+ * Rendered via a root-level portal (TourOverlayHost in _layout.tsx), not a
+ * <Modal>: a Modal opens a separate native Android window whose coordinate
+ * origin doesn't match the window the screen's measureInWindow() anchors
+ * live in, which threw the spotlight box off from the real anchor position.
+ * <TourOverlay> itself just registers its props with TourOverlayContext and
+ * renders nothing.
  */
-import React from 'react';
-import { Dimensions, Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { useTourOverlayContext } from '@/context/tour-overlay-context';
 
 // Rough floor for the card's own height (dots + 2-line title + 3-line body +
 // action row) — used only to decide which side of the spotlight has room,
@@ -29,8 +37,7 @@ export interface SpotlightRect {
   height: number;
 }
 
-interface TourOverlayProps {
-  visible: boolean;
+export interface TourOverlayViewProps {
   spotlight: SpotlightRect | null;
   title: string;
   body: string;
@@ -44,10 +51,27 @@ interface TourOverlayProps {
   onSkip: () => void;
 }
 
+interface TourOverlayProps extends TourOverlayViewProps {
+  visible: boolean;
+}
+
 const SPOTLIGHT_PAD = 8;
 
-export function TourOverlay({
-  visible,
+/** Registers this tour step's props with the root TourOverlayHost; renders nothing itself. */
+export function TourOverlay({ visible, ...rest }: TourOverlayProps) {
+  const { setOverlay } = useTourOverlayContext();
+
+  useEffect(() => {
+    setOverlay(visible ? rest : null);
+    return () => setOverlay(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, rest.spotlight, rest.title, rest.body, rest.stepIndex, rest.totalSteps, rest.isLast]);
+
+  return null;
+}
+
+/** The actual visual overlay, mounted once at the app root by TourOverlayHost. */
+export function TourOverlayView({
   spotlight,
   title,
   body,
@@ -59,12 +83,10 @@ export function TourOverlay({
   doneLabel,
   onNext,
   onSkip,
-}: TourOverlayProps) {
+}: TourOverlayViewProps) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { width: winW, height: winH } = Dimensions.get('window');
-
-  if (!visible) return null;
 
   const box = spotlight
     ? {
@@ -91,72 +113,88 @@ export function TourOverlay({
   }
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onSkip}>
-      <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
-        {box ? (
-          <>
-            <View style={[styles.dim, { backgroundColor: colors.overlay, top: 0, left: 0, right: 0, height: box.y }]} />
-            <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y + box.height, left: 0, right: 0, bottom: 0 }]} />
-            <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y, height: box.height, left: 0, width: box.x }]} />
-            <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y, height: box.height, left: box.x + box.width, right: 0 }]} />
+    <View style={StyleSheet.absoluteFill} pointerEvents="box-none">
+      {box ? (
+        <>
+          <View style={[styles.dim, { backgroundColor: colors.overlay, top: 0, left: 0, right: 0, height: box.y }]} />
+          <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y + box.height, left: 0, right: 0, bottom: 0 }]} />
+          <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y, height: box.height, left: 0, width: box.x }]} />
+          <View style={[styles.dim, { backgroundColor: colors.overlay, top: box.y, height: box.height, left: box.x + box.width, right: 0 }]} />
+          <View
+            pointerEvents="none"
+            style={[
+              styles.spotlightBorder,
+              { borderColor: colors.primary, top: box.y, left: box.x, width: box.width, height: box.height },
+            ]}
+          />
+        </>
+      ) : (
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]} />
+      )}
+
+      <Animated.View
+        key={stepIndex}
+        entering={FadeIn.duration(220)}
+        style={[
+          styles.card,
+          {
+            backgroundColor: colors.surface,
+            borderColor: colors.border,
+            maxWidth: Math.min(winW - Spacing.four * 2, 420),
+            ...cardStyle,
+          },
+        ]}
+      >
+        <View style={styles.dots}>
+          {Array.from({ length: totalSteps }).map((_, i) => (
             <View
-              pointerEvents="none"
+              key={i}
               style={[
-                styles.spotlightBorder,
-                { borderColor: colors.primary, top: box.y, left: box.x, width: box.width, height: box.height },
+                styles.dot,
+                { backgroundColor: i === stepIndex ? colors.primary : colors.border },
               ]}
             />
-          </>
-        ) : (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]} />
-        )}
+          ))}
+        </View>
+        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.body, { color: colors.textSecondary }]}>{body}</Text>
+        <View style={styles.actions}>
+          <TouchableOpacity onPress={onSkip} accessibilityRole="button" accessibilityLabel={skipLabel}>
+            <Text style={[styles.skipText, { color: colors.textSecondary }]}>{skipLabel}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={onNext}
+            accessibilityRole="button"
+            accessibilityLabel={isLast ? doneLabel : nextLabel}
+            style={[styles.nextBtn, { backgroundColor: colors.primary }]}
+          >
+            <Text style={styles.nextText}>{isLast ? doneLabel : nextLabel}</Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+    </View>
+  );
+}
 
-        <Animated.View
-          key={stepIndex}
-          entering={FadeIn.duration(220)}
-          style={[
-            styles.card,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              maxWidth: Math.min(winW - Spacing.four * 2, 420),
-              ...cardStyle,
-            },
-          ]}
-        >
-          <View style={styles.dots}>
-            {Array.from({ length: totalSteps }).map((_, i) => (
-              <View
-                key={i}
-                style={[
-                  styles.dot,
-                  { backgroundColor: i === stepIndex ? colors.primary : colors.border },
-                ]}
-              />
-            ))}
-          </View>
-          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
-          <Text style={[styles.body, { color: colors.textSecondary }]}>{body}</Text>
-          <View style={styles.actions}>
-            <TouchableOpacity onPress={onSkip} accessibilityRole="button" accessibilityLabel={skipLabel}>
-              <Text style={[styles.skipText, { color: colors.textSecondary }]}>{skipLabel}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={onNext}
-              accessibilityRole="button"
-              accessibilityLabel={isLast ? doneLabel : nextLabel}
-              style={[styles.nextBtn, { backgroundColor: colors.primary }]}
-            >
-              <Text style={styles.nextText}>{isLast ? doneLabel : nextLabel}</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </View>
-    </Modal>
+/** Mounted once at the app root (see _layout.tsx); renders whichever screen's tour is active. */
+export function TourOverlayHost() {
+  const { overlay } = useTourOverlayContext();
+
+  if (!overlay) return null;
+
+  return (
+    <View style={styles.host} pointerEvents="box-none">
+      <TourOverlayView {...overlay} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  host: {
+    ...StyleSheet.absoluteFill,
+    zIndex: 9999,
+    elevation: 9999,
+  },
   dim: { position: 'absolute' },
   spotlightBorder: {
     position: 'absolute',
