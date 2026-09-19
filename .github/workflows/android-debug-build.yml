@@ -25,14 +25,18 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # android/ is gitignored and regenerated from app.config.js — no
-      # local gradle.properties RAM/ABI overrides to reapply here, this
-      # runner has plenty of memory for all 4 ABIs.
+      # android/ is gitignored and regenerated from app.config.js.
       - run: npx expo prebuild --platform android --no-install
 
+      # ubuntu-latest has ~14GB free disk after the preinstalled toolchains
+      # (Android SDK/NDK, .NET, Haskell, etc.) eat their share. Compiling the
+      # new-arch native C++ modules for all 4 ABIs (arm64-v8a, armeabi-v7a,
+      # x86, x86_64) in one run exhausted it — a first attempt died 49
+      # minutes in with "No space left on device". arm64-v8a alone covers
+      # every real device this gets installed on for verification.
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: ./gradlew assembleDebug --no-daemon -PreactNativeArchitectures=arm64-v8a
 
       - uses: actions/upload-artifact@v4
         with:
