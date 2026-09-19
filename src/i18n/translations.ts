@@ -2548,6 +2548,38 @@ export const SOURCE = {
         hi: 'कुछ गड़बड़ हो गई।',
       },
     },
+    moreFromUs: {
+      header: {
+        en: 'More from us',
+        ko: '저희 앱 더보기',
+        es: 'Más de nosotros',
+        hi: 'हमारे और ऐप्स',
+      },
+      dreamiName: {
+        en: 'Dreami',
+        ko: 'Dreami',
+        es: 'Dreami',
+        hi: 'Dreami',
+      },
+      dreamiTagline: {
+        en: 'Dream journaling & sleep insights',
+        ko: '꿈 일기와 수면 인사이트',
+        es: 'Diario de sueños e información del sueño',
+        hi: 'स्वप्न डायरी और नींद की जानकारी',
+      },
+      clarityAIName: {
+        en: 'ClarityAI',
+        ko: 'ClarityAI',
+        es: 'ClarityAI',
+        hi: 'ClarityAI',
+      },
+      clarityAITagline: {
+        en: 'AI-powered reflection companion',
+        ko: 'AI 기반 성찰 동반자',
+        es: 'Compañero de reflexión con IA',
+        hi: 'एआई-संचालित चिंतन साथी',
+      },
+    },
     privacy: {
       en: 'Privacy policy',
       ko: '개인정보 처리방침',

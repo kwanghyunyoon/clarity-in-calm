@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AccountSection } from '@/components/settings/AccountSection';
+import { MoreFromUsSection } from '@/components/settings/MoreFromUsSection';
 import { TimePicker, formatTime12h } from '@/components/settings/TimePicker';
 import { SectionHeader } from '@/components/ui/SectionHeader';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
@@ -215,6 +216,9 @@ export default function SettingsScreen() {
             onPress={handleDeleteAll}
           />
         </SettingsGroup>
+
+        {/* ── More from us ── */}
+        <MoreFromUsSection />
 
         {/* ── About ── */}
         <SectionHeader label={ts.about} />

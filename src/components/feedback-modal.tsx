@@ -4,6 +4,7 @@
  * because that's currently the only entry point into it.
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -52,7 +53,7 @@ export function FeedbackModal({ visible, onClose }: { visible: boolean; onClose:
         <View style={[fs.sheet, { backgroundColor: colors.surface }]}>
           {status === 'success' ? (
             <View style={fs.centered}>
-              <Text style={fs.successIcon}>✅</Text>
+              <Ionicons name="checkmark-circle" size={48} color={colors.primary} style={fs.successIcon} />
               <Text style={[fs.successTitle, { color: colors.text }]}>Thanks!</Text>
               <Text style={[fs.successBody, { color: colors.textSecondary }]}>
                 Your feedback has been received.
@@ -151,7 +152,7 @@ const fs = StyleSheet.create({
   submitBtnDisabled: { opacity: 0.45 },
   submitBtnText:     { fontSize: 16, fontWeight: '700', color: '#ffffff' },
   centered:          { alignItems: 'center', paddingVertical: Spacing.five, gap: Spacing.three },
-  successIcon:       { fontSize: 48 },
+  successIcon:       { marginBottom: Spacing.one },
   successTitle:      { fontSize: 24, fontWeight: '800' },
   successBody:       { fontSize: 15, textAlign: 'center' },
 });

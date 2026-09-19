@@ -4,6 +4,7 @@
  * Each slide has a tailored visual component in addition to the text content.
  */
 
+import { Ionicons } from '@expo/vector-icons';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated2, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -113,7 +114,7 @@ export function OnboardingModal() {
                   <View style={s.checklist}>
                     {checklist.map((item, i) => (
                       <View key={i} style={s.checklistRow}>
-                        <Text style={s.checklistCheck}>✅</Text>
+                        <Ionicons name="checkmark-circle" size={15} color={colors.primary} />
                         <Text style={[s.checklistText, { color: colors.text }]}>{item}</Text>
                       </View>
                     ))}
@@ -205,7 +206,6 @@ const s = StyleSheet.create({
                   maxWidth: 300 },
   checklist:      { gap: Spacing.one + 4, alignSelf: 'stretch', marginTop: Spacing.one },
   checklistRow:   { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.one + 2 },
-  checklistCheck: { fontSize: 15 },
   checklistText:  { fontSize: 14, lineHeight: 20, fontWeight: '500', flex: 1 },
 
   bottom:       { gap: Spacing.two + 2, alignItems: 'center' },

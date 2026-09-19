@@ -2,6 +2,7 @@
  * First-launch language step — shown once, before the language toggle is
  * available on every other slide (see LanguagePicker's 'cards' variant).
  */
+import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Spacing } from '@/constants/theme';
@@ -27,7 +28,7 @@ export function LanguageStepView({
 }) {
   return (
     <View style={s.langStepRoot}>
-      <Text style={s.langStepEmoji}>🌐</Text>
+      <Ionicons name="globe-outline" size={56} color={colors.primary} style={s.langStepIcon} />
       <Text style={[s.title, { color: colors.text }]}>{t.onboarding.languageStepTitle}</Text>
       <Text style={[s.body, { color: colors.textSecondary }]}>{t.onboarding.languageStepBody}</Text>
 
@@ -58,7 +59,7 @@ export function LanguageStepView({
 const s = StyleSheet.create({
   langStepRoot:   { flex: 1, alignItems: 'center', justifyContent: 'center',
                     gap: Spacing.two, paddingHorizontal: Spacing.two },
-  langStepEmoji:  { fontSize: 56, marginBottom: Spacing.one },
+  langStepIcon:   { marginBottom: Spacing.one },
   pillTip:        { fontSize: 13, lineHeight: 19, textAlign: 'center',
                     marginTop: Spacing.one, maxWidth: 300 },
   btnDisabled:    { opacity: 0.4 },
