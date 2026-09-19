@@ -74,9 +74,9 @@ export const JOURNAL_TEMPLATES = [
     emoji: '🌅',
     description: 'End-of-day wind-down',
     prompts: [
-      'What drained my energy today?',
-      'What gave me energy today?',
-      'What would I do differently tomorrow?',
+      'The moment my mood shifted most today — what happened right before it?',
+      'Something I did today that helped, even a little — what made it help?',
+      'One thing I would do differently tomorrow:',
     ],
   },
   {

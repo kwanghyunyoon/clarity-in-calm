@@ -3193,24 +3193,24 @@ export const SOURCE = {
       },
       reflection: {
         en: [
-          'What drained my energy today?',
-          'What gave me energy today?',
-          'What would I do differently tomorrow?',
+          'The moment my mood shifted most today — what happened right before it?',
+          'Something I did today that helped, even a little — what made it help?',
+          'One thing I would do differently tomorrow:',
         ],
         ko: [
-          '오늘 나를 지치게 한 것은?',
-          '오늘 나에게 힘을 준 것은?',
-          '내일은 무엇을 다르게 해볼까?',
+          '오늘 기분이 가장 크게 바뀐 순간 — 그 직전에 무슨 일이 있었나요?',
+          '오늘 도움이 됐던 것 — 무엇이 그것을 도움이 되게 했나요?',
+          '내일 다르게 해보고 싶은 한 가지:',
         ],
         es: [
-          '¿Qué me agotó hoy?',
-          '¿Qué me dio energía hoy?',
-          '¿Qué haría diferente mañana?',
+          'El momento en que mi ánimo cambió más hoy — ¿qué pasó justo antes?',
+          'Algo que hice hoy que ayudó, aunque fuera un poco — ¿qué hizo que ayudara?',
+          'Una cosa que haría diferente mañana:',
         ],
         hi: [
-          'आज मुझे किस चीज़ ने थकाया?',
-          'आज मुझे किस चीज़ ने ऊर्जा दी?',
-          'कल मैं क्या अलग करूँगा/करूँगी?',
+          'आज मेरा मूड सबसे ज़्यादा कब बदला — उससे ठीक पहले क्या हुआ था?',
+          'आज कुछ ऐसा जो मददगार रहा, थोड़ा ही सही — उसने कैसे मदद की?',
+          'कल मैं एक चीज़ अलग करूँगा/करूँगी:',
         ],
       },
       cbt: {
