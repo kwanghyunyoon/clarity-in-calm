@@ -2059,11 +2059,11 @@ export const SOURCE = {
       es: 'emociones registradas',
       hi: 'भावनाएँ दर्ज',
     },
-    avgIntensity: {
-      en: 'avg intensity',
-      ko: '평균 강도',
-      es: 'intensidad promedio',
-      hi: 'औसत तीव्रता',
+    avgMood: {
+      en: 'avg mood',
+      ko: '평균 기분',
+      es: 'ánimo promedio',
+      hi: 'औसत मूड',
     },
     topEmotion: {
       en: 'Most felt',

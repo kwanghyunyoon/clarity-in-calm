@@ -18,11 +18,12 @@ import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { BorderRadius, EmotionColors, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { FEELINGS_LIBRARY_BY_ID, FeelingsLibraryEntry } from '@/constants/feelings-library';
-import { useEmotions } from '@/context/emotion-context';
 import { useHelp } from '@/context/help-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { toLocalDateStr } from '@/lib/date-utils';
+import { filterEmotionEntries } from '@/lib/insights-analytics';
 
 function getGreeting(t: ReturnType<typeof useTranslation>): string {
   const h = new Date().getHours();
@@ -53,17 +54,22 @@ export default function TodayScreen() {
   const t = useTranslation();
   const insets = useSafeAreaInsets();
   const { entries, entriesThisMonth } = useWellness();
-  const { todayEmotions, emotionLogs } = useEmotions();
   const { showHelp } = useHelp();
+
+  const emotionEntries = useMemo(() => filterEmotionEntries(entries), [entries]);
+  const todayEmotions = useMemo(() => {
+    const today = toLocalDateStr(new Date());
+    return emotionEntries.filter(e => toLocalDateStr(new Date(e.date)) === today);
+  }, [emotionEntries]);
 
   const quote = useMemo(() => getDailyQuote(t), [t]);
   const greeting = getGreeting(t);
 
   const affirmation = useMemo(() => {
-    const mostRecentEmotionId = emotionLogs[0]?.emotionId;
+    const mostRecentEmotionId = emotionEntries[0]?.emotionId;
     const libraryId = mostRecentEmotionId ? EMOTION_TO_FEELINGS_CATEGORY[mostRecentEmotionId] : undefined;
     return libraryId ? FEELINGS_LIBRARY_BY_ID[libraryId] : undefined;
-  }, [emotionLogs]);
+  }, [emotionEntries]);
 
   // Bottom padding = tab bar height (approx 80) + safe area bottom
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
@@ -168,7 +174,7 @@ export default function TodayScreen() {
                   >
                     <Text style={[styles.emotionPillText, { color }]}>{log.emotionLabel}</Text>
                     <Text style={[styles.emotionIntensity, { color: colors.textSecondary }]}>
-                      {' '}·{log.intensity}
+                      {' '}·{log.mood}
                     </Text>
                   </View>
                 );
@@ -183,7 +189,7 @@ export default function TodayScreen() {
             entriesThisMonth={entriesThisMonth}
             entriesThisMonthLabel={t.today.entriesThisMonth}
             totalEntries={entries.length}
-            totalEmotions={emotionLogs.length}
+            totalEmotions={emotionEntries.length}
             entriesLabel={t.today.journalEntries}
             emotionsLabel={t.today.emotionsLogged}
           />

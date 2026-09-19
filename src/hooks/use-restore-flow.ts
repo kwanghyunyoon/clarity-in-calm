@@ -10,7 +10,6 @@ import { File } from 'expo-file-system';
 import { useState } from 'react';
 import { Alert } from 'react-native';
 
-import { useEmotions } from '@/context/emotion-context';
 import { useSettings } from '@/context/settings-context';
 import { countEntriesInBackup, useWellness } from '@/context/wellness-context';
 import { isValidBackupEnvelope, restoreBackup } from '@/lib/backup-crypto';
@@ -23,7 +22,6 @@ export function useRestoreFlow(onRestored: () => void) {
   const tb = t.backupScreen;
   const { reload: reloadSettings } = useSettings();
   const wellness = useWellness();
-  const emotions = useEmotions();
 
   const [pendingEnvelopeJson, setPendingEnvelopeJson] = useState<string | null>(null);
   const [passphraseModalVisible, setPassphraseModalVisible] = useState(false);
@@ -80,7 +78,7 @@ export function useRestoreFlow(onRestored: () => void) {
     try {
       await writeRestoreToTemp(ALL_DATA_KEYS, data);
       await promoteRestoredData(ALL_DATA_KEYS, data);
-      await Promise.all([wellness.reload(), emotions.reload(), reloadSettings()]);
+      await Promise.all([wellness.reload(), reloadSettings()]);
       Alert.alert(tb.restoreDone.title, tb.restoreDone.body, [{ text: 'OK', onPress: onRestored }]);
     } catch (e: any) {
       Alert.alert(tb.restoreFailed.title, e.message ?? tb.restoreFailed.fallbackBody);

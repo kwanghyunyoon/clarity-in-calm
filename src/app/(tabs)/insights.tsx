@@ -11,17 +11,17 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
-import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import {
-  computeAvgIntensity,
+  computeAvgMood,
   computeDayMoods,
   computeMoodDistribution,
   computeTimeOfDay,
   computeTopEmotion,
   computeTriggerCounts,
+  filterEmotionEntries,
   getLast7Days,
 } from '@/lib/insights-analytics';
 
@@ -31,27 +31,28 @@ export default function InsightsScreen() {
   const ti = t.insightsScreen;
   const insets = useSafeAreaInsets();
   const { entries, entriesThisMonth } = useWellness();
-  const { emotionLogs } = useEmotions();
 
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const last7Days = useMemo(() => getLast7Days(), []);
 
+  const emotionEntries = useMemo(() => filterEmotionEntries(entries), [entries]);
+
   // ── Stats
-  const avgIntensity = useMemo(() => computeAvgIntensity(emotionLogs), [emotionLogs]);
+  const avgMood = useMemo(() => computeAvgMood(entries), [entries]);
 
   // ── Top emotion
   const topEmotion = useMemo(
-    () => computeTopEmotion(emotionLogs, colors.primary),
-    [emotionLogs, colors.primary],
+    () => computeTopEmotion(entries, colors.primary),
+    [entries, colors.primary],
   );
 
   // ── Top context triggers
-  const triggerCounts = useMemo(() => computeTriggerCounts(emotionLogs), [emotionLogs]);
+  const triggerCounts = useMemo(() => computeTriggerCounts(entries), [entries]);
   const contextTagLabels = t.emotionsScreen.contextTagLabels as Record<string, string>;
 
   // ── Time of day distribution
-  const timeOfDay = useMemo(() => computeTimeOfDay(emotionLogs), [emotionLogs]);
+  const timeOfDay = useMemo(() => computeTimeOfDay(entries), [entries]);
 
   const maxTime = Math.max(...Object.values(timeOfDay), 1);
 
@@ -71,7 +72,7 @@ export default function InsightsScreen() {
     night:     'moon-outline',
   };
 
-  if (entries.length === 0 && emotionLogs.length === 0) {
+  if (entries.length === 0) {
     return (
       <Screen>
         <ScreenHeader style={styles.headerGap}>
@@ -111,17 +112,17 @@ export default function InsightsScreen() {
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEntries}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[styles.statNum, { color: colors.primary }]}>{emotionLogs.length}</Text>
+            <Text style={[styles.statNum, { color: colors.primary }]}>{emotionEntries.length}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.totalEmotions}</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.statNum, { color: colors.primary }]}>{entriesThisMonth}</Text>
             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.entriesThisMonth}</Text>
           </View>
-          {emotionLogs.length > 0 && (
+          {emotionEntries.length > 0 && (
             <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Text style={[styles.statNum, { color: colors.primary }]}>{avgIntensity.toFixed(1)}</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.avgIntensity}</Text>
+              <Text style={[styles.statNum, { color: colors.primary }]}>{avgMood.toFixed(1)}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{ti.avgMood}</Text>
             </View>
           )}
         </Animated.View>
@@ -184,7 +185,7 @@ export default function InsightsScreen() {
         )}
 
         {/* ── Time of day ── */}
-        {emotionLogs.length > 0 && (
+        {emotionEntries.length > 0 && (
           <Animated.View entering={FadeInDown.delay(190).springify()} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[styles.cardTitle, { color: colors.textSecondary }]}>{ti.timeOfDay}</Text>
             <View style={styles.timeChart}>

@@ -1,16 +1,23 @@
-import React, { createContext, useCallback, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { DataKeySpec } from '@/lib/data-keys';
 import { toLocalDateStr } from '@/lib/date-utils';
 import { PatternConcern, PatternNoticeRecord } from '@/lib/crisis-detection';
+import { mergeEmotionLogsIntoEntries } from '@/lib/migrate-emotion-logs';
+import { secureRead } from '@/lib/secure-storage';
 import { usePersistedState } from '@/lib/use-persisted-state';
-import { JournalEntry, MoodValue } from '@/types';
+import { EmotionLog, JournalEntry, MoodValue } from '@/types';
 
 // Re-export for backward compat
 export type { MoodValue, JournalEntry };
 
+type EmotionEntryExtras = Partial<Pick<JournalEntry,
+  | 'templateId' | 'tags' | 'title' | 'isFutureSelf' | 'unlockAt'
+  | 'emotionId' | 'emotionLabel' | 'primaryEmotion' | 'contextTags' | 'bodyRegions' | 'copingActions'
+>>;
+
 interface WellnessContextType {
   entries: JournalEntry[];
-  addEntry: (mood: MoodValue, note: string, extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title' | 'isFutureSelf' | 'unlockAt'>>) => void;
+  addEntry: (mood: MoodValue, note: string, extras?: EmotionEntryExtras) => void;
   updateEntry: (id: string, patch: Partial<JournalEntry>) => void;
   deleteEntry: (id: string) => void;
   customTags: string[];
@@ -34,6 +41,12 @@ const STORAGE_KEY_ENTRIES_LEGACY = 'wellness_entries_v1';
 const STORAGE_KEY_SESSIONS = 'wellness_sessions_v1';
 const STORAGE_KEY_TAGS     = 'wellness_custom_tags_v1';
 const STORAGE_KEY_PATTERN_NOTICE = 'wellness_pattern_notice_v1';
+// Retired as a write target by #70 — EmotionProvider/addEmotionLog is gone,
+// the Emotions tab now writes through addEntry below. Read-only from here on:
+// once to merge any not-yet-migrated logs into `entries`, and kept in
+// WELLNESS_DATA_KEYS purely so backup/export-all and delete-all still cover
+// whatever's left at this key on devices that already had EmotionLog data.
+const STORAGE_KEY_EMOTION_LOGS_LEGACY = 'wellness_emotions_v1';
 
 export const WELLNESS_DATA_KEYS: DataKeySpec[] = [
   STORAGE_KEY_ENTRIES,
@@ -41,6 +54,7 @@ export const WELLNESS_DATA_KEYS: DataKeySpec[] = [
   STORAGE_KEY_SESSIONS,
   STORAGE_KEY_TAGS,
   STORAGE_KEY_PATTERN_NOTICE,
+  STORAGE_KEY_EMOTION_LOGS_LEGACY,
 ].map(key => ({ key, backend: 'secure' }));
 
 /** Counts journal entries in a raw data-registry dump (e.g. a decrypted
@@ -79,9 +93,28 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
 
   const isLoaded = entriesLoaded && sessionsLoaded && tagsLoaded && patternNoticeLoaded;
 
+  // One-time cutover (#70): fold any not-yet-migrated EmotionLog records into
+  // `entries`. mergeEmotionLogsIntoEntries dedupes by id, so this is safe to
+  // re-run — it's a no-op once every legacy log has been merged.
+  const migrateEmotionLogs = useCallback(async () => {
+    const legacyLogs = await secureRead<EmotionLog[]>(STORAGE_KEY_EMOTION_LOGS_LEGACY);
+    if (!legacyLogs || legacyLogs.length === 0) return;
+    setEntries(prev => mergeEmotionLogsIntoEntries(prev, legacyLogs));
+  }, [setEntries]);
+
+  const hasMigratedRef = useRef(false);
+  useEffect(() => {
+    if (!entriesLoaded || hasMigratedRef.current) return;
+    hasMigratedRef.current = true;
+    migrateEmotionLogs().catch(() => {});
+  }, [entriesLoaded, migrateEmotionLogs]);
+
   const reload = useCallback(async () => {
     await Promise.all([reloadEntries(), reloadSessions(), reloadTags(), reloadPatternNotice()]);
-  }, [reloadEntries, reloadSessions, reloadTags, reloadPatternNotice]);
+    // A restore can bring in EmotionLog data unmerged relative to a
+    // pre-#70 backup — re-check on every reload, not just first mount.
+    await migrateEmotionLogs();
+  }, [reloadEntries, reloadSessions, reloadTags, reloadPatternNotice, migrateEmotionLogs]);
 
   const recordPatternNotice = useCallback((concern: PatternConcern) => {
     if (!isLoaded) return;
@@ -91,7 +124,7 @@ export function WellnessProvider({ children }: { children: React.ReactNode }) {
   const addEntry = useCallback((
     mood: MoodValue,
     note: string,
-    extras?: Partial<Pick<JournalEntry, 'templateId' | 'tags' | 'title' | 'isFutureSelf' | 'unlockAt'>>,
+    extras?: EmotionEntryExtras,
   ) => {
     if (!isLoaded) return;
     setEntries(prev => [{

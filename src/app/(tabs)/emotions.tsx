@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -23,10 +23,11 @@ import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { BASIC_EMOTIONS_BY_ID } from '@/constants/emotions';
 import { BorderRadius, Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
-import { useEmotions } from '@/context/emotion-context';
 import { useWellness } from '@/context/wellness-context';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { filterEmotionEntries } from '@/lib/insights-analytics';
+import { MoodValue } from '@/types';
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -44,8 +45,8 @@ export default function EmotionsScreen() {
   const t = useTranslation();
   const te = t.emotionsScreen;
   const insets = useSafeAreaInsets();
-  const { emotionLogs, addEmotionLog, deleteEmotionLog } = useEmotions();
-  const { customTags } = useWellness();
+  const { entries, addEntry, deleteEntry, customTags } = useWellness();
+  const emotionEntries = useMemo(() => filterEmotionEntries(entries), [entries]);
 
   const [selectedEmotion, setSelectedEmotion] = useState<SelectedEmotion | null>(null);
   const [intensity, setIntensity] = useState(5);
@@ -72,15 +73,17 @@ export default function EmotionsScreen() {
 
   function handleSave() {
     if (!selectedEmotion) return;
-    addEmotionLog({
+    // Intensity (1-10) is UI-only precision — storage keeps mood (1-5), per
+    // #66/#70's ceil(intensity / 2) mapping, so native and migrated entries
+    // share one scale.
+    const mood = Math.ceil(intensity / 2) as MoodValue;
+    addEntry(mood, note.trim(), {
       emotionId: selectedEmotion.id,
       emotionLabel: selectedEmotion.label,
       primaryEmotion: selectedEmotion.id,
-      intensity,
       contextTags,
       bodyRegions,
       copingActions,
-      note: note.trim() || undefined,
     });
     setSaved(true);
     setTimeout(() => {
@@ -100,7 +103,7 @@ export default function EmotionsScreen() {
       te.deleteConfirm.body,
       [
         { text: te.deleteConfirm.cancel, style: 'cancel' },
-        { text: te.deleteConfirm.confirm, style: 'destructive', onPress: () => deleteEmotionLog(id) },
+        { text: te.deleteConfirm.confirm, style: 'destructive', onPress: () => deleteEntry(id) },
       ],
     );
   }
@@ -236,12 +239,13 @@ export default function EmotionsScreen() {
           )}
 
           {/* ── Past logs ── */}
-          {emotionLogs.length > 0 && (
+          {emotionEntries.length > 0 && (
             <View style={styles.pastSection}>
               <Text style={[styles.pastTitle, { color: colors.textSecondary }]}>{te.pastTitle}</Text>
-              {emotionLogs.slice(0, 20).map((log, i) => {
+              {emotionEntries.slice(0, 20).map((log, i) => {
                 const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
                 const color = emotion?.color ?? colors.primary;
+                const tags = log.contextTags ?? [];
                 return (
                   <Animated.View
                     key={log.id}
@@ -252,16 +256,16 @@ export default function EmotionsScreen() {
                     <View style={styles.logBody}>
                       <View style={styles.logHeader}>
                         <Text style={[styles.logEmotion, { color }]}>{log.emotionLabel}</Text>
-                        <Text style={[styles.logIntensity, { color: colors.textSecondary }]}>·{log.intensity}/10</Text>
+                        <Text style={[styles.logIntensity, { color: colors.textSecondary }]}>·{log.mood}/5</Text>
                         <View style={styles.logMeta}>
                           <Text style={[styles.logTime, { color: colors.textSecondary }]}>
                             {formatDate(log.date)} {formatTime(log.date)}
                           </Text>
                         </View>
                       </View>
-                      {log.contextTags.length > 0 && (
+                      {tags.length > 0 && (
                         <View style={styles.tagRow}>
-                          {log.contextTags.slice(0, 4).map(tag => (
+                          {tags.slice(0, 4).map(tag => (
                             <View key={tag} style={[styles.miniChip, { backgroundColor: color + '18' }]}>
                               <Text style={[styles.miniChipText, { color }]}>
                                 {te.contextTagLabels[tag as keyof typeof te.contextTagLabels] ?? tag}
@@ -291,7 +295,7 @@ export default function EmotionsScreen() {
           )}
 
           {/* ── Empty state ── */}
-          {emotionLogs.length === 0 && !selectedEmotion && (
+          {emotionEntries.length === 0 && !selectedEmotion && (
             <View style={styles.emptyState}>
               <Ionicons
                 name="sync-circle-outline"

@@ -5,15 +5,16 @@
  * module's DataKeySpec[] export and listing that export here — neither
  * screen ever needs to change.
  */
-import { EMOTION_DATA_KEYS } from '@/context/emotion-context';
 import { SETTINGS_DATA_KEYS } from '@/context/settings-context';
 import { WELLNESS_DATA_KEYS } from '@/context/wellness-context';
 import { ONBOARDING_DATA_KEYS } from '@/hooks/use-onboarding-flow';
 import { DataKeySpec } from './data-keys';
 
+// wellness_emotions_v1 (formerly EMOTION_DATA_KEYS, owned by the now-removed
+// EmotionProvider) is covered via WELLNESS_DATA_KEYS since #70 retired it as
+// a write target and folded its lifecycle into WellnessProvider.
 export const ALL_DATA_KEYS: DataKeySpec[] = [
   ...WELLNESS_DATA_KEYS,
-  ...EMOTION_DATA_KEYS,
   ...SETTINGS_DATA_KEYS,
   ...ONBOARDING_DATA_KEYS,
 ];

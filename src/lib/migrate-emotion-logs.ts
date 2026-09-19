@@ -29,9 +29,8 @@ export function mapEmotionLogToEntry(log: EmotionLog): JournalEntry {
 
 /**
  * Merges legacy EmotionLog records into an existing JournalEntry array,
- * skipping any log whose id has already been migrated. Not yet wired into
- * WellnessProvider/EmotionProvider — see issue #66's resolution for why the
- * live storage cutover is tracked as a separate follow-up.
+ * skipping any log whose id has already been migrated. Wired into
+ * WellnessProvider's one-time cutover effect as of #70.
  */
 export function mergeEmotionLogsIntoEntries(entries: JournalEntry[], emotionLogs: EmotionLog[]): JournalEntry[] {
   if (emotionLogs.length === 0) return entries;

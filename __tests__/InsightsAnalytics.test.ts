@@ -3,26 +3,30 @@
  * and used by insights.tsx. No React Native rendering required — pure logic only.
  */
 import {
-  computeAvgIntensity,
+  computeAvgMood,
   computeDayMoods,
   computeMoodDistribution,
   computeTimeOfDay,
   computeTopEmotion,
   computeTriggerCounts,
+  filterEmotionEntries,
   getLast7Days,
 } from '@/lib/insights-analytics';
-import type { EmotionLog, JournalEntry } from '@/types';
+import type { JournalEntry } from '@/types';
 
 function makeEntry(partial: Partial<JournalEntry> & { date: string; mood: JournalEntry['mood'] }): JournalEntry {
   return { id: `${Math.random()}`, note: '', ...partial };
 }
 
-function makeLog(partial: Partial<EmotionLog> & { date: string; emotionId: string }): EmotionLog {
+// An emotion check-in entry (has emotionId), the only kind the
+// emotion-specific analytics functions look at.
+function makeLog(partial: Partial<JournalEntry> & { date: string; emotionId: string }): JournalEntry {
   return {
     id: `${Math.random()}`,
+    note: '',
+    mood: 3,
     emotionLabel: partial.emotionId,
     primaryEmotion: partial.emotionId,
-    intensity: 5,
     contextTags: [],
     bodyRegions: [],
     copingActions: [],
@@ -41,15 +45,33 @@ describe('getLast7Days', () => {
   });
 });
 
-describe('computeAvgIntensity', () => {
-  test('averages intensity across logs', () => {
-    const logs = [makeLog({ date: '2026-07-19', emotionId: 'fear', intensity: 4 }),
-      makeLog({ date: '2026-07-19', emotionId: 'anger', intensity: 8 })];
-    expect(computeAvgIntensity(logs)).toBe(6);
+describe('computeAvgMood', () => {
+  test('averages mood across emotion entries', () => {
+    const logs = [makeLog({ date: '2026-07-19', emotionId: 'fear', mood: 2 }),
+      makeLog({ date: '2026-07-19', emotionId: 'anger', mood: 4 })];
+    expect(computeAvgMood(logs)).toBe(3);
   });
 
-  test('returns 0 for no logs', () => {
-    expect(computeAvgIntensity([])).toBe(0);
+  test('returns 0 for no entries', () => {
+    expect(computeAvgMood([])).toBe(0);
+  });
+
+  test('ignores plain journal entries with no emotionId', () => {
+    const entries = [
+      makeEntry({ date: '2026-07-19', mood: 5 }),
+      makeLog({ date: '2026-07-19', emotionId: 'fear', mood: 1 }),
+    ];
+    expect(computeAvgMood(entries)).toBe(1);
+  });
+});
+
+describe('filterEmotionEntries', () => {
+  test('keeps only entries with an emotionId', () => {
+    const entries = [
+      makeEntry({ date: '2026-07-19', mood: 5 }),
+      makeLog({ date: '2026-07-19', emotionId: 'fear' }),
+    ];
+    expect(filterEmotionEntries(entries)).toHaveLength(1);
   });
 });
 

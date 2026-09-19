@@ -4,7 +4,6 @@ import { AppState, Platform, StyleSheet, View, useColorScheme } from 'react-nati
 
 import ErrorBoundary from '@/components/error-boundary';
 import { ReminderLocaleSync } from '@/components/ReminderLocaleSync';
-import { EmotionProvider } from '@/context/emotion-context';
 import { HelpProvider } from '@/context/help-context';
 import { LanguageProvider } from '@/context/language-context';
 import { SettingsProvider } from '@/context/settings-context';
@@ -45,18 +44,16 @@ export default function RootLayout() {
           <HelpProvider>
             <LanguageProvider>
               <WellnessProvider>
-                <EmotionProvider>
-                  <PrivacyShield />
-                  <ReminderLocaleSync />
-                  {/* Optional sign-in: all routes are always registered. The (tabs)
-                      group is the app; (auth) is pushed from Settings; reset-password
-                      is reached via the recovery deep link. No hard auth gate. */}
-                  <Stack screenOptions={{ headerShown: false }}>
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
-                    <Stack.Screen name="reset-password" />
-                  </Stack>
-                </EmotionProvider>
+                <PrivacyShield />
+                <ReminderLocaleSync />
+                {/* Optional sign-in: all routes are always registered. The (tabs)
+                    group is the app; (auth) is pushed from Settings; reset-password
+                    is reached via the recovery deep link. No hard auth gate. */}
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="(auth)" options={{ presentation: 'modal' }} />
+                  <Stack.Screen name="reset-password" />
+                </Stack>
               </WellnessProvider>
             </LanguageProvider>
           </HelpProvider>
