@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import * as Crypto from 'expo-crypto';
 import * as aesjs from 'aes-js';
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 // Expo's SecureStore rejects values over ~2048 bytes, and a Supabase session
 // (access + refresh token) routinely exceeds that. So the session itself is
@@ -47,24 +47,46 @@ class LargeSecureStore {
   }
 }
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+// Lazily constructed: AUTH_ENABLED is false for this release, so the (auth)
+// routes that import this module are never reached from the UI, but Expo
+// Router still eagerly requires every file under src/app/ to build its route
+// table — a top-level throw here used to crash the app at startup whenever
+// EXPO_PUBLIC_SUPABASE_URL/_ANON_KEY weren't set (e.g. CI builds with no
+// .env). Deferring construction to first actual use means the missing-env
+// error only surfaces if auth code is genuinely invoked (re-enabling
+// AUTH_ENABLED requires a real .env anyway).
+let cachedClient: SupabaseClient | undefined;
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error(
-    'Missing EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY. Copy .env.example to .env and fill in your Supabase project values.'
-  );
+function getSupabaseClient(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+
+  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      'Missing EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY. Copy .env.example to .env and fill in your Supabase project values.'
+    );
+  }
+
+  cachedClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      // Native gets the encrypted SecureStore-backed storage. On web, expo-secure-store
+      // isn't a real target and LargeSecureStore touches AsyncStorage/`window`, which
+      // crashes the static SSR prerender — so let supabase-js fall back to its default
+      // localStorage adapter (which is SSR-guarded internally).
+      storage: Platform.OS === 'web' ? undefined : new LargeSecureStore(),
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  });
+  return cachedClient;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    // Native gets the encrypted SecureStore-backed storage. On web, expo-secure-store
-    // isn't a real target and LargeSecureStore touches AsyncStorage/`window`, which
-    // crashes the static SSR prerender — so let supabase-js fall back to its default
-    // localStorage adapter (which is SSR-guarded internally).
-    storage: Platform.OS === 'web' ? undefined : new LargeSecureStore(),
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
+export const supabase = new Proxy({} as SupabaseClient, {
+  get(_target, prop, _receiver) {
+    const client = getSupabaseClient();
+    return Reflect.get(client, prop, client);
   },
 });
