@@ -65,6 +65,46 @@ jobs:
 
       - run: npx expo prebuild --platform android --no-install
 
+      - name: Wire release keystore into generated Gradle project
+        # `expo prebuild` on this Expo version does NOT read root
+        # credentials.json to configure release signing — the generated
+        # build.gradle's `release` buildType signs with signingConfigs.debug
+        # (the auto-generated debug.keystore) unless patched by hand. This
+        # silently produced debug-signed AABs that failed the fingerprint
+        # check below no matter what ANDROID_KEYSTORE_BASE64 contained.
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          cp credentials/android/keystore.jks android/app/release.keystore.jks
+          # expo prebuild's generated gradle.properties has no trailing
+          # newline, so a bare `cat >>` glues onto its last line.
+          printf '\n' >> android/gradle.properties
+          cat >> android/gradle.properties <<PROPS
+          MYAPP_RELEASE_STORE_FILE=release.keystore.jks
+          MYAPP_RELEASE_STORE_PASSWORD=$ANDROID_KEYSTORE_PASSWORD
+          MYAPP_RELEASE_KEY_ALIAS=$ANDROID_KEY_ALIAS
+          MYAPP_RELEASE_KEY_PASSWORD=$ANDROID_KEY_PASSWORD
+          PROPS
+
+          # Add a release signingConfig right after the auto-generated debug
+          # one (anchored on the debug keyPassword line, which only appears
+          # once), then point buildTypes.release at it instead of debug.
+          sed -i "/keyPassword 'android'/{n; a\\
+                  release {\\
+                      storeFile file(MYAPP_RELEASE_STORE_FILE)\\
+                      storePassword MYAPP_RELEASE_STORE_PASSWORD\\
+                      keyAlias MYAPP_RELEASE_KEY_ALIAS\\
+                      keyPassword MYAPP_RELEASE_KEY_PASSWORD\\
+                  }
+          }" android/app/build.gradle
+          sed -i "/see https:\/\/reactnative.dev\/docs\/signed-apk-android./{n;s/signingConfigs.debug/signingConfigs.release/}" android/app/build.gradle
+
+          grep -q "signingConfigs.release" android/app/build.gradle
+          grep -q "MYAPP_RELEASE_STORE_FILE" android/gradle.properties
+
       - name: Configure Gradle for low-memory serialized build
         run: |
           # expo prebuild's generated gradle.properties has no trailing
