@@ -15,7 +15,7 @@ export default {
     },
     android: {
       package: 'com.clarityincalm.app',
-      versionCode: 18,
+      versionCode: 21,
       jsEngine: 'hermes',
       adaptiveIcon: {
         backgroundColor: '#EDEAE5',
