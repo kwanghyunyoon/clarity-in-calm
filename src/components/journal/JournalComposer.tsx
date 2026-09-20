@@ -247,7 +247,10 @@ export function JournalComposer({ templatesRef, noteInputRef, saveBtnRef }: Jour
         </View>
 
         {/* ── Note input ── */}
-        <View style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]} ref={noteInputRef}>
+        <View
+          style={[styles.inputCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          ref={noteInputRef}
+        >
           <TextInput
             style={[styles.input, { color: colors.text }]}
             placeholder={placeholder}

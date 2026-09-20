@@ -55,7 +55,7 @@ interface TourOverlayProps extends TourOverlayViewProps {
   visible: boolean;
 }
 
-const SPOTLIGHT_PAD = 8;
+const SPOTLIGHT_PAD = 4;
 
 /** Registers this tour step's props with the root TourOverlayHost; renders nothing itself. */
 export function TourOverlay({ visible, ...rest }: TourOverlayProps) {

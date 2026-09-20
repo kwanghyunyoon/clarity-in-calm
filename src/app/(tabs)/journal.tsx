@@ -1,6 +1,7 @@
 import { useFocusEffect } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { JournalComposer } from '@/components/journal/JournalComposer';
 import { JournalEntryList } from '@/components/journal/JournalEntryList';
@@ -11,13 +12,14 @@ import { Spacing } from '@/constants/theme';
 import { useScreenTour } from '@/hooks/use-screen-tour';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { measureWhenSettled } from '@/utils/measureWhenSettled';
 
 const JOURNAL_TOUR_STEP_IDS = ['templates', 'input', 'save', 'past'] as const;
-const MEASURE_SETTLE_MS = 350;
 
 export default function JournalScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const templatesRef = useRef<View>(null);
   const noteInputRef = useRef<View>(null);
@@ -36,8 +38,9 @@ export default function JournalScreen() {
   const [spotlight, setSpotlight] = useState<SpotlightRect | null>(null);
   const [focused, setFocused] = useState(true);
 
-  // Modal-based overlay portals outside the tab's tree; react-navigation
-  // freezes (doesn't unmount) inactive tabs, so force-hide on blur.
+  // The overlay portals to a root-level host outside the tab's tree;
+  // react-navigation freezes (doesn't unmount) inactive tabs, so force-hide
+  // on blur.
   useFocusEffect(
     useCallback(() => {
       setFocused(true);
@@ -47,18 +50,40 @@ export default function JournalScreen() {
 
   useEffect(() => {
     if (!visible) return;
-    let cancelled = false;
     if (step.id === 'past') listRef.current?.scrollToEnd({ animated: true });
 
-    const timer = setTimeout(() => {
-      if (cancelled) return;
-      const node = anchorRefs[step.id as keyof typeof anchorRefs]?.current;
-      node?.measureInWindow((x, y, width, height) => {
-        if (!cancelled) setSpotlight({ x, y, width, height });
-      });
-    }, MEASURE_SETTLE_MS);
+    const anchorRef = anchorRefs[step.id as keyof typeof anchorRefs];
+    if (!anchorRef.current) {
+      setSpotlight(null);
+      return;
+    }
 
-    return () => { cancelled = true; clearTimeout(timer); };
+    // Measure repeatedly until the anchor's position (and, for 'past', the
+    // scroll-to-end) has actually settled, rather than guessing a fixed
+    // delay — a one-shot measurement after a fixed timeout was stale
+    // whenever the anchor was still settling into position.
+    let stopped = false;
+    const cancel = measureWhenSettled(
+      (callback) => {
+        const node = anchorRef.current;
+        if (!node) {
+          stopped = true;
+          setSpotlight(null);
+          return;
+        }
+        node.measureInWindow((x, y, width, height) => {
+          if (stopped) return;
+          callback({ x, y, width, height });
+        });
+      },
+      // measureInWindow() on Android reports coordinates that exclude the
+      // status-bar inset, while the tour overlay (a root-level portal) draws
+      // in full edge-to-edge window space — so every anchor comes back
+      // insets.top too high unless corrected here.
+      (box) => setSpotlight({ ...box, y: box.y + insets.top }),
+    );
+
+    return () => { stopped = true; cancel(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, step.id]);
 

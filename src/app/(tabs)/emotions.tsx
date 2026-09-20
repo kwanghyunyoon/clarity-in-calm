@@ -32,13 +32,13 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { filterEmotionEntries } from '@/lib/insights-analytics';
 import { MoodValue } from '@/types';
+import { measureWhenSettled } from '@/utils/measureWhenSettled';
 
 // Only 'picker' has a real anchor visible before a selection is made — every
 // other section (intensity/context/note/save) only mounts once the user
 // picks an emotion, so instead of a run of anchorless centered-dialogue
 // steps (one per section), they're collapsed into a single 'more' step.
 const EMOTIONS_TOUR_STEP_IDS = ['picker', 'more'] as const;
-const MEASURE_SETTLE_MS = 350;
 
 function formatTime(iso: string): string {
   return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -90,14 +90,32 @@ export default function EmotionsScreen() {
 
   useEffect(() => {
     if (!tourVisible || tourStep.id !== 'picker') return;
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      if (cancelled) return;
-      pickerRef.current?.measureInWindow((x, y, width, height) => {
-        if (!cancelled) setTourSpotlight({ x, y, width, height });
-      });
-    }, MEASURE_SETTLE_MS);
-    return () => { cancelled = true; clearTimeout(timer); };
+    if (!pickerRef.current) {
+      setTourSpotlight(null);
+      return;
+    }
+    let stopped = false;
+    const cancel = measureWhenSettled(
+      (callback) => {
+        const node = pickerRef.current;
+        if (!node) {
+          stopped = true;
+          setTourSpotlight(null);
+          return;
+        }
+        node.measureInWindow((x, y, width, height) => {
+          if (stopped) return;
+          callback({ x, y, width, height });
+        });
+      },
+      // measureInWindow() on Android reports coordinates that exclude the
+      // status-bar inset, while the tour overlay (a root-level portal) draws
+      // in full edge-to-edge window space — so every anchor comes back
+      // insets.top too high unless corrected here.
+      (box) => setTourSpotlight({ ...box, y: box.y + insets.top }),
+    );
+    return () => { stopped = true; cancel(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tourVisible, tourStep.id]);
 
   const tourStepCopy = t.tour.emotions.steps[tourStep.index];

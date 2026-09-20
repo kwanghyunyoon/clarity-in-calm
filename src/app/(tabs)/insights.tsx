@@ -28,11 +28,11 @@ import {
   filterEmotionEntries,
   getLast7Days,
 } from '@/lib/insights-analytics';
+import { measureWhenSettled } from '@/utils/measureWhenSettled';
 
 // Deferred until there's at least one entry to spotlight — this screen has
 // no anchors at all on its empty state.
 const INSIGHTS_TOUR_STEP_IDS = ['stats', 'chart', 'breakdown', 'triggers'] as const;
-const MEASURE_SETTLE_MS = 350;
 
 export default function InsightsScreen() {
   const { colors } = useTheme();
@@ -98,19 +98,32 @@ export default function InsightsScreen() {
 
   useEffect(() => {
     if (!tourVisible) return;
-    let cancelled = false;
-    const timer = setTimeout(() => {
-      if (cancelled) return;
-      const node = insightsAnchorRefs[tourStep.id as keyof typeof insightsAnchorRefs]?.current;
-      if (node) {
+    const anchorRef = insightsAnchorRefs[tourStep.id as keyof typeof insightsAnchorRefs];
+    if (!anchorRef?.current) {
+      setTourSpotlight(null);
+      return;
+    }
+    let stopped = false;
+    const cancel = measureWhenSettled(
+      (callback) => {
+        const node = anchorRef.current;
+        if (!node) {
+          stopped = true;
+          setTourSpotlight(null);
+          return;
+        }
         node.measureInWindow((x, y, width, height) => {
-          if (!cancelled) setTourSpotlight({ x, y, width, height });
+          if (stopped) return;
+          callback({ x, y, width, height });
         });
-      } else {
-        setTourSpotlight(null);
-      }
-    }, MEASURE_SETTLE_MS);
-    return () => { cancelled = true; clearTimeout(timer); };
+      },
+      // measureInWindow() on Android reports coordinates that exclude the
+      // status-bar inset, while the tour overlay (a root-level portal) draws
+      // in full edge-to-edge window space — so every anchor comes back
+      // insets.top too high unless corrected here.
+      (box) => setTourSpotlight({ ...box, y: box.y + insets.top }),
+    );
+    return () => { stopped = true; cancel(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tourVisible, tourStep.id]);
 
