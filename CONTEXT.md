@@ -25,6 +25,25 @@ Source: trio visual audit, issue #26 (closed 2026-07-24), comments from all thre
 All five sub-decisions resolved via `/grilling` on issue #28 — see
 [ADR-0001](docs/adr/0001-trio-shared-visual-identity.md).
 
+### Backup vs. Export vs. Restore
+
+Three distinct data-movement concepts that must not be conflated (resolved via `/grilling`,
+2026-09-15, in the design session for issue-tracked "encrypted backup + restore"):
+
+- **Backup** — a passphrase-encrypted, portable file containing the *entire* `ALL_DATA_KEYS`
+  registry (journal/check-ins, emotion/coping logs, custom tags, settings, onboarding flags).
+  Replaces the old plaintext "Export all data (JSON)" Settings action as the one true full-data
+  export. Decryptable only with the passphrase chosen at backup time — there is no recovery
+  path if it's forgotten.
+- **Restore** — importing a Backup file. Always a *full replace*: existing on-device data is
+  deleted and overwritten with the backup's contents, never merged. The backup is decrypted and
+  structurally validated *before* any existing on-device data is touched or a destructive
+  confirmation is shown. Reachable both from Settings (existing install) and from first launch
+  (new/reset device), offered before language selection since settings are themselves restored.
+- **ClarityAI export** ("Share data with ClarityAI") — a separate, unrelated curated
+  analytics-only summary (mood values, streak, counts). Not a backup candidate; untouched by the
+  above.
+
 ### Trio app connections
 
 Distinct from "shared visual identity" above — this covers whether the three apps share any
