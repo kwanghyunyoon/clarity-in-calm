@@ -1,0 +1,109 @@
+name: Android release build
+
+# Manual, signed release AAB build for Play Console upload. Runs on a
+# GitHub-hosted runner instead of locally — this repo's dev machine has only
+# 6.4GB RAM shared across every open terminal, and a full 4-ABI release
+# compile (newArchEnabled=true, reanimated/worklets/gesture-handler) has
+# previously OOM-killed a sibling repo's local build silently mid-compile.
+# The signing keystore is never committed — it's reconstructed from repo
+# secrets scoped to the `release` environment.
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Write release credentials from secrets
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          mkdir -p credentials/android
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > credentials/android/keystore.jks
+          cat > credentials.json <<JSON
+          {
+            "android": {
+              "keystore": {
+                "keystorePath": "credentials/android/keystore.jks",
+                "keystorePassword": "$ANDROID_KEYSTORE_PASSWORD",
+                "keyAlias": "$ANDROID_KEY_ALIAS",
+                "keyPassword": "$ANDROID_KEY_PASSWORD"
+              }
+            }
+          }
+          JSON
+
+      - run: npx expo prebuild --platform android --no-install
+
+      - name: Configure Gradle for low-memory serialized build
+        run: |
+          # expo prebuild's generated gradle.properties has no trailing
+          # newline, so a bare `cat >>` glues our first line onto its last
+          # (observed: "36org.gradle.jvmargs=..." breaking Gradle's parser).
+          printf '\n' >> android/gradle.properties
+          cat >> android/gradle.properties <<'PROPS'
+          org.gradle.jvmargs=-Xmx1536m -XX:MaxMetaspaceSize=512m
+          org.gradle.parallel=false
+          org.gradle.workers.max=1
+          PROPS
+
+      - name: Build release AAB
+        working-directory: android
+        run: ./gradlew bundleRelease --no-daemon
+
+      - name: Verify signature and ABI completeness
+        env:
+          EXPECTED_SHA256: ${{ secrets.ANDROID_KEYSTORE_SHA256 }}
+        run: |
+          set -euo pipefail
+          AAB=android/app/build/outputs/bundle/release/app-release.aab
+          rm -rf /tmp/aabverify && mkdir -p /tmp/aabverify
+          unzip -o -q "$AAB" "META-INF/*" -d /tmp/aabverify
+          ACTUAL_SHA256=$(keytool -printcert -file /tmp/aabverify/META-INF/*.RSA | awk '/SHA256:/ {print $2}')
+          if [ "$ACTUAL_SHA256" != "$EXPECTED_SHA256" ]; then
+            echo "::error::AAB signature ($ACTUAL_SHA256) does not match expected keystore fingerprint ($EXPECTED_SHA256)."
+            exit 1
+          fi
+          ABIS=$(unzip -l "$AAB" | grep -o "lib/[a-z0-9_-]*/" | sort -u)
+          for abi in arm64-v8a armeabi-v7a x86 x86_64; do
+            echo "$ABIS" | grep -q "lib/$abi/" || { echo "::error::Missing ABI: $abi"; exit 1; }
+          done
+
+      - name: Report versionCode/versionName (verify against Play Console manually)
+        run: grep -E "versionCode|versionName" app.config.js
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: clarity-in-calm-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14
