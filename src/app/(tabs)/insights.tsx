@@ -77,6 +77,7 @@ export default function InsightsScreen() {
   const chartRef = useRef<View>(null);
   const breakdownRef = useRef<View>(null);
   const triggersRef = useRef<View>(null);
+  const scrollRef = useRef<ScrollView>(null);
   const insightsAnchorRefs = { stats: statsRef, chart: chartRef, breakdown: breakdownRef, triggers: triggersRef };
 
   const { visible: tourVisible, step: tourStep, totalSteps: tourTotalSteps, next: tourNext, skip: tourSkip } = useScreenTour({
@@ -104,6 +105,12 @@ export default function InsightsScreen() {
       return;
     }
     let stopped = false;
+    // The "triggers" section is the last card in the ScrollView, so it can
+    // still be below the fold when this step fires — scroll it into view
+    // before measuring, otherwise its y-coordinate ends up off-screen.
+    if (tourStep.id === 'triggers') {
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }
     const cancel = measureWhenSettled(
       (callback) => {
         const node = anchorRef.current;
