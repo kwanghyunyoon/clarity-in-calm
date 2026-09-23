@@ -5,14 +5,13 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
-import React, { useCallback, useEffect, useState } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
-import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { AUTOSTART_PARAM, decideQuickLaunch } from '@/lib/quick-launch';
@@ -34,19 +33,7 @@ export default function GroundScreen() {
   const g = t.ground;
   const insets = useSafeAreaInsets();
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
-  const navigation = useNavigation();
-  const tabBarStyle = useTabBarStyle();
   const params = useLocalSearchParams();
-
-  // Hide the floating tab bar while this screen is focused, restoring it on
-  // blur — a mid-exercise user shouldn't have to reach past it to exit.
-  useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({ tabBarStyle: { display: 'none' } });
-      return () => parent?.setOptions({ tabBarStyle });
-    }, [navigation, tabBarStyle]),
-  );
 
   const steps = g.steps as readonly {
     count: number; sense: string; instruction: string; tip: string;

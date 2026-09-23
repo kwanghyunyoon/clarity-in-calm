@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -17,7 +17,6 @@ import Animated, {
 
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing } from '@/constants/theme';
-import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
@@ -43,19 +42,7 @@ export default function BreatheScreen() {
   const t = useTranslation();
   const { addBreathingSession } = useWellness();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
-  const tabBarStyle = useTabBarStyle();
   const params = useLocalSearchParams();
-
-  // Hide the floating tab bar while this screen is focused, restoring it on
-  // blur — a mid-exercise user shouldn't have to reach past it to exit.
-  useFocusEffect(
-    useCallback(() => {
-      const parent = navigation.getParent();
-      parent?.setOptions({ tabBarStyle: { display: 'none' } });
-      return () => parent?.setOptions({ tabBarStyle });
-    }, [navigation, tabBarStyle]),
-  );
 
   // Build PHASES from translations so labels/hints are localised
     const PHASES = [

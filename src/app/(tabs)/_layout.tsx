@@ -99,8 +99,10 @@ export default function TabLayout() {
         />
 
         {/* ── Hidden utility routes (still navigable) ── */}
-        <Tabs.Screen name="breathe"  options={{ href: null }} />
-        <Tabs.Screen name="ground"   options={{ href: null }} />
+        {/* Exercises hide the floating tab bar — a mid-exercise user shouldn't
+            have to reach past it to exit, and it would cover the bottom text. */}
+        <Tabs.Screen name="breathe"  options={{ href: null, tabBarStyle: { display: 'none' } }} />
+        <Tabs.Screen name="ground"   options={{ href: null, tabBarStyle: { display: 'none' } }} />
         <Tabs.Screen name="feelings-library" options={{ href: null }} />
         <Tabs.Screen name="backup" options={{ href: null }} />
       </Tabs>
