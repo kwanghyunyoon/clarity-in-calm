@@ -1,3 +1,6 @@
+// Lets local TS config plugins (plugins/*.ts) import the app's TS modules.
+import 'tsx/cjs';
+
 export default {
   expo: {
     name: 'clarity-in-calm',
@@ -65,6 +68,7 @@ export default {
       ],
       'expo-secure-store',
       'expo-apple-authentication',
+      './plugins/app-shortcuts.ts',
     ],
     experiments: {
       typedRoutes: true,

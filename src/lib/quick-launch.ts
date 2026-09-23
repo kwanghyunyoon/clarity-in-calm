@@ -14,6 +14,11 @@ export type ExerciseState = 'not-started' | 'in-progress' | 'finished';
 /** The query param that marks a navigation as a Quick Launch. */
 export const AUTOSTART_PARAM = 'autostart';
 
+/** The link a Launch point fires, e.g. `clarityincalm://breathe?autostart=1`. */
+export function quickLaunchLink(scheme: string, exercise: ExerciseId): string {
+  return `${scheme}://${exercise}?${AUTOSTART_PARAM}=1`;
+}
+
 export interface QuickLaunchInput {
   /** Current pathname, e.g. from expo-router's usePathname(). */
   route: string | null | undefined;
