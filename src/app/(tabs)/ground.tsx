@@ -5,13 +5,14 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import React, { useState } from 'react';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
+import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 
@@ -32,6 +33,18 @@ export default function GroundScreen() {
   const g = t.ground;
   const insets = useSafeAreaInsets();
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
+  const navigation = useNavigation();
+  const tabBarStyle = useTabBarStyle();
+
+  // Hide the floating tab bar while this screen is focused, restoring it on
+  // blur — a mid-exercise user shouldn't have to reach past it to exit.
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({ tabBarStyle: { display: 'none' } });
+      return () => parent?.setOptions({ tabBarStyle });
+    }, [navigation, tabBarStyle]),
+  );
 
   const steps = g.steps as readonly {
     count: number; sense: string; instruction: string; tip: string;
@@ -93,6 +106,17 @@ export default function GroundScreen() {
   // ── Step screen ────────────────────────────────────────────────────────────
   return (
     <Screen>
+      <TouchableOpacity
+        style={[s.exitButton, { top: insets.top + Spacing.two, backgroundColor: colors.backgroundElement }]}
+        onPress={() => router.back()}
+        activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel={g.exit}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons name="close" size={22} color={colors.text} />
+      </TouchableOpacity>
+
       <ScreenHeader variant="immersive">
         <Text style={[s.title,    { color: colors.text }]}>{g.title}</Text>
         <Text style={[s.subtitle, { color: colors.textSecondary }]}>{g.subtitle}</Text>
@@ -167,6 +191,10 @@ export default function GroundScreen() {
 }
 
 const s = StyleSheet.create({
+  exitButton:  { position: 'absolute', right: Spacing.four, zIndex: 10,
+                 width: 40, height: 40, borderRadius: 20,
+                 alignItems: 'center', justifyContent: 'center' },
+
   scroll:      { flexGrow: 1, justifyContent: 'center', paddingHorizontal: Spacing.three },
 
   title:       { fontSize: 28, fontWeight: '700', letterSpacing: -0.5, textAlign: 'center' },

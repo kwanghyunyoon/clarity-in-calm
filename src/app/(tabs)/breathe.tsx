@@ -1,5 +1,8 @@
+import { Ionicons } from '@expo/vector-icons';
+import { router, useFocusEffect, useNavigation } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   cancelAnimation,
   Easing,
@@ -14,6 +17,7 @@ import Animated, {
 
 import { Screen, ScreenHeader } from '@/components/ui/Screen';
 import { Spacing } from '@/constants/theme';
+import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useWellness } from '@/context/wellness-context';
@@ -34,6 +38,19 @@ export default function BreatheScreen() {
   const { colors } = useTheme();
   const t = useTranslation();
   const { addBreathingSession } = useWellness();
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const tabBarStyle = useTabBarStyle();
+
+  // Hide the floating tab bar while this screen is focused, restoring it on
+  // blur — a mid-exercise user shouldn't have to reach past it to exit.
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({ tabBarStyle: { display: 'none' } });
+      return () => parent?.setOptions({ tabBarStyle });
+    }, [navigation, tabBarStyle]),
+  );
 
   // Build PHASES from translations so labels/hints are localised
     const PHASES = [
@@ -143,8 +160,24 @@ export default function BreatheScreen() {
     setIsRunning((v) => !v);
   };
 
+  const handleExit = () => {
+    if (isRunning && rounds > 0) addBreathingSession();
+    router.back();
+  };
+
   return (
     <Screen style={s.root}>
+      <TouchableOpacity
+        style={[s.exitButton, { top: insets.top + Spacing.two, backgroundColor: colors.backgroundElement }]}
+        onPress={handleExit}
+        activeOpacity={0.8}
+        accessibilityRole="button"
+        accessibilityLabel={t.breathe.exit}
+        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+      >
+        <Ionicons name="close" size={22} color={colors.text} />
+      </TouchableOpacity>
+
       <ScreenHeader variant="immersive">
         <Text style={[s.title,    { color: colors.text }]}>{t.breathe.title}</Text>
         <Text style={[s.subtitle, { color: colors.textSecondary }]}>{t.breathe.subtitle}</Text>
@@ -222,6 +255,9 @@ const GLOW_SIZE  = DISC_SIZE + 72;
 
 const s = StyleSheet.create({
   root:          { alignItems: 'center', justifyContent: 'center' },
+  exitButton:    { position: 'absolute', right: Spacing.four, zIndex: 10,
+                   width: 40, height: 40, borderRadius: 20,
+                   alignItems: 'center', justifyContent: 'center' },
   title:         { fontSize: 28, fontWeight: '700', letterSpacing: -0.5 },
   subtitle:      { fontSize: 16, fontWeight: '500' },
 

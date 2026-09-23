@@ -1,12 +1,12 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { ColorValue, Platform, StyleSheet, View, useColorScheme } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ColorValue, View, useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { LanguagePill } from '@/components/language-pill';
 import { OnboardingModal } from '@/components/onboarding-modal';
-import { Colors, Spacing, TAB_BAR_FLOAT_HEIGHT } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
+import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTranslation } from '@/hooks/use-translation';
 
 function TabIcon({
@@ -28,9 +28,7 @@ export default function TabLayout() {
   const scheme = colorScheme === 'dark' ? 'dark' : 'light';
   const colors = Colors[scheme];
   const t = useTranslation();
-  const insets = useSafeAreaInsets();
-
-  const barBottom = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 4) + Spacing.two;
+  const tabBarStyle = useTabBarStyle();
 
   return (
     <>
@@ -41,25 +39,7 @@ export default function TabLayout() {
         screenOptions={{
           headerShown: false,
           tabBarHideOnKeyboard: false,
-          tabBarStyle: {
-            position: 'absolute',
-            left: Spacing.three,
-            right: Spacing.three,
-            bottom: barBottom,
-            height: TAB_BAR_FLOAT_HEIGHT,
-            borderRadius: 28,
-            borderTopWidth: 0,
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: colors.tabBarBorder,
-            backgroundColor: colors.tabBar,
-            paddingTop: 6,
-            paddingBottom: 0,
-            elevation: 4,
-            shadowColor: '#000',
-            shadowOpacity: 0.12,
-            shadowRadius: 8,
-            shadowOffset: { width: 0, height: 4 },
-          },
+          tabBarStyle,
           tabBarActiveTintColor: colors.primary,
           tabBarInactiveTintColor: colors.textSecondary,
           tabBarLabelStyle: {

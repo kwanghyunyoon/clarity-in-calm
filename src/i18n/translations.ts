@@ -1042,6 +1042,12 @@ export const SOURCE = {
       es: 'La respiración de caja activa tu sistema nervioso parasimpático, reduciendo el estrés y mejorando la concentración. Cada fase dura 4 segundos.',
       hi: 'बॉक्स ब्रीदिंग आपके पैरासिम्पेथेटिक नर्वस सिस्टम को सक्रिय करती है, तनाव कम करती है और एकाग्रता बढ़ाती है। प्रत्येक चरण 4 सेकंड का है।',
     },
+    exit: {
+      en: 'Exit',
+      ko: '나가기',
+      es: 'Salir',
+      hi: 'बाहर निकलें',
+    },
   },
   ground: {
     title: {
@@ -1261,6 +1267,12 @@ export const SOURCE = {
       ko: '5-4-3-2-1 기법은 감각을 활성화해 불안한 생각의 소용돌이를 끊어줘요. 전 세계 치료사들이 활용하는 방법이고, 아무런 도구도 필요 없어요.',
       es: 'La técnica 5-4-3-2-1 interrumpe las espirales de ansiedad activando tus sentidos. Utilizada por terapeutas en todo el mundo — y no cuesta nada.',
       hi: '5-4-3-2-1 तकनीक आपकी इंद्रियों को सक्रिय करके चिंता के चक्र को तोड़ती है। दुनिया भर के थेरेपिस्ट इसका उपयोग करते हैं — और इसके लिए कुछ भी चाहिए नहीं।',
+    },
+    exit: {
+      en: 'Exit',
+      ko: '나가기',
+      es: 'Salir',
+      hi: 'बाहर निकलें',
     },
   },
   journal: {
