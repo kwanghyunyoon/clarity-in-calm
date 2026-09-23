@@ -1830,20 +1830,6 @@ export const SOURCE = {
       },
     },
   },
-  crisisResources: {
-    navLabel: {
-      en: 'Crisis resources',
-      ko: '위기 지원 자료',
-      es: 'Recursos de crisis',
-      hi: 'संकट सहायता संसाधन',
-    },
-    closeBtn: {
-      en: 'Close',
-      ko: '닫기',
-      es: 'Cerrar',
-      hi: 'बंद करें',
-    },
-  },
   today: {
     title: {
       en: 'Today',
