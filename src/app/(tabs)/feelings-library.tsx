@@ -89,13 +89,26 @@ export default function FeelingsLibraryScreen() {
   );
 }
 
+function splitToLines(body: string): string[] {
+  return body
+    .split(/(?<=[.!?।])\s+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
 function DetailSection({
   label, body, colors, accent,
 }: { label: string; body: string; colors: { text: string; textSecondary: string }; accent?: string }) {
   return (
     <View style={styles.detailSection}>
       <Text style={[styles.sectionLabel, { color: accent ?? colors.textSecondary }]}>{label}</Text>
-      <Text style={[styles.detailBody, { color: colors.text }]}>{body}</Text>
+      <View style={styles.bulletList}>
+        {splitToLines(body).map((line, idx) => (
+          <Text key={idx} style={[styles.detailBody, { color: colors.text }]}>
+            · {line}
+          </Text>
+        ))}
+      </View>
     </View>
   );
 }
@@ -150,20 +163,20 @@ const styles = StyleSheet.create({
     marginTop: Spacing.three,
     gap: Spacing.three,
   },
-  detailSection: { gap: Spacing.half + 2 },
+  detailSection: { gap: Spacing.half + 4 },
   sectionLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    letterSpacing: 0.3,
   },
+  bulletList: { gap: Spacing.half + 2 },
   detailBody: {
     fontSize: 14,
-    lineHeight: 21,
+    lineHeight: 22,
   },
   exploreSection: { gap: Spacing.two },
   promptText: {
     fontSize: 14,
-    lineHeight: 21,
+    lineHeight: 22,
   },
 });
