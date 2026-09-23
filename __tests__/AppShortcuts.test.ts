@@ -29,15 +29,42 @@ describe('buildAppShortcuts — shortcuts', () => {
     expect(data).toEqual([link]);
   });
 
-  it.each(['breathe', 'ground'])('%s opens the app’s own MainActivity', (id) => {
+  // Launchers start shortcuts with NEW_TASK|CLEAR_TASK. Aimed at MainActivity,
+  // that recreates it over the live JS runtime: the app got stuck on the splash
+  // and would lose unsaved journal text. The trampoline takes that hit instead.
+  it.each(['breathe', 'ground'])('%s opens the Quick Launch trampoline, not MainActivity', (id) => {
     const s = shortcut(id);
     expect(s).toContain('android:action="android.intent.action.VIEW"');
     expect(s).toContain('android:targetPackage="com.clarityincalm.app"');
-    expect(s).toContain('android:targetClass="com.clarityincalm.app.MainActivity"');
+    expect(s).toContain('android:targetClass="com.clarityincalm.app.QuickLaunchActivity"');
   });
 
   it.each(['breathe', 'ground'])('%s labels come from string resources', (id) => {
     expect(shortcut(id)).toContain(`android:shortcutShortLabel="@string/shortcut_${id}"`);
+  });
+});
+
+describe('buildAppShortcuts — Quick Launch trampoline', () => {
+  it('lives in its own task so the launcher’s CLEAR_TASK never touches the app’s task', () => {
+    expect(out.trampoline.manifest).toMatchObject({
+      'android:name': '.QuickLaunchActivity',
+      'android:taskAffinity': '',
+      'android:excludeFromRecents': 'true',
+      'android:noHistory': 'true',
+    });
+  });
+
+  it('forwards the link to MainActivity with NEW_TASK only, so the running app is reused', () => {
+    const kt = out.trampoline.kotlin;
+    expect(kt).toMatch(/^package com\.clarityincalm\.app$/m);
+    expect(kt).toContain('MainActivity::class.java');
+    expect(kt).toContain('Intent.FLAG_ACTIVITY_NEW_TASK');
+    expect(kt).not.toContain('CLEAR_TASK');
+    expect(kt).toContain('finish()');
+  });
+
+  it('only forwards the app’s own scheme', () => {
+    expect(out.trampoline.kotlin).toContain('"clarityincalm"');
   });
 });
 
