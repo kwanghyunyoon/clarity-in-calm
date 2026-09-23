@@ -52,6 +52,36 @@ backend/account system or data, versus just looking related. Resolved via `/gril
 connected only by lightweight cross-promotion (store-listing links), no deep-linking. See
 [ADR-0002](docs/adr/0002-trio-app-connections.md).
 
+### Exercise, Quick Launch, Launch point
+
+Vocabulary for reaching calming exercises fast (resolved via `/grilling`, 2026-09-23):
+
+- **Exercise** — a guided calming activity: Breathe (box breathing) or Grounding (5-4-3-2-1).
+  Exercises live inside Clarity-in-Calm. Splitting them out as standalone apps was considered
+  and rejected: a separate app doesn't reduce the taps needed in a panic moment, and
+  [ADR-0002](docs/adr/0002-trio-app-connections.md) already rules out deep-linking between
+  apps.
+- **Quick Launch** — opening the app directly into an Exercise that is *already running*,
+  bypassing Today, the splash, and Onboarding. A first-ever Quick Launch defers Onboarding to the
+  next normal launch rather than interrupting the Exercise. A Quick-Launched Breathe opens with a
+  short "get ready" lead-in before the first inhale (a normal in-app Start does not). A Quick
+  Launch into an Exercise already in progress *resumes* it; it only restarts one that was
+  finished or never begun. Leaving the Exercise lands on Today.
+  A Quick Launch into an already-open app must not discard an unsaved journal entry. Sessions
+  count toward stats exactly like normal ones. Only Breathe and Grounding are Quick-Launchable;
+  crisis resources are deliberately not a Quick Launch target.
+- **Launch point** — any system surface outside the app that triggers a Quick Launch: app
+  shortcut (long-press icon), pinned home-screen shortcut, Quick Settings tile, home-screen
+  widget. Launch point labels follow the *device* language, not the in-app language picker.
+- **Quick access page** — the permanent in-app explainer for Launch points, reached from
+  Settings ("Quick access"). Offers a one-tap system "Add" for each Launch point the device
+  supports, and manual steps where it doesn't.
+- **Feature announcement** — a one-time, dismissible card on Today ("Calm in one tap") pointing
+  existing users to the Quick access page. Shown once, ever; Launch points added later join the
+  Quick access page silently rather than re-announcing. Distinct from **Onboarding** (new users
+  get a dedicated Onboarding slide instead) and from a **Screen tour** (none on Exercise screens —
+  it would interrupt the Exercise itself).
+
 ### Screen tour vs. Onboarding
 
 Two distinct first-run explainer concepts that must not be folded into one flag or flow
