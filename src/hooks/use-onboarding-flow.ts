@@ -9,6 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 import type { Locale } from '@/i18n/translations';
 import { DataKeySpec } from '@/lib/data-keys';
+import { decideQuickLaunch, type QuickLaunchInput } from '@/lib/quick-launch';
 
 const ONBOARDING_KEY    = '@cic:hasSeenOnboarding';
 const LANGUAGE_STEP_KEY = '@cic:hasChosenLanguage';
@@ -23,13 +24,24 @@ interface UseOnboardingFlowArgs {
   hideHelp: () => void;
   setLocale: (locale: Locale) => void;
   slideCount: number;
+  /** Current route + params, so a Quick Launch can put first-launch Onboarding off. */
+  route: Pick<QuickLaunchInput, 'route' | 'params'>;
 }
 
-export function useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCount }: UseOnboardingFlowArgs) {
+export function useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCount, route }: UseOnboardingFlowArgs) {
   const [firstLaunch,      setFirstLaunch]      = useState(false);
   const [showLanguageStep, setShowLanguageStep] = useState(false);
   const [langSelection,    setLangSelection]    = useState<Locale | null>(null);
   const [page,             setPage]             = useState(0);
+
+  // The Exercise screen clears `autostart` as soon as it acts on it, so the
+  // Quick Launch is remembered for the rest of the session: first-launch
+  // Onboarding stays put off (not marked seen) until the next normal launch.
+  const [quickLaunch, setQuickLaunch] = useState<Pick<QuickLaunchInput, 'route' | 'params'> | null>(null);
+  if (quickLaunch === null && decideQuickLaunch(route).isQuickLaunch) setQuickLaunch(route);
+  const postponed =
+    quickLaunch !== null &&
+    decideQuickLaunch({ ...quickLaunch, hasSeenOnboarding: false }).postponeOnboarding;
 
   useEffect(() => {
     let mounted = true;
@@ -58,7 +70,7 @@ export function useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCou
   }
 }, [isHelpVisible]);
 
-  const visible = firstLaunch || isHelpVisible;
+  const visible = (firstLaunch && !postponed) || isHelpVisible;
   const isLast  = page === slideCount - 1;
 
   const handleNext = async () => {

@@ -1000,6 +1000,13 @@ export const SOURCE = {
       es: 'Listo',
       hi: 'तैयार',
     },
+    // Quick Launch lead-in: shown over a 3-2-1 countdown before the first inhale
+    getReady: {
+      en: 'Get ready',
+      ko: '준비하세요',
+      es: 'Prepárate',
+      hi: 'तैयार हो जाएँ',
+    },
     tapToStart: {
       en: 'tap Start to begin',
       ko: '시작을 눌러주세요',

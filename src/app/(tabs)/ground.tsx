@@ -5,8 +5,8 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect, useNavigation } from 'expo-router';
-import React, { useCallback, useState } from 'react';
+import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -15,6 +15,7 @@ import { Spacing, TAB_BAR_CLEARANCE } from '@/constants/theme';
 import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
+import { AUTOSTART_PARAM, decideQuickLaunch } from '@/lib/quick-launch';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -35,6 +36,7 @@ export default function GroundScreen() {
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
   const navigation = useNavigation();
   const tabBarStyle = useTabBarStyle();
+  const params = useLocalSearchParams();
 
   // Hide the floating tab bar while this screen is focused, restoring it on
   // blur — a mid-exercise user shouldn't have to reach past it to exit.
@@ -69,6 +71,29 @@ export default function GroundScreen() {
     setCompleted(false);
   };
 
+  /* ── Quick Launch ──
+   * `autostart=1` (see src/lib/quick-launch.ts) opens at step 1 unless a run
+   * is already under way, in which case it resumes where it was left. The
+   * param is cleared straight away so coming back to this tab later doesn't
+   * reset it again.
+   */
+  const autostart = params[AUTOSTART_PARAM];
+  useEffect(() => {
+    const decision = decideQuickLaunch({
+      route: '/ground',
+      params: { [AUTOSTART_PARAM]: autostart },
+      exerciseState: completed ? 'finished' : stepIndex > 0 ? 'in-progress' : 'not-started',
+    });
+    if (!decision.isQuickLaunch) return;
+    const id = setTimeout(() => {
+      router.setParams({ [AUTOSTART_PARAM]: undefined });
+      if (decision.action === 'restart') handleReset();
+    }, 0);
+    return () => clearTimeout(id);
+    // stepIndex/completed are read, not watched: the decision is made once per link.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autostart]);
+
   // ── Completion screen ──────────────────────────────────────────────────────
   if (completed) {
     return (
@@ -93,7 +118,7 @@ export default function GroundScreen() {
 
           <TouchableOpacity
             style={[s.btnOutline, { borderColor: colors.backgroundSelected }]}
-            onPress={() => router.back()}
+            onPress={() => router.navigate('/')}
             activeOpacity={0.75}
           >
             <Text style={[s.btnOutlineText, { color: colors.textSecondary }]}>{g.complete.back}</Text>
@@ -108,7 +133,7 @@ export default function GroundScreen() {
     <Screen>
       <TouchableOpacity
         style={[s.exitButton, { top: insets.top + Spacing.two, backgroundColor: colors.backgroundElement }]}
-        onPress={() => router.back()}
+        onPress={() => router.navigate('/')}
         activeOpacity={0.8}
         accessibilityRole="button"
         accessibilityLabel={g.exit}

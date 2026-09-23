@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Tabs, useGlobalSearchParams, usePathname } from 'expo-router';
+import { useState } from 'react';
 import { ColorValue, View, useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
@@ -8,6 +9,7 @@ import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
 import { useTabBarStyle } from '@/hooks/use-tab-bar-style';
 import { useTranslation } from '@/hooks/use-translation';
+import { decideQuickLaunch } from '@/lib/quick-launch';
 
 function TabIcon({
   name,
@@ -29,10 +31,14 @@ export default function TabLayout() {
   const colors = Colors[scheme];
   const t = useTranslation();
   const tabBarStyle = useTabBarStyle();
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  // Decided once, at launch: a Quick Launch goes straight into the Exercise.
+  const [skipSplash] = useState(() => decideQuickLaunch({ route: pathname, params }).skipSplash);
 
   return (
     <>
-      <AnimatedSplashOverlay />
+      {!skipSplash && <AnimatedSplashOverlay />}
       <LanguagePill />
       <OnboardingModal />
       <Tabs

@@ -5,6 +5,7 @@
  */
 
 import { Ionicons } from '@expo/vector-icons';
+import { useGlobalSearchParams, usePathname } from 'expo-router';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated2, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,6 +29,7 @@ export function OnboardingModal() {
   const { locale, setLocale } = useLocale();
   const { isHelpVisible, hideHelp } = useHelp();
   const insets                = useSafeAreaInsets();
+  const route = { route: usePathname(), params: useGlobalSearchParams() };
 
   const slides    = t.onboarding.slides as readonly { emoji: string; title: string; body: string }[];
   const checklist = t.onboarding.shieldChecklist as readonly string[];
@@ -42,7 +44,7 @@ export function OnboardingModal() {
     handleNext,
     handleClose,
     handleLanguageContinue,
-  } = useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCount: slides.length });
+  } = useOnboardingFlow({ isHelpVisible, hideHelp, setLocale, slideCount: slides.length, route });
 
   const {
     tb: restoreTb,

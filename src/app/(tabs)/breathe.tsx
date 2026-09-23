@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { router, useFocusEffect, useNavigation } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,6 +32,10 @@ import {
   PHASE_DURATIONS,
   RING_SCALE,
 } from '@/lib/breathing';
+import { AUTOSTART_PARAM, decideQuickLaunch } from '@/lib/quick-launch';
+
+/** Length of the Quick Launch "get ready" lead-in, in whole seconds. */
+const LEAD_IN_SECONDS = 3;
 
 
 export default function BreatheScreen() {
@@ -41,6 +45,7 @@ export default function BreatheScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const tabBarStyle = useTabBarStyle();
+  const params = useLocalSearchParams();
 
   // Hide the floating tab bar while this screen is focused, restoring it on
   // blur — a mid-exercise user shouldn't have to reach past it to exit.
@@ -65,6 +70,8 @@ export default function BreatheScreen() {
   // Whole second of the cycle, 0…15. The single source of truth for the label,
   // the hint and the countdown — all three are derived from it below.
   const [tick,      setTick]      = useState(0);
+  // Seconds left in the Quick Launch lead-in (3, 2, 1), or null when none is running.
+  const [leadIn,    setLeadIn]    = useState<number | null>(null);
 
   /* ── The one clock ──
    * `progress` runs 0 → CYCLE_MS linearly and repeats. The disc, ring, glow and
@@ -116,7 +123,7 @@ export default function BreatheScreen() {
 
   /* ── Derived from the clock ── */
   const phase = PHASES.find((p) => p.id === getPhaseAtTime(tick * 1000))!;
-  const phaseLabel = isRunning ? phase.label : t.breathe.ready;
+  const phaseLabel = leadIn !== null ? t.breathe.getReady : isRunning ? phase.label : t.breathe.ready;
   const phaseHint  = isRunning ? phase.hint  : t.breathe.tapToStart;
   const countdown  = getPhaseCountdownAtTime(tick * 1000);
 
@@ -146,24 +153,68 @@ export default function BreatheScreen() {
     };
   });
 
-  /* ── Toggle ── */
-  const handleToggle = () => {
-    if (isRunning && rounds > 0) {
-      addBreathingSession();
-    }
+  /* ── Start / stop ── */
+  const startSession = useCallback(() => {
+    // Rewind the label to the top of the cycle before the clock restarts.
+    prevTickRef.current = -1;
+    setTick(0);
     setRounds(0);
-    if (!isRunning) {
-      // Rewind the label to the top of the cycle before the clock restarts.
-      prevTickRef.current = -1;
-      setTick(0);
-    }
-    setIsRunning((v) => !v);
+    setIsRunning(true);
+  }, []);
+
+  const stopSession = () => {
+    if (isRunning && rounds > 0) addBreathingSession();
+    setLeadIn(null);
+    setRounds(0);
+    setIsRunning(false);
+  };
+
+  const handleToggle = () => {
+    if (isRunning || leadIn !== null) stopSession();
+    else startSession();
   };
 
   const handleExit = () => {
-    if (isRunning && rounds > 0) addBreathingSession();
-    router.back();
+    stopSession();
+    router.navigate('/');
   };
+
+  /* ── Quick Launch ──
+   * `autostart=1` (see src/lib/quick-launch.ts) starts the session by itself,
+   * after a short lead-in so nobody is told to inhale mid-breath. A session
+   * already running is left alone. The param is cleared straight away so that
+   * coming back to this tab later doesn't start it again.
+   */
+  const autostart = params[AUTOSTART_PARAM];
+  const inProgress = isRunning || leadIn !== null;
+  useEffect(() => {
+    const decision = decideQuickLaunch({
+      route: '/breathe',
+      params: { [AUTOSTART_PARAM]: autostart },
+      exerciseState: inProgress ? 'in-progress' : 'not-started',
+    });
+    if (!decision.isQuickLaunch) return;
+    const id = setTimeout(() => {
+      router.setParams({ [AUTOSTART_PARAM]: undefined });
+      if (decision.leadIn) setLeadIn(LEAD_IN_SECONDS);
+    }, 0);
+    return () => clearTimeout(id);
+    // inProgress is read, not watched: the decision is made once per link.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autostart]);
+
+  useEffect(() => {
+    if (leadIn === null) return;
+    const id = setTimeout(() => {
+      if (leadIn > 1) {
+        setLeadIn(leadIn - 1);
+      } else {
+        setLeadIn(null);
+        startSession();
+      }
+    }, 1000);
+    return () => clearTimeout(id);
+  }, [leadIn, startSession]);
 
   return (
     <Screen style={s.root}>
@@ -198,15 +249,15 @@ export default function BreatheScreen() {
           style={[s.disc, { backgroundColor: colors.primary }, circleStyle]}
         >
           <Text style={s.phaseText}>{phaseLabel}</Text>
-          {isRunning && (
-            <Text style={s.countdownText}>{countdown}</Text>
+          {(isRunning || leadIn !== null) && (
+            <Text style={s.countdownText}>{leadIn ?? countdown}</Text>
           )}
         </Animated.View>
       </View>
 
       <View style={s.textStack}>
         {/* "Follow the circle" instruction — only before session starts */}
-        {!isRunning && (
+        {!isRunning && leadIn === null && (
           <Text style={[s.followCircle, { color: colors.primary }]}>
             {t.breathe.followCircle}
           </Text>
@@ -229,13 +280,13 @@ export default function BreatheScreen() {
       <TouchableOpacity
         style={[
           s.button,
-          { backgroundColor: isRunning ? colors.backgroundElement : colors.primary },
+          { backgroundColor: inProgress ? colors.backgroundElement : colors.primary },
         ]}
         onPress={handleToggle}
         activeOpacity={0.8}
       >
-        <Text style={[s.buttonText, { color: isRunning ? colors.text : '#ffffff' }]}>
-          {isRunning ? t.breathe.endSession : t.breathe.startBreathing}
+        <Text style={[s.buttonText, { color: inProgress ? colors.text : '#ffffff' }]}>
+          {inProgress ? t.breathe.endSession : t.breathe.startBreathing}
         </Text>
       </TouchableOpacity>
 
