@@ -4,7 +4,6 @@ import { BASIC_EMOTIONS } from '@/constants/emotions';
 import { BorderRadius, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { ensureContrastText } from '@/lib/color-contrast';
 
 export interface SelectedEmotion {
   id: string;
@@ -47,7 +46,6 @@ export function EmotionPillSelector({ selected, onSelect, otherLabel, customPlac
       {BASIC_EMOTIONS.map(emotion => {
         const isSelected = selected?.id === emotion.id;
         const label = labelFor(emotion.id, emotion.label);
-        const textColor = ensureContrastText(emotion.color, colors.backgroundElement);
         return (
           <TouchableOpacity
             key={emotion.id}
@@ -66,7 +64,7 @@ export function EmotionPillSelector({ selected, onSelect, otherLabel, customPlac
             accessibilityState={{ selected: isSelected }}
             accessibilityLabel={label}
           >
-            <Text style={[styles.pillText, { color: isSelected ? textColor : colors.text }]}>
+            <Text style={[styles.pillText, { color: isSelected ? emotion.color : colors.text }]}>
               {label}
             </Text>
           </TouchableOpacity>

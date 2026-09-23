@@ -12,7 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Animated, { FadeInDown, FadeInUp, SlideInRight } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BodyCheckIn } from '@/components/emotions/BodyCheckIn';
@@ -30,8 +30,6 @@ import { useWellness } from '@/context/wellness-context';
 import { useScreenTour } from '@/hooks/use-screen-tour';
 import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
-import { ensureContrastText } from '@/lib/color-contrast';
-import { canAdvance, EMOTION_LOG_STEPS, nextStepIndex, prevStepIndex } from '@/lib/emotion-log-steps';
 import { filterEmotionEntries } from '@/lib/insights-analytics';
 import { MoodValue } from '@/types';
 import { measureWhenSettled } from '@/utils/measureWhenSettled';
@@ -68,15 +66,8 @@ export default function EmotionsScreen() {
   const [copingActions, setCopingActions] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [saved, setSaved] = useState(false);
-  const [stepIndex, setStepIndex] = useState(0);
-
-  const step = EMOTION_LOG_STEPS[stepIndex];
-  const isFirstStep = stepIndex === 0;
-  const canGoNext = canAdvance(step, !!selectedEmotion);
 
   const accentColor = selectedEmotion?.color ?? colors.primary;
-  const accentTextColor = ensureContrastText(accentColor, colors.surface);
-  const trimmedNote = note.trim();
   const bottomPad = TAB_BAR_CLEARANCE + insets.bottom;
 
   const pickerRef = useRef<View>(null);
@@ -129,9 +120,6 @@ export default function EmotionsScreen() {
 
   const tourStepCopy = t.tour.emotions.steps[tourStep.index];
 
-  const bodyRegionLabels = t.emotionsCatalog.bodyRegions as Record<string, string>;
-  const copingActionLabels = t.emotionsCatalog.copingActions as Record<string, string>;
-
   function toggleTag(tag: string) {
     setContextTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]);
   }
@@ -144,22 +132,13 @@ export default function EmotionsScreen() {
     setCopingActions(prev => (prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]));
   }
 
-  function handleNext() {
-    if (!canAdvance(step, !!selectedEmotion)) return;
-    setStepIndex(i => nextStepIndex(i));
-  }
-
-  function handleBack() {
-    setStepIndex(i => prevStepIndex(i));
-  }
-
   function handleSave() {
     if (!selectedEmotion) return;
     // Intensity (1-10) is UI-only precision — storage keeps mood (1-5), per
     // #66/#70's ceil(intensity / 2) mapping, so native and migrated entries
     // share one scale.
     const mood = Math.ceil(intensity / 2) as MoodValue;
-    addEntry(mood, trimmedNote, {
+    addEntry(mood, note.trim(), {
       emotionId: selectedEmotion.id,
       emotionLabel: selectedEmotion.label,
       primaryEmotion: selectedEmotion.id,
@@ -176,7 +155,6 @@ export default function EmotionsScreen() {
       setBodyRegions([]);
       setCopingActions([]);
       setNote('');
-      setStepIndex(0);
     }, 1500);
   }
 
@@ -210,56 +188,38 @@ export default function EmotionsScreen() {
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
         >
-          <View
-            style={styles.progressRow}
-            accessibilityRole="progressbar"
-            accessibilityValue={{ min: 1, max: EMOTION_LOG_STEPS.length, now: stepIndex + 1 }}
-          >
-            {EMOTION_LOG_STEPS.map((id, i) => (
-              <View
-                key={id}
-                style={[
-                  styles.progressDot,
-                  { backgroundColor: i === stepIndex ? accentColor : colors.border },
-                ]}
-              />
-            ))}
-          </View>
-
-          {/* ── Step: Emotion ── */}
-          {step === 'emotion' && (
-            <Animated.View entering={FadeInDown.springify()} style={styles.wheelSection} ref={pickerRef}>
-              {!selectedEmotion && (
-                <Text style={[styles.wheelPrompt, { color: colors.textSecondary }]}>
-                  {te.selectEmotion}
+          {/* ── Wheel ── */}
+          <Animated.View entering={FadeInDown.delay(50).springify()} style={styles.wheelSection} ref={pickerRef}>
+            {!selectedEmotion && (
+              <Text style={[styles.wheelPrompt, { color: colors.textSecondary }]}>
+                {te.selectEmotion}
+              </Text>
+            )}
+            {selectedEmotion && (
+              <Animated.View entering={FadeInUp.springify()} style={[styles.selectedBadge, { backgroundColor: accentColor + '22', borderColor: accentColor + '55' }]}>
+                <Text style={[styles.selectedLabel, { color: accentColor }]}>
+                  {selectedEmotion.label}
                 </Text>
-              )}
-              {selectedEmotion && (
-                <Animated.View entering={FadeInUp.springify()} style={[styles.selectedBadge, { backgroundColor: accentColor + '22', borderColor: accentColor + '55' }]}>
-                  <Text style={[styles.selectedLabel, { color: accentTextColor }]}>
-                    {selectedEmotion.label}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setSelectedEmotion(null)}
-                    accessibilityLabel="Clear selected emotion"
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="close" size={16} color={colors.textSecondary} />
-                  </TouchableOpacity>
-                </Animated.View>
-              )}
-              <EmotionPillSelector
-                selected={selectedEmotion}
-                onSelect={setSelectedEmotion}
-                otherLabel={te.otherPill}
-                customPlaceholder={te.customPlaceholder}
-              />
-            </Animated.View>
-          )}
+                <TouchableOpacity
+                  onPress={() => setSelectedEmotion(null)}
+                  accessibilityLabel="Clear selected emotion"
+                  accessibilityRole="button"
+                >
+                  <Ionicons name="close" size={16} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+            <EmotionPillSelector
+              selected={selectedEmotion}
+              onSelect={setSelectedEmotion}
+              otherLabel={te.otherPill}
+              customPlaceholder={te.customPlaceholder}
+            />
+          </Animated.View>
 
-          {/* ── Step: Intensity ── */}
-          {step === 'intensity' && (
-            <Animated.View entering={SlideInRight.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {/* ── Intensity ── */}
+          {selectedEmotion && (
+            <Animated.View entering={SlideInDown.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.intensity}</Text>
               <IntensitySlider
                 value={intensity}
@@ -271,32 +231,34 @@ export default function EmotionsScreen() {
             </Animated.View>
           )}
 
-          {/* ── Step: Context tags + body check-in ── */}
-          {step === 'context' && (
-            <>
-              <Animated.View entering={SlideInRight.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.contextTags}</Text>
-                <ContextTagSelector
-                  selected={contextTags}
-                  onToggle={toggleTag}
-                  customTags={customTags}
-                  tagLabels={te.contextTagLabels}
-                />
-              </Animated.View>
-              <Animated.View entering={SlideInRight.delay(60).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.bodyCheckIn}</Text>
-                <BodyCheckIn
-                  selected={bodyRegions}
-                  onToggle={toggleBodyRegion}
-                  accentColor={accentColor}
-                />
-              </Animated.View>
-            </>
+          {/* ── Context tags ── */}
+          {selectedEmotion && (
+            <Animated.View entering={SlideInDown.delay(60).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.contextTags}</Text>
+              <ContextTagSelector
+                selected={contextTags}
+                onToggle={toggleTag}
+                customTags={customTags}
+                tagLabels={te.contextTagLabels}
+              />
+            </Animated.View>
           )}
 
-          {/* ── Step: Coping actions ── */}
-          {step === 'coping' && (
-            <Animated.View entering={SlideInRight.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {/* ── Body check-in ── */}
+          {selectedEmotion && (
+            <Animated.View entering={SlideInDown.delay(90).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.bodyCheckIn}</Text>
+              <BodyCheckIn
+                selected={bodyRegions}
+                onToggle={toggleBodyRegion}
+                accentColor={accentColor}
+              />
+            </Animated.View>
+          )}
+
+          {/* ── Coping actions ── */}
+          {selectedEmotion && (
+            <Animated.View entering={SlideInDown.delay(120).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.copingActions}</Text>
               <CopingActionsSelector
                 selected={copingActions}
@@ -305,9 +267,9 @@ export default function EmotionsScreen() {
             </Animated.View>
           )}
 
-          {/* ── Step: Note ── */}
-          {step === 'note' && (
-            <Animated.View entering={SlideInRight.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          {/* ── Note ── */}
+          {selectedEmotion && (
+            <Animated.View entering={SlideInDown.delay(150).springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.note}</Text>
               <TextInput
                 style={[styles.noteInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
@@ -322,55 +284,9 @@ export default function EmotionsScreen() {
             </Animated.View>
           )}
 
-          {/* ── Step: Review ── */}
-          {step === 'review' && selectedEmotion && (
-            <Animated.View entering={SlideInRight.springify()} style={[styles.section, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>{te.reviewTitle}</Text>
-
-              <View style={styles.reviewRow}>
-                <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.selectedEmotion}</Text>
-                <Text style={[styles.reviewValue, { color: accentTextColor }]}>{selectedEmotion.label}</Text>
-              </View>
-
-              <View style={styles.reviewRow}>
-                <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.intensity}</Text>
-                <Text style={[styles.reviewValue, { color: colors.text }]}>{intensity}/10</Text>
-              </View>
-
-              {contextTags.length > 0 && (
-                <View style={styles.reviewRow}>
-                  <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.contextTags}</Text>
-                  <Text style={[styles.reviewValue, { color: colors.text }]}>
-                    {contextTags.map(tag => te.contextTagLabels[tag as keyof typeof te.contextTagLabels] ?? tag).join(', ')}
-                  </Text>
-                </View>
-              )}
-
-              {bodyRegions.length > 0 && (
-                <View style={styles.reviewRow}>
-                  <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.bodyCheckIn}</Text>
-                  <Text style={[styles.reviewValue, { color: colors.text }]}>
-                    {bodyRegions.map(id => bodyRegionLabels[id] ?? id).join(', ')}
-                  </Text>
-                </View>
-              )}
-
-              {copingActions.length > 0 && (
-                <View style={styles.reviewRow}>
-                  <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.copingActions}</Text>
-                  <Text style={[styles.reviewValue, { color: colors.text }]}>
-                    {copingActions.map(id => copingActionLabels[id] ?? id).join(', ')}
-                  </Text>
-                </View>
-              )}
-
-              {trimmedNote.length > 0 && (
-                <View style={styles.reviewRow}>
-                  <Text style={[styles.reviewLabel, { color: colors.textSecondary }]}>{te.note}</Text>
-                  <Text style={[styles.reviewValue, { color: colors.text }]}>{trimmedNote}</Text>
-                </View>
-              )}
-
+          {/* ── Save button ── */}
+          {selectedEmotion && (
+            <Animated.View entering={FadeInDown.delay(180).springify()}>
               <AnimatedPressable
                 onPress={handleSave}
                 disabled={saved}
@@ -383,43 +299,13 @@ export default function EmotionsScreen() {
             </Animated.View>
           )}
 
-          {/* ── Step navigation ── */}
-          <View style={styles.navRow}>
-            {!isFirstStep && (
-              <TouchableOpacity
-                onPress={handleBack}
-                style={[styles.backBtn, { borderColor: colors.border }]}
-                accessibilityRole="button"
-                accessibilityLabel={te.back}
-              >
-                <Text style={[styles.backBtnText, { color: colors.textSecondary }]}>{te.back}</Text>
-              </TouchableOpacity>
-            )}
-            {step !== 'review' && (
-              <AnimatedPressable
-                onPress={handleNext}
-                disabled={!canGoNext}
-                style={[
-                  styles.nextBtn,
-                  { backgroundColor: canGoNext ? accentColor : colors.border },
-                ]}
-                accessibilityRole="button"
-                accessibilityLabel={te.next}
-              >
-                <Text style={[styles.nextBtnText, { color: canGoNext ? '#fff' : colors.textSecondary }]}>
-                  {te.next}
-                </Text>
-              </AnimatedPressable>
-            )}
-          </View>
-
           {/* ── Past logs ── */}
-          {step === 'emotion' && emotionEntries.length > 0 && (
+          {emotionEntries.length > 0 && (
             <View style={styles.pastSection}>
               <Text style={[styles.pastTitle, { color: colors.textSecondary }]}>{te.pastTitle}</Text>
               {emotionEntries.slice(0, 20).map((log, i) => {
                 const emotion = BASIC_EMOTIONS_BY_ID[log.emotionId];
-                const color = ensureContrastText(emotion?.color ?? colors.primary, colors.surface);
+                const color = emotion?.color ?? colors.primary;
                 const tags = log.contextTags ?? [];
                 return (
                   <Animated.View
@@ -427,7 +313,7 @@ export default function EmotionsScreen() {
                     entering={FadeInDown.delay(i * 40).springify()}
                     style={[styles.logCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
                   >
-                    <View style={[styles.logColorBar, { backgroundColor: emotion?.color ?? colors.primary }]} />
+                    <View style={[styles.logColorBar, { backgroundColor: color }]} />
                     <View style={styles.logBody}>
                       <View style={styles.logHeader}>
                         <Text style={[styles.logEmotion, { color }]}>{log.emotionLabel}</Text>
@@ -470,7 +356,7 @@ export default function EmotionsScreen() {
           )}
 
           {/* ── Empty state ── */}
-          {step === 'emotion' && emotionEntries.length === 0 && !selectedEmotion && (
+          {emotionEntries.length === 0 && !selectedEmotion && (
             <View style={styles.emptyState}>
               <Ionicons
                 name="sync-circle-outline"
@@ -513,16 +399,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.three,
     gap: Spacing.three,
   },
-  progressRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
   wheelSection: {
     alignItems: 'center',
     gap: Spacing.two,
@@ -564,52 +440,11 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     minHeight: 80,
   },
-  reviewRow: {
-    gap: 2,
-  },
-  reviewLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.4,
-    textTransform: 'uppercase',
-  },
-  reviewValue: {
-    fontSize: 15,
-    lineHeight: 20,
-  },
-  navRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.two,
-  },
-  backBtn: {
-    borderRadius: BorderRadius.xl,
-    borderWidth: 1,
-    paddingVertical: Spacing.three,
-    paddingHorizontal: Spacing.four,
-  },
-  backBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  nextBtn: {
-    flex: 1,
-    borderRadius: BorderRadius.xl,
-    paddingVertical: Spacing.three,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  nextBtnText: {
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: -0.2,
-  },
   saveBtn: {
     borderRadius: BorderRadius.xl,
     paddingVertical: Spacing.three,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: Spacing.two,
   },
   saveBtnText: {
     color: '#fff',

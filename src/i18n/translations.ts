@@ -619,7 +619,7 @@ export const SOURCE = {
           },
           {
             title: "There's more once you pick a feeling",
-            body: "A few short steps follow — intensity, context, coping, a note — then a final review before you save. Use Back/Next to move through them.",
+            body: "A slider for how strong it is, tags for context and body sensations, coping actions, and a note — all appear below, ready to save.",
           },
         ],
         ko: [
@@ -629,7 +629,7 @@ export const SOURCE = {
           },
           {
             title: '감정을 선택하면 더 많은 항목이 나타나요',
-            body: '강도, 맥락, 대처 행동, 메모 순으로 몇 단계가 이어지고, 마지막에 확인 후 저장해요. 뒤로/다음 버튼으로 이동하세요.',
+            body: '강도 슬라이더, 맥락 태그와 몸의 감각, 대처 행동, 메모까지 — 모두 아래에 나타나고 바로 저장할 수 있어요.',
           },
         ],
         es: [
@@ -639,7 +639,7 @@ export const SOURCE = {
           },
           {
             title: 'Aparece más al elegir una emoción',
-            body: 'Siguen unos pasos breves — intensidad, contexto, afrontamiento, una nota — y luego una revisión final antes de guardar. Usa Atrás/Siguiente para avanzar.',
+            body: 'Un control de intensidad, etiquetas de contexto y sensaciones corporales, acciones de afrontamiento y una nota — todo aparece abajo, listo para guardar.',
           },
         ],
         hi: [
@@ -649,7 +649,7 @@ export const SOURCE = {
           },
           {
             title: 'भावना चुनते ही और भी विकल्प दिखेंगे',
-            body: 'इसके बाद कुछ छोटे चरण आते हैं — तीव्रता, संदर्भ, कोपिंग, एक नोट — फिर सेव करने से पहले अंतिम समीक्षा। आगे बढ़ने के लिए वापस/आगे का उपयोग करें।',
+            body: 'तीव्रता का स्लाइडर, संदर्भ और शरीर की संवेदनाओं के टैग, कोपिंग एक्शन, और एक नोट — सब कुछ नीचे दिखेगा, सेव करने के लिए तैयार।',
           },
         ],
       },
@@ -2056,24 +2056,6 @@ export const SOURCE = {
       ko: '선택됨',
       es: 'Seleccionado',
       hi: 'चुना गया',
-    },
-    back: {
-      en: 'Back',
-      ko: '뒤로',
-      es: 'Atrás',
-      hi: 'वापस',
-    },
-    next: {
-      en: 'Next',
-      ko: '다음',
-      es: 'Siguiente',
-      hi: 'आगे',
-    },
-    reviewTitle: {
-      en: 'Review your check-in',
-      ko: '기록 확인하기',
-      es: 'Revisa tu registro',
-      hi: 'अपनी प्रविष्टि जाँचें',
     },
     // Keyed by the raw values in PREDEFINED_CONTEXT_TAGS (src/constants/emotions.ts) —
     // these were previously mislabeled with journal.tsx's tag vocabulary (work/home/
