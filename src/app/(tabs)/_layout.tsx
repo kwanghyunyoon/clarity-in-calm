@@ -3,6 +3,7 @@ import { Tabs } from 'expo-router';
 import { ColorValue, View, useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
+import { CrisisResourcesButton } from '@/components/crisis-resources-button';
 import { LanguagePill } from '@/components/language-pill';
 import { OnboardingModal } from '@/components/onboarding-modal';
 import { Colors } from '@/constants/theme';
@@ -34,6 +35,7 @@ export default function TabLayout() {
     <>
       <AnimatedSplashOverlay />
       <LanguagePill />
+      <CrisisResourcesButton />
       <OnboardingModal />
       <Tabs
         screenOptions={{

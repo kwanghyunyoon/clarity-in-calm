@@ -1,8 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useCallback, useState } from 'react';
 import {
-  Alert,
-  Linking,
   Modal,
   Platform,
   ScrollView,
@@ -14,6 +12,7 @@ import {
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 
+import { CrisisResourceLines } from '@/components/crisis-resource-lines';
 import { DatePickerModal } from '@/components/journal/DatePickerModal';
 import { AnimatedPressable } from '@/components/ui/AnimatedPressable';
 import { JOURNAL_TEMPLATES } from '@/constants/emotions';
@@ -32,19 +31,6 @@ interface JournalComposerProps {
   templatesRef?: React.RefObject<View | null>;
   noteInputRef?: React.RefObject<View | null>;
   saveBtnRef?: React.RefObject<View | null>;
-}
-
-async function openUrl(rawUrl: string) {
-  let url = rawUrl;
-  if (Platform.OS === 'android' && url.startsWith('sms:') && url.includes('?')) {
-    url = url.split('?')[0];
-  }
-  const supported = await Linking.canOpenURL(url);
-  if (supported) {
-    await Linking.openURL(url);
-  } else {
-    Alert.alert('Cannot open', url);
-  }
 }
 
 export function JournalComposer({ templatesRef, noteInputRef, saveBtnRef }: JournalComposerProps) {
@@ -372,19 +358,7 @@ export function JournalComposer({ templatesRef, noteInputRef, saveBtnRef }: Jour
             <View style={[styles.crisisModal, { backgroundColor: colors.surface }]}>
               <Text style={[styles.crisisTitle, { color: colors.text }]}>{concernNotice.title}</Text>
               <Text style={[styles.crisisBody, { color: colors.textSecondary }]}>{concernNotice.body}</Text>
-              {concernNotice.lines.map((line) => (
-                <TouchableOpacity
-                  key={line.title}
-                  style={[styles.crisisLine, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}
-                  onPress={() => openUrl(line.action)}
-                >
-                  <Text style={styles.crisisEmoji}>{line.emoji}</Text>
-                  <View style={styles.crisisLineText}>
-                    <Text style={[styles.crisisLineTitle, { color: colors.text }]}>{line.title}</Text>
-                    <Text style={[styles.crisisLineSub, { color: colors.textSecondary }]}>{line.sub}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
+              <CrisisResourceLines lines={concernNotice.lines} colors={colors} />
               <TouchableOpacity
                 style={[styles.crisisBtn, { backgroundColor: colors.primary }]}
                 onPress={handleCrisisConfirm}
@@ -489,18 +463,6 @@ const styles = StyleSheet.create({
   },
   crisisTitle: { fontSize: 22, fontWeight: '700', letterSpacing: -0.3 },
   crisisBody: { fontSize: 15, lineHeight: 22 },
-  crisisLine: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: BorderRadius.lg,
-    borderWidth: 1,
-    padding: Spacing.three,
-    gap: Spacing.three,
-  },
-  crisisEmoji: { fontSize: 24 },
-  crisisLineText: { flex: 1 },
-  crisisLineTitle: { fontSize: 15, fontWeight: '600' },
-  crisisLineSub: { fontSize: 13, marginTop: 2 },
   crisisBtn: { borderRadius: BorderRadius.xl, paddingVertical: Spacing.three, alignItems: 'center' },
   crisisBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
   crisisSaveLink: { textAlign: 'center', fontSize: 14, paddingVertical: Spacing.two },
