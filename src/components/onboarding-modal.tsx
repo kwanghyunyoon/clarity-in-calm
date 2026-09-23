@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated2, { FadeIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
 
 import { Spacing } from '@/constants/theme';
 import { useHelp } from '@/context/help-context';
@@ -18,7 +17,6 @@ import { useTheme } from '@/hooks/use-theme';
 import { useTranslation } from '@/hooks/use-translation';
 import { useOnboardingFlow } from '@/hooks/use-onboarding-flow';
 
-import { FeedbackModal } from './feedback-modal';
 import { PassphrasePromptModal } from './passphrase-prompt-modal';
 import { LanguagePicker } from './onboarding/language-picker';
 import { LanguageStepView } from './onboarding/language-step';
@@ -30,8 +28,6 @@ export function OnboardingModal() {
   const { locale, setLocale } = useLocale();
   const { isHelpVisible, hideHelp } = useHelp();
   const insets                = useSafeAreaInsets();
-
-  const [feedbackVisible, setFeedbackVisible] = useState(false);
 
   const slides    = t.onboarding.slides as readonly { emoji: string; title: string; body: string }[];
   const checklist = t.onboarding.shieldChecklist as readonly string[];
@@ -153,19 +149,11 @@ export function OnboardingModal() {
                   {isLast ? t.onboarding.getStarted : t.onboarding.next}
                 </Text>
               </TouchableOpacity>
-
-              <TouchableOpacity onPress={() => setFeedbackVisible(true)} activeOpacity={0.7} style={s.reportBtn}>
-                <Text style={[s.reportTxt, { color: colors.textSecondary }]}>
-                  {t.onboarding.reportIssue}
-                </Text>
-              </TouchableOpacity>
             </View>
           </>
         )}
 
       </View>
-
-      <FeedbackModal visible={feedbackVisible} onClose={() => setFeedbackVisible(false)} />
 
       <PassphrasePromptModal
         visible={passphraseModalVisible}
@@ -215,7 +203,4 @@ const s = StyleSheet.create({
   btn:          { paddingHorizontal: Spacing.five, paddingVertical: Spacing.two + 6,
                   borderRadius: 50, alignItems: 'center', width: '100%' },
   btnText:      { fontSize: 17, fontWeight: '700', color: '#ffffff' },
-
-  reportBtn:    { paddingVertical: 4 },
-  reportTxt:    { fontSize: 12, fontWeight: '500', textDecorationLine: 'underline' },
 });

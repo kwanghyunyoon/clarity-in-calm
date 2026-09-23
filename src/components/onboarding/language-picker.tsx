@@ -37,9 +37,8 @@ export function LanguagePicker({ colors, selected, onSelect, variant }: Language
                 i === LANGUAGES.length - 1 && s.langBtnLast,
               ]}
             >
-              <Text style={s.langFlag}>{lang.flag}</Text>
               <Text style={[s.langLabel, { color: active ? '#fff' : colors.textSecondary }]}>
-                {lang.shortLabel}
+                {lang.code}
               </Text>
             </TouchableOpacity>
           );
@@ -62,7 +61,7 @@ export function LanguagePicker({ colors, selected, onSelect, variant }: Language
               { backgroundColor: colors.backgroundElement, borderColor: active ? colors.primary : 'transparent' },
             ]}
           >
-            <Text style={s.langCardFlag}>{opt.flag}</Text>
+            <Text style={[s.langCardCode, { color: colors.textSecondary }]}>{opt.code}</Text>
             <Text style={[s.langCardLabel, { color: colors.text }]}>{opt.nativeName}</Text>
             {active && <Text style={[s.langCardCheck, { color: colors.primary }]}>✓</Text>}
           </TouchableOpacity>
@@ -80,14 +79,13 @@ const s = StyleSheet.create({
                   paddingHorizontal: Spacing.two + 4, paddingVertical: Spacing.one + 4 },
   langBtnFirst: { borderTopLeftRadius: 50, borderBottomLeftRadius: 50 },
   langBtnLast:  { borderTopRightRadius: 50, borderBottomRightRadius: 50 },
-  langFlag:     { fontSize: 14 },
   langLabel:    { fontSize: 12, fontWeight: '700' },
 
   langCards:      { width: '100%', gap: Spacing.two, marginTop: Spacing.two },
   langCard:       { flexDirection: 'row', alignItems: 'center', gap: Spacing.two,
                     borderRadius: 14, borderWidth: 2,
                     paddingHorizontal: Spacing.three, paddingVertical: Spacing.two + 4 },
-  langCardFlag:   { fontSize: 22 },
+  langCardCode:   { fontSize: 15, fontWeight: '700' },
   langCardLabel:  { fontSize: 16, fontWeight: '700', flex: 1 },
   langCardCheck:  { fontSize: 18, fontWeight: '700' },
 });
